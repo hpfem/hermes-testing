@@ -39,3 +39,4 @@ project(hermes_examples)
 	include_directories(${DEP_INCLUDE_PATHS})
 
   add_subdirectory(memory-leaks)
+  add_subdirectory(visualization)
