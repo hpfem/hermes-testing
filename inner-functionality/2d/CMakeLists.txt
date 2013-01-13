@@ -1,0 +1,5 @@
+add_subdirectory(adaptivity)
+add_subdirectory(integrals)
+add_subdirectory(meshes)
+add_subdirectory(spaces)
+add_subdirectory(exceptions)
