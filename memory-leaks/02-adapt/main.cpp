@@ -35,8 +35,6 @@ using namespace RefinementSelectors;
 
 // Set to "false" to suppress Hermes OpenGL visualization. 
 const bool HERMES_VISUALIZATION = false;           
-// Set to "true" to enable VTK output.
-const bool VTK_VISUALIZATION = true;             
 // Initial polynomial degree of mesh elements.
 const int P_INIT = 2;                             
 // This is a quantitative parameter of the adapt(...) function and
@@ -64,7 +62,7 @@ const CandList CAND_LIST = H2D_HP_ANISO_H;
 // their notoriously bad performance.
 const int MESH_REGULARITY = -1;                   
 // Stopping criterion for adaptivity.
-const double ERR_STOP = 2.0;                      
+const double ERR_STOP = 1.0;                      
 // This parameter influences the selection of candidates in hp-adaptivity. 
 // Default value is 1.0.
 const double CONV_EXP = 1.0;                      
@@ -109,10 +107,10 @@ int main(int argc, char* argv[])
   H1ProjBasedSelector<double> selector(CAND_LIST, CONV_EXP, H2DRS_DEFAULT_ORDER);
 
   // Initialize views.
-  Views::ScalarView sview("Solution", new Views::WinGeom(0, 0, 410, 600));
+  Views::ScalarView sview("Solution");
   sview.fix_scale_width(50);
   sview.show_mesh(false);
-  Views::OrderView  oview("Polynomial orders", new Views::WinGeom(420, 0, 400, 600));
+  Views::OrderView  oview("Polynomial orders");
 
   // DOF and CPU convergence graphs initialization.
   SimpleGraph graph_dof, graph_cpu;
@@ -161,21 +159,6 @@ int main(int argc, char* argv[])
 
     // Time measurement.
     cpu_time.tick();
-
-    // VTK output.
-    if (VTK_VISUALIZATION) 
-    {
-      // Output solution in VTK format.
-      Views::Linearizer lin;
-      char* title = new char[100];
-      sprintf(title, "sln-%d.vtk", as);
-      lin.save_solution_vtk(&sln, title, "Potential", false);
-
-      // Output mesh and element orders in VTK format.
-      Views::Orderizer ord;
-      sprintf(title, "ord-%d.vtk", as);
-      ord.save_orders_vtk(&space, title);
-    }
 
     // View the coarse mesh solution and polynomial orders.
     if (HERMES_VISUALIZATION) 
@@ -244,6 +227,7 @@ int main(int argc, char* argv[])
 if(HERMES_VISUALIZATION)
   Views::View::wait();
 
+  delete ref_sln.get_mesh();
   return 0;
 }
 
