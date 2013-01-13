@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
         H1Space<double>* space = new H1Space<double>(&mesh_lshape, &bcs, poly_order_i);
 
         space->save("space.xml");
-
+        space->set_validation(false);
         space->load("space.xml", &mesh_lshape, &bcs);
 
         dofs.push_back(space->get_num_dofs());
@@ -151,8 +151,10 @@ int main(int argc, char* argv[])
   for(unsigned int dofs_in_i = 0; dofs_in_i < dofs.size(); dofs_in_i++)
   {
     dofs_in >> dofs_test;
+    std::cout << "Tested DOFs: " << dofs_test << ", real: " << dofs[dofs_in_i] << "." << std::endl;
     if(dofs_test != dofs[dofs_in_i])
     {
+      std::cout << "Failure!" << std::endl;
       return -1;
     }
   }
@@ -164,8 +166,10 @@ int main(int argc, char* argv[])
     for(unsigned int value_i = 0; value_i < 4; value_i++)
     {
       bc_values_in >> bc_values_test;
+      std::cout << "Tested BC value: " << bc_values_test << ", real: " << bc_values[bc_values_in_i][value_i] << "." << std::endl;
       if(std::abs(bc_values[bc_values_in_i][value_i] - bc_values_test) > 1E-8)
       {
+        std::cout << "Failure!" << std::endl;
         return -1;
       }
     }
