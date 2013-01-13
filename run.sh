@@ -22,7 +22,6 @@ read ans
 if [ "$ans" = "y" ]; then
 	echo "Processing visualization tests..."
   cd visualization/views
-  cd 01-all
   make
   ./01-all
   echo "Outputs saved in visualization/views/*.bmp"
