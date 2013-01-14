@@ -79,8 +79,6 @@ wf.set_verbose_output(false);
     mloader.set_validation(false);
     mloader.load("domain.xml", mesh);
 
-		mloader.save("asdf", mesh);
-
     // Perform initial mesh refinements (optional).
     mesh->refine_in_areas(Hermes::vector<std::string>("Aluminum", "Copper"), INIT_REF_NUM);
     mesh->refine_in_area("Aluminum");
