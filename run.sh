@@ -47,17 +47,17 @@ if [ "$ans" = "y" ]; then
   echo "Building the test..."
   make
   echo "Test built, running..."
-  rm callgrind.out.*
+  rm -f callgrind.out.*
   valgrind --log-file=temp --tool=callgrind --collect-bus=yes ./01-performance-simple 3 3
   callgrind_annotate callgrind.out.* > ../01-performance-simple-CallgrindLogfile
   echo "Callgrind output '01-performance-simple-CallgrindLogfile' available in performance/"
-  rm cachegrind.out.*
+  rm -f cachegrind.out.*
   valgrind --log-file=temp --tool=cachegrind ./01-performance-simple 3 3
   cg_annotate cachegrind.out.* > ../01-performance-simple-CachegrindLogfile
   echo "Cachegrind output '01-performance-simple-CachegrindLogfile' available in performance/"
   valgrind --log-file=../01-performance-simple-DHATLogfile --tool=exp-dhat ./01-performance-simple 3 3
   echo "DHAT output '01-performance-simple-DHATLogfile' available in performance/"
-  rm massif.out.*
+  rm -f massif.out.*
   valgrind --log-file=temp --tool=massif ./01-performance-simple 3 3
   ms_print massif.out.* > ../01-performance-simple-MassifgrindLogfile
   echo "Massif output '01-performance-simple-MassifgrindLogfile' available in performance/"
@@ -67,17 +67,17 @@ if [ "$ans" = "y" ]; then
   echo "Building the test..."
   make
   echo "Test built, running..."
-  rm callgrind.out.*
+  rm -f callgrind.out.*
   valgrind --log-file=temp --tool=callgrind --collect-bus=yes ./02-performance-adapt
   callgrind_annotate callgrind.out.* > ../02-performance-adapt-CallgrindLogfile
   echo "Callgrind output '02-performance-adapt-CallgrindLogfile' available in performance/"
-  rm cachegrind.out.*
+  rm -f cachegrind.out.*
   valgrind --log-file=temp --tool=cachegrind ./02-performance-adapt
   cg_annotate cachegrind.out.* > ../02-performance-adapt-CachegrindLogfile
   echo "Cachegrind output '02-performance-adapt-CachegrindLogfile' available in performance/"
   valgrind --log-file=../02-performance-adapt-DHATLogfile --tool=exp-dhat ./02-performance-adapt
   echo "DHAT output '02-performance-adapt-DHATLogfile' available in performance/"
-  rm massif.out.*
+  rm -f massif.out.*
   valgrind --log-file=temp --tool=massif ./02-performance-adapt
   ms_print massif.out.* > ../02-performance-adapt-MassifgrindLogfile
   echo "Massif output '02-performance-adapt-MassifgrindLogfile' available in performance/"
@@ -86,20 +86,20 @@ if [ "$ans" = "y" ]; then
   echo "Building the test..."
   make
   echo "Test built, running..."
-  rm callgrind.out.*
+  rm -f callgrind.out.*
   valgrind --log-file=temp --tool=callgrind --collect-bus=yes ./03-performance-transient-adapt
   callgrind_annotate callgrind.out.* > ../03-performance-transient-adapt-CallgrindLogfile
   echo "Callgrind output '03-performance-transient-adapt-CallgrindLogfile' available in performance/"
-  rm cachegrind.out.*
+  rm -f cachegrind.out.*
   valgrind --log-file=temp --tool=cachegrind ./03-performance-transient-adapt
   cg_annotate cachegrind.out.* > ../03-performance-transient-adapt-CachegrindLogfile
   echo "Cachegrind output '03-performance-transient-adapt-CachegrindLogfile' available in performance/"
   valgrind --log-file=../03-performance-transient-adapt-DHATLogfile --tool=exp-dhat ./03-performance-transient-adapt
   echo "DHAT output '03-performance-transient-adapt-DHATLogfile' available in performance/"
-  rm massif.out.*
+  rm -f massif.out.*
   valgrind --log-file=temp --tool=massif ./03-performance-transient-adapt
   ms_print massif.out.* > ../03-performance-transient-adapt-MassifgrindLogfile
-  echo "Massif output '02-performance-adapt-MassifgrindLogfile' available in performance/"
+  echo "Massif output '03-performance-transient-adapt-MassifgrindLogfile' available in performance/"
   echo Performance leaks tests runtime - $(expr `date +%s` - $memory_start_time) s
   echo "Performance leaks tests - Done."
   cd ../..
