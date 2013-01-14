@@ -4,7 +4,7 @@ echo "CMake generation done."
 echo "Run memory-leaks tests? (Long) [y/n]"
 read ans
 if [ "$ans" = "y" ]; then
-  memory_start_time= `date +%s`
+  memory_start_time=`date +%s`
 	echo "Processing memory leaks tests..."
   cd memory-leaks
   cd 01-memory-simple
@@ -32,8 +32,7 @@ fi
 echo "Run performance tests? (Very long) [y/n]"
 read ans
 if [ "$ans" = "y" ]; then
-  perf_start_time= `date +%s`
-
+  perf_start_time=`date +%s`
 	echo "Processing performance tests..."
   echo "In the meantime:"
   echo "     Valgrind(memcheck):   http://valgrind.org/docs/manual/mc-manual.html"
