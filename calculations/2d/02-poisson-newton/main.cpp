@@ -52,18 +52,20 @@ int main(int argc, char* argv[])
   for (int p_init = 1; p_init <= 10; p_init++)
   {
     space.set_uniform_order(p_init);
+    space.assign_dofs();
     int ndof = space.get_num_dofs();
 
     // Initial coefficient vector for the Newton's method.
     double* coeff_vec = new double[ndof];
     memset(coeff_vec, 0, ndof*sizeof(double));
 
-  // Initialize the Newton solver.
-  Hermes::Hermes2D::NewtonSolver<double> newton(&wf, &space);
+    // Initialize the Newton solver.
+    Hermes::Hermes2D::NewtonSolver<double> newton(&wf, &space);
 
     // Perform Newton's iteration and translate the resulting coefficient vector into a Solution.
     Hermes::Hermes2D::Solution<double> sln;
-    try{
+    try
+    {
       newton.solve(coeff_vec);
     }
     catch(Hermes::Exceptions::Exception& e)
