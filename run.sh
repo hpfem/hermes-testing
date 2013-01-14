@@ -47,10 +47,6 @@ if [ "$ans" = "y" ]; then
   echo "Building the test..."
   make
   echo "Test built, running..."
-  rm -f callgrind.out.*
-  valgrind --log-file=temp --tool=callgrind --collect-bus=yes ./01-performance-simple 3 3
-  callgrind_annotate callgrind.out.* > ../01-performance-simple-CallgrindLogfile
-  echo "Callgrind output '01-performance-simple-CallgrindLogfile' available in performance/"
   rm -f cachegrind.out.*
   valgrind --log-file=temp --tool=cachegrind ./01-performance-simple 3 3
   cg_annotate cachegrind.out.* > ../01-performance-simple-CachegrindLogfile
@@ -67,10 +63,6 @@ if [ "$ans" = "y" ]; then
   echo "Building the test..."
   make
   echo "Test built, running..."
-  rm -f callgrind.out.*
-  valgrind --log-file=temp --tool=callgrind --collect-bus=yes ./02-performance-adapt
-  callgrind_annotate callgrind.out.* > ../02-performance-adapt-CallgrindLogfile
-  echo "Callgrind output '02-performance-adapt-CallgrindLogfile' available in performance/"
   rm -f cachegrind.out.*
   valgrind --log-file=temp --tool=cachegrind ./02-performance-adapt
   cg_annotate cachegrind.out.* > ../02-performance-adapt-CachegrindLogfile
@@ -86,10 +78,6 @@ if [ "$ans" = "y" ]; then
   echo "Building the test..."
   make
   echo "Test built, running..."
-  rm -f callgrind.out.*
-  valgrind --log-file=temp --tool=callgrind --collect-bus=yes ./03-performance-transient-adapt
-  callgrind_annotate callgrind.out.* > ../03-performance-transient-adapt-CallgrindLogfile
-  echo "Callgrind output '03-performance-transient-adapt-CallgrindLogfile' available in performance/"
   rm -f cachegrind.out.*
   valgrind --log-file=temp --tool=cachegrind ./03-performance-transient-adapt
   cg_annotate cachegrind.out.* > ../03-performance-transient-adapt-CachegrindLogfile
