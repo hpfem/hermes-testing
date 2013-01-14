@@ -41,8 +41,7 @@ include_directories(${DEP_INCLUDE_PATHS})
 enable_testing()
 
 add_subdirectory(memory-leaks)
+add_subdirectory(performance)
 add_subdirectory(visualization)
 add_subdirectory(inner-functionality)
 add_subdirectory(calculations)
-
-
