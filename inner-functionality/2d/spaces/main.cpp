@@ -97,7 +97,7 @@ int main(int argc, char* argv[])
         }
         surf_pos.lo = surf_pos.hi = 0;
 
-        bc_values.push_back(space->get_bc_projection(&surf_pos, 3));
+        bc_values.push_back(space->get_bc_projection(&surf_pos, 3, &(bc_essential[bc_i])));
       }
 
       // L2Spaces from order 0.
