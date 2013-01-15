@@ -126,7 +126,6 @@ int main(int argc, char* argv[])
   int as = 1; bool done = false;
   do
   {
-    
     // Time measurement.
     cpu_time.tick();
 
@@ -139,7 +138,6 @@ int main(int argc, char* argv[])
 
     newton.set_space(ref_space);
 
-
     // Perform Newton's iteration.
     try
     {
@@ -148,7 +146,6 @@ int main(int argc, char* argv[])
     catch(std::exception& e)
     {
       std::cout << e.what();
-      
     }
 
     // Translate the resulting coefficient vector into the instance of Solution.
