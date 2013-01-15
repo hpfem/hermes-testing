@@ -1,7 +1,7 @@
 cmake .
 echo "This test suite will fail if you do not have Hermes, or Valgrind, etc.."
 echo "CMake generation done."
-echo "Run memory-leaks tests? (Long) [y/n]"
+echo "Run memory-leaks tests? [FOR DEVELOPERS ONLY] (Long) [y/n]"
 read ans
 if [ "$ans" = "y" ]; then
   memory_start_time=`date +%s`
@@ -29,7 +29,7 @@ if [ "$ans" = "y" ]; then
   echo "Memory leaks tests - Done."
   cd ../..
 fi
-echo "Run performance tests? (Very long) [y/n]"
+echo "Run performance tests? [FOR DEVELOPERS ONLY] (Very long) [y/n]"
 read ans
 if [ "$ans" = "y" ]; then
   perf_start_time=`date +%s`
@@ -87,8 +87,8 @@ if [ "$ans" = "y" ]; then
   valgrind --log-file=temp --tool=massif ./03-performance-transient-adapt
   ms_print massif.out.* > ../03-performance-transient-adapt-MassifgrindLogfile
   echo "Massif output '03-performance-transient-adapt-MassifgrindLogfile' available in performance/"
-  echo Performance leaks tests runtime - $(expr `date +%s` - $memory_start_time) s
-  echo "Performance leaks tests - Done."
+  echo Performance tests runtime - $(expr `date +%s` - $memory_start_time) s
+  echo "Performance tests - Done."
   cd ../..
 fi
 echo "Run visualization tests? (Short) [y/n]"
@@ -102,7 +102,7 @@ if [ "$ans" = "y" ]; then
   echo "Visualization tests - Done."
   cd ../../..
 fi
-echo "Run inner-funcionality tests? (Very short) [y/n]"
+echo "Run inner-functionality tests? (Very short) [y/n]"
 read ans
 if [ "$ans" = "y" ]; then
 	echo "Processing internal tests..."
