@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
   printf("coefficient sum = %f\n", sum);
 
   bool success = true;
-  if(std::abs(sum + 2761.840589) > 1e-4) success = false;
+  if(std::abs(sum + 2740.325815) > 1e-4) success = false;
 
   if(success == true)
   {
