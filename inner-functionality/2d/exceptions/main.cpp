@@ -14,12 +14,14 @@ int main(int argc, char* argv[])
   try
   {
     sln.get_ref_value(NULL,0,0,0,0);
+    std::cout << "Failure - get_ref_value!";
     return -1;
   }
   catch(Exceptions::NullException&e)
   {
     if(e.get_param_idx()!=1)
     {
+      std::cout << "Failure - get_ref_value!";
       return -1;
     }
   }
@@ -28,16 +30,17 @@ int main(int argc, char* argv[])
   double solution_vector[3];
   Hermes::vector<const Hermes2D::Space<double>*> spaces(NULL,NULL,NULL,NULL);
   Hermes::vector<Hermes2D::Solution<double>*> solutions(NULL,NULL,NULL);
-
   try
   {
     sln.vector_to_solutions(solution_vector,spaces,solutions);
+    std::cout << "Failure - vector_to_solutions!";
     return -1;
   }
   catch(Exceptions::LengthException& e)
   {
     if(e.get_first_param_idx()!=2 || e.get_second_param_idx()!=3 || e.get_first_length()!=4 || e.get_expected_length()!=3)
     {
+      std::cout << "Failure - vector_to_solutions!";
       return -1;
     }
   }
@@ -55,6 +58,7 @@ int main(int argc, char* argv[])
   try
   {
     linsolv.solve();
+    std::cout << "Failure - algebra!";
     return -1;
   }
   catch(Exceptions::LinearMatrixSolverException& e)
@@ -73,6 +77,7 @@ int main(int argc, char* argv[])
   try
   {
     Hermes2D::Adapt<double> adapr(spaces2,proj_norms);
+    std::cout << "Failure - adapt!";
     return -1;
   }
   catch(Exceptions::ValueException & e)
@@ -84,6 +89,7 @@ int main(int argc, char* argv[])
     Hermes::Hermes2D::Mesh mesh;
     Hermes::Hermes2D::MeshReaderH2DXML reader;
     reader.load("domain.xml", &mesh);
+    std::cout << "Failure - mesh!";
     return -1;
   }
   catch(Exceptions::MeshLoadFailureException& e)
@@ -95,6 +101,8 @@ int main(int argc, char* argv[])
   {
     Hermes::Hermes2D::Mesh mesh;
     H1Space<double> space(&mesh);
+    space.get_num_dofs();
+    std::cout << "Failure - space!";
     return -1;
   }
   catch(Hermes::Exceptions::Exception& e)
@@ -115,6 +123,7 @@ int main(int argc, char* argv[])
     LinearSolver<double> ls;
     ls.set_space(&space);
     ls.solve();
+    std::cout << "Failure - solver!";
     return -1;
   }
   catch(Hermes::Exceptions::Exception& e)
@@ -122,5 +131,6 @@ int main(int argc, char* argv[])
     e.print_msg();
   }
 
+  std::cout << "Success!";
   return 0;
 }
