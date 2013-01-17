@@ -23,7 +23,9 @@ endif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 
 # Enabling multiprocessor build on MSVC
 if(MSVC)
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP") 
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+else(MSVC)
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 endif(MSVC)
 
 include_directories("${PTHREAD_ROOT}/include")
