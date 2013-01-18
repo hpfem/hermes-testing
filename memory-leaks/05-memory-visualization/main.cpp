@@ -85,26 +85,33 @@ int main(int argc, char* argv[])
 
     std::cout << "Linearizer #1" << std::endl;
     lin->process_solution(ref_mag);
+    lin->free();
     std::cout << "Linearizer #2" << std::endl;
     lin->process_solution(abs_ref_mag);
+    lin->free();
     std::cout << "Linearizer #3" << std::endl;
     lin->process_solution(top_abs_ref_mag);
+    lin->free();
 
     std::cout << "Orderizer #1" << std::endl;
     ord->process_space(&space);
+    ord->free();
     Mesh::ReferenceMeshCreator ref_mesh_creator(&mesh);
 		Mesh* ref_mesh = ref_mesh_creator.create_ref_mesh();
 		Space<std::complex<double> >::ReferenceSpaceCreator ref_space_creator(&space, ref_mesh);
 		Space<std::complex<double> >* ref_space = ref_space_creator.create_ref_space();
     std::cout << "Orderizer #2" << std::endl;
     ord->process_space(ref_space);
+    ord->free();
     delete ref_space;
     delete ref_mesh;
 
     std::cout << "Vectorizer #1" << std::endl;
     vec->process_solution(ref_mag, abs_ref_mag, H2D_FN_VAL_0, H2D_FN_VAL_0);
+    vec->free();
     std::cout << "Vectorizer #2" << std::endl;
     vec->process_solution(top_abs_ref_mag, abs_ref_mag, H2D_FN_VAL_0, H2D_FN_VAL_0);
+    vec->free();
   
     delete top_abs_ref_mag;
     delete abs_ref_mag;
@@ -116,7 +123,5 @@ int main(int argc, char* argv[])
   delete ord;
   delete vec;
 
-  // Wait for all views to be closed.
-  View::wait();
   return 0;
 }
