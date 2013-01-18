@@ -1,230 +1,121 @@
 #define HERMES_REPORT_ALL
+#define HERMES_REPORT_FILE "application.log"
 #include "definitions.h"
 
-using namespace RefinementSelectors;
-
-// This example shows how to run adaptive hp-FEM, h-FEM and p-FEM with
-// basic control parameters. The underlying problem is a planar model
-// of an electrostatic micromotor (MEMS). You may want to experiment with
-// various types of adaptivity via the options H2D_P_ISO, H2D_P_ANISO,
-// H2D_H_ISO, H2D_H_ANISO, H2D_HP_ISO, H2D_HP_ANISO_H, H2D_HP_ANISO_P,
-// and H2D_HP_ANISO. See the User Documentation for more details.
+// This example solves a time-domain resonator problem for the Maxwell's equation. 
+// It is very similar to resonator-time-domain-I but B is eliminated from the 
+// equations, thus converting the first-order system into one second -order
+// equation in time. The second-order equation in time is decomposed back into 
+// a first-order system in time in the standard way (see example wave-1). Time 
+// discretization is performed using the implicit Euler method.
 //
-// Uniform initial polynomial degree of mesh elements can be set using
-// the variable P_INIT. Before using adaptivity, you have to define a refinement
-// selector as shown below. The function adapt() takes the selector
-// as a parameter, along with THRESHOLD, STRATEGY, and MESH_REGULARITY.
-//   
-// Additional control parameters are available, these will be demonstrated
-// in the following tutorial examples. In this example, two types of convergence
-// graphs are created -- error estimate wrt. the number of degrees of freedom
-// (DOF), and error estimate wrt. CPU time. Later we will show how to output
-// the error wrt. exact solution when exact solution is available.
-//   
-// This example also demonstrates how to define different material parameters
-// in various parts of the computational domain, and how to measure time.
+// PDE: \frac{1}{SPEED_OF_LIGHT**2}\frac{\partial^2 E}{\partial t^2} + curl curl E = 0,
+// converted into
 //
-// PDE: -div[eps_r(x,y) grad phi] = 0
-//      eps_r = EPS_1 in Omega_1 (surrounding air)
-//      eps_r = EPS_2 in Omega_2 (moving part of the motor)
+//      \frac{\partial E}{\partial t} - F = 0,
+//      \frac{\partial F}{\partial t} + SPEED_OF_LIGHT**2 * curl curl E = 0.
 //
-// BC: phi = 0 V on Gamma_1 (left edge and also the rest of the outer boundary
-//     phi = VOLTAGE on Gamma_2 (boundary of stator)
+// Approximated by
+// 
+//      \frac{E^{n+1} - E^{n}}{tau} - F^{n+1} = 0,
+//      \frac{F^{n+1} - F^{n}}{tau} + SPEED_OF_LIGHT**2 * curl curl E^{n+1} = 0.
+//
+// Domain: Square (-pi/2, pi/2) x (-pi/2, pi/2)... See mesh file domain.mesh.
+//
+// BC:  E \times \nu = 0 on the boundary (perfect conductor),
+//      F \times \nu = 0 on the boundary (E \times \nu = 0 => \partial E / \partial t \times \nu = 0).
+//
+// IC:  Prescribed wave for E, zero for F.
 //
 // The following parameters can be changed:
 
-// Set to "false" to suppress Hermes OpenGL visualization. 
-const bool HERMES_VISUALIZATION = false;           
 // Initial polynomial degree of mesh elements.
-const int P_INIT = 2;                             
-// This is a quantitative parameter of the adapt(...) function and
-// it has different meanings for various adaptive strategies.
-const double THRESHOLD = 0.8;                     
-// Adaptive strategy:
-// STRATEGY = 0 ... refine elements until sqrt(THRESHOLD) times total
-//   error is processed. If more elements have similar errors, refine
-//   all to keep the mesh symmetric.
-// STRATEGY = 1 ... refine all elements whose error is larger
-//   than THRESHOLD times maximum element error.
-// STRATEGY = 2 ... refine all elements whose error is larger
-//   than THRESHOLD.
-// More adaptive strategies can be created in adapt_ortho_h1.cpp.
-const int STRATEGY = 0;                           
-// Predefined list of element refinement candidates. Possible values are
-// H2D_P_ISO, H2D_P_ANISO, H2D_H_ISO, H2D_H_ANISO, H2D_HP_ISO, H2D_HP_ANISO_H
-// H2D_HP_ANISO_P, H2D_HP_ANISO.
-const CandList CAND_LIST = H2D_HP_ANISO_H;        
-// Maximum allowed level of hanging nodes:
-// MESH_REGULARITY = -1 ... arbitrary level hangning nodes (default),
-// MESH_REGULARITY = 1 ... at most one-level hanging nodes,
-// MESH_REGULARITY = 2 ... at most two-level hanging nodes, etc.
-// Note that regular meshes are not supported, this is due to
-// their notoriously bad performance.
-const int MESH_REGULARITY = -1;                   
-// Stopping criterion for adaptivity.
-const double ERR_STOP = 1.0;                      
-// This parameter influences the selection of candidates in hp-adaptivity. 
-// Default value is 1.0.
-const double CONV_EXP = 1.0;                      
-// Adaptivity process stops when the number of degrees of freedom grows
-// over this limit. This is to prevent h-adaptivity to go on forever.
-const int NDOF_STOP = 60000;                      
+const int P_INIT = 3;                              
+// Number of initial uniform mesh refinements.
+const int INIT_REF_NUM = 3;
+// Time step.
+const double time_step = 0.05;                     
+// Final time.
+const double T_FINAL = 0.3;                       
+// Stopping criterion for the Newton's method.
+const double NEWTON_TOL = 1e-8;                   
+// Maximum allowed number of Newton iterations.
+const int NEWTON_MAX_ITER = 100;                  
 // Matrix solver: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
 // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
-MatrixSolverType matrix_solver = SOLVER_UMFPACK; 
-                                                  
+MatrixSolverType matrix_solver = SOLVER_UMFPACK;   
+
 // Problem parameters.
-const double EPS0 = 8.863e-12;
-const double VOLTAGE = 50.0;
-const double EPS_MOTOR = 10.0 * EPS0;
-const double EPS_AIR = 1.0 * EPS0;
+// Square of wave speed.  
+const double C_SQUARED = 1;                                         
 
 int main(int argc, char* argv[])
 {
-	Hermes2DApi.set_integral_param_value(numThreads, 1);
-
   // Load the mesh.
   Mesh mesh;
   MeshReaderH2D mloader;
   mloader.load("domain.mesh", &mesh);
 
+  // Perform initial mesh refinemets.
+  for (int i = 0; i < INIT_REF_NUM; i++) mesh.refine_all_elements();
+
+  // Initialize solutions.
+  CustomInitialConditionWave E_sln(&mesh);
+  ZeroSolutionVector<double> F_sln(&mesh);
+  Hermes::vector<Solution<double>*> slns(&E_sln, &F_sln);
+
   // Initialize the weak formulation.
-  CustomWeakFormPoisson wf("Motor", EPS_MOTOR, "Air", EPS_AIR);
-  wf.set_verbose_output(false);
+  CustomWeakFormWaveIE wf(time_step, C_SQUARED, &E_sln, &F_sln);
   
   // Initialize boundary conditions
-  DefaultEssentialBCConst<double> bc_essential_out("Outer", 0.0);
-  DefaultEssentialBCConst<double> bc_essential_stator("Stator", VOLTAGE);
-  EssentialBCs<double> bcs(Hermes::vector<EssentialBoundaryCondition<double> *>(&bc_essential_out, &bc_essential_stator));
+  DefaultEssentialBCConst<double> bc_essential("Perfect conductor", 0.0);
+  EssentialBCs<double> bcs(&bc_essential);
 
-  // Create an H1 space with default shapeset.
-  H1Space<double> space(&mesh, &bcs, P_INIT);
+  // Create x- and y- displacement space using the default H1 shapeset.
+  HcurlSpace<double> E_space(&mesh, &bcs, P_INIT);
+  HcurlSpace<double> F_space(&mesh, &bcs, P_INIT);
+  Hermes::vector<const Space<double> *> spaces = Hermes::vector<const Space<double> *>(&E_space, &F_space);
+  int ndof = HcurlSpace<double>::get_num_dofs(spaces);
+  Hermes::Mixins::Loggable::Static::info("ndof = %d.", ndof);
 
-  // Initialize coarse and fine mesh solution.
-  Solution<double> sln, ref_sln;
+  // Initialize the FE problem.
+  DiscreteProblem<double>* dp = new DiscreteProblem<double>(&wf, spaces);
 
-  // Initialize refinement selector.
-  H1ProjBasedSelector<double> selector(CAND_LIST, CONV_EXP, H2DRS_DEFAULT_ORDER);
+  // Project the initial condition on the FE space to obtain initial 
+  // coefficient vector for the Newton's method.
+  // NOTE: If you want to start from the zero vector, just define 
+  // coeff_vec to be a vector of ndof zeros (no projection is needed).
+  double* coeff_vec = new double[ndof];
+  OGProjection<double> ogProjection; ogProjection.project_global(spaces, slns, coeff_vec); 
 
-  // Initialize views.
-  Views::ScalarView sview("Solution");
-  sview.fix_scale_width(50);
-  sview.show_mesh(false);
-  Views::OrderView  oview("Polynomial orders");
+  // Initialize Newton solver.
+  NewtonSolver<double> newton(dp);
 
-  // DOF and CPU convergence graphs initialization.
-  SimpleGraph graph_dof, graph_cpu;
-
-  // Time measurement.
-  Hermes::Mixins::TimeMeasurable cpu_time;
-
-  DiscreteProblem<double> dp(&wf, &space);
-  NewtonSolver<double> newton(&dp);
-  newton.set_verbose_output(false);
-
-  // Adaptivity loop:
-  int as = 1; bool done = false;
+  // Time stepping loop.
+  double current_time = 0; int ts = 1;
   do
   {
-    // Time measurement.
-    cpu_time.tick();
-
-    // Construct globally refined mesh and setup fine mesh space.
-    Mesh::ReferenceMeshCreator ref_mesh_creator(&mesh);
-    Mesh* ref_mesh = ref_mesh_creator.create_ref_mesh();
-    Space<double>::ReferenceSpaceCreator ref_space_creator(&space, ref_mesh);
-    Space<double>* ref_space = ref_space_creator.create_ref_space();
-    int ndof_ref = ref_space->get_num_dofs();
-
-    newton.set_space(ref_space);
-
     // Perform Newton's iteration.
     try
     {
-      newton.solve();
+      newton.set_newton_max_iter(NEWTON_MAX_ITER);
+      newton.set_newton_tol(NEWTON_TOL);
+      newton.solve_keep_jacobian(coeff_vec);
     }
-    catch(std::exception& e)
+    catch(Hermes::Exceptions::Exception e)
     {
-      std::cout << e.what();
+      e.print_msg();
     }
 
-    // Translate the resulting coefficient vector into the instance of Solution.
-    Solution<double>::vector_to_solution(newton.get_sln_vector(), ref_space, &ref_sln);
-    
-    // Project the fine mesh solution onto the coarse mesh.
-    OGProjection<double> ogProjection; ogProjection.project_global(&space, &ref_sln, &sln);
+    // Translate the resulting coefficient vector into Solutions.
+    Solution<double>::vector_to_solutions(newton.get_sln_vector(), spaces, slns);
 
-    // Time measurement.
-    cpu_time.tick();
+    // Update time.
+    current_time += time_step;
 
-    // View the coarse mesh solution and polynomial orders.
-    if (HERMES_VISUALIZATION) 
-    {
-      sview.show(&sln);
-      oview.show(&space);
-    }
+  } while (current_time < T_FINAL);
 
-    // Skip visualization time.
-    cpu_time.tick();
+  delete dp;
 
-    // Calculate element errors and total error estimate.
-    Adapt<double> adaptivity(&space);
-    bool solutions_for_adapt = true;
-    // In the following function, the Boolean parameter "solutions_for_adapt" determines whether
-    // the calculated errors are intended for use with adaptivity (this may not be the case, for example,
-    // when error wrt. an exact solution is calculated). The default value is solutions_for_adapt = true,
-    // The last parameter "error_flags" determine whether the total and element errors are treated as
-    // absolute or relative. Its default value is error_flags = HERMES_TOTAL_ERROR_REL | HERMES_ELEMENT_ERROR_REL.
-    // In subsequent examples and benchmarks, these two parameters will be often used with
-    // their default values, and thus they will not be present in the code explicitly.
-    double err_est_rel = adaptivity.calc_err_est(&sln, &ref_sln, solutions_for_adapt,
-                         HERMES_TOTAL_ERROR_REL | HERMES_ELEMENT_ERROR_REL) * 100;
-
-    // Add entry to DOF and CPU convergence graphs.
-    cpu_time.tick();    
-    graph_cpu.add_values(cpu_time.accumulated(), err_est_rel);
-    graph_cpu.save("conv_cpu_est.dat");
-    graph_dof.add_values(space.get_num_dofs(), err_est_rel);
-    graph_dof.save("conv_dof_est.dat");
-    
-    // Skip the time spent to save the convergence graphs.
-    cpu_time.tick();
-
-    // If err_est too large, adapt the mesh.
-    if (err_est_rel < ERR_STOP) 
-      done = true;
-    else
-    {
-      done = adaptivity.adapt(&selector, THRESHOLD, STRATEGY, MESH_REGULARITY);
-
-      // Increase the counter of performed adaptivity steps.
-      if (done == false)  
-        as++;
-    }
-    if (space.get_num_dofs() >= NDOF_STOP) 
-      done = true;
-
-    // Keep the mesh from final step to allow further work with the final fine mesh solution.
-    if(done == false) 
-      delete ref_space->get_mesh(); 
-    delete ref_space;
-  }
-  while (done == false);
-
-
-  // Show the fine mesh solution - final result.
-	if(HERMES_VISUALIZATION)
-	{
-		sview.set_title("Fine mesh solution");
-		sview.show_mesh(false);
-		sview.show(&ref_sln);
-  }
-
-  // Wait for all views to be closed.
-if(HERMES_VISUALIZATION)
-  Views::View::wait();
-
-  delete ref_sln.get_mesh();
   return 0;
 }
-
