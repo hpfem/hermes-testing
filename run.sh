@@ -19,12 +19,20 @@ if [ "$ans" = "y" ]; then
   echo "Test built, running..."
   valgrind --leak-check=full --log-file=../02-memory-adapt-ValgrindLogfile ./02-memory-adapt
   echo "Valgrind output '02-memory-adapt-ValgrindLogfile' available in memory-leaks/"
-  cd ../03-memory-transient-adapt
+  cd ../04-memory-transient-adapt
   echo "Building the test..."
   make
   echo "Test built, running..."
-  valgrind --leak-check=full --log-file=../03-memory-transient-adapt-ValgrindLogfile ./03-memory-transient-adapt
-  echo "Valgrind output '03-memory-transient-adapt-ValgrindLogfile' available in memory-leaks/"
+  valgrind --leak-check=full --log-file=../04-memory-transient-adapt-ValgrindLogfile ./04-memory-transient-adapt
+  echo "Valgrind output '04-memory-transient-adapt-ValgrindLogfile' available in memory-leaks/"
+  echo Memory leaks tests runtime - $(expr `date +%s` - $memory_start_time) s
+  echo "Memory leaks tests - Done."
+  cd ../05-memory-visualization
+  echo "Building the test..."
+  make
+  echo "Test built, running..."
+  valgrind --leak-check=full --log-file=../05-memory-visualization-ValgrindLogfile ./05-memory-visualization
+  echo "Valgrind output '05-memory-visualization-ValgrindLogfile' available in memory-leaks/"
   echo Memory leaks tests runtime - $(expr `date +%s` - $memory_start_time) s
   echo "Memory leaks tests - Done."
   cd ../..
