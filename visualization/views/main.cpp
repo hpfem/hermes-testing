@@ -78,6 +78,8 @@ int main(int argc, char* argv[])
     space.set_element_order(e->id, i++ % 9 + 1);
   }
 
+  space.assign_dofs();
+
   // Initialize the solution.
   Hermes::Hermes2D::Solution<double> sln;
 
