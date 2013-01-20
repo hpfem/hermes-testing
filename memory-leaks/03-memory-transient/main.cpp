@@ -115,6 +115,8 @@ int main(int argc, char* argv[])
 
   } while (current_time < T_FINAL);
 
+  delete [] coeff_vec;
+
   delete dp;
 
   return 0;
