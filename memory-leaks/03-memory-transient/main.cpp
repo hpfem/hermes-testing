@@ -119,5 +119,6 @@ int main(int argc, char* argv[])
 
   delete dp;
 
+  std::cout << "OK";
   return 0;
 }

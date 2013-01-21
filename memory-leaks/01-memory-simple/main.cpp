@@ -101,12 +101,14 @@ wf.set_verbose_output(false);
     new_space->set_element_order(e->id, i++ % 4 + 1);
   }
 
+  new_space->assign_dofs();
+
   // Initialize the solution.
   Hermes::Hermes2D::Solution<double>* sln = new Hermes::Hermes2D::Solution<double>();
 
   // Initialize linear solver.
   Hermes::Hermes2D::LinearSolver<double> linear_solver(&wf, new_space);
-linear_solver.set_verbose_output(false);
+  linear_solver.set_verbose_output(false);
 
   // Solve the linear problem.
   try
@@ -134,5 +136,6 @@ linear_solver.set_verbose_output(false);
   delete new_space;
   delete new_mesh;
 
+  std::cout << "OK";
   return 0;
 }

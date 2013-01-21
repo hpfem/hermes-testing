@@ -225,6 +225,7 @@ if(HERMES_VISUALIZATION)
   Views::View::wait();
 
   delete ref_sln.get_mesh();
+  std::cout << "OK";
   return 0;
 }
 
