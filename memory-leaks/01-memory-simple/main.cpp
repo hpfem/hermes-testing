@@ -70,10 +70,6 @@ wf.set_verbose_output(false);
 
   // This is in a block to test that the instances mesh and space can be deleted after being copied with no harm.
   {
-    // Set the number of threads used in Hermes.
-    Hermes::HermesCommonApi.set_integral_param_value(Hermes::exceptionsPrintCallstack, 0);
-    Hermes::Hermes2D::Hermes2DApi.set_integral_param_value(Hermes::Hermes2D::numThreads, 8);
-
     // Load the mesh.
     Hermes::Hermes2D::MeshReaderH2DXML mloader;
     mloader.set_validation(false);

@@ -17,8 +17,6 @@ Hermes::MatrixSolverType matrix_solver_type = Hermes::SOLVER_UMFPACK;
 
 int main(int argc, char* argv[])
 {
-  Hermes2DApi.set_integral_param_value(numThreads, 1);
-
   // Load the mesh.
   Mesh meshVertical, meshHorizontal;
   Hermes::vector<Mesh*> meshes (&meshVertical, &meshHorizontal);

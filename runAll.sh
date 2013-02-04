@@ -102,6 +102,21 @@ echo Performance tests runtime - $(expr `date +%s` - $memory_start_time) s
 echo "Performance tests - Done."
 cd ../..
 
+echo "Processing load-save tests..."
+cd load-save/mesh
+make
+./01-loadSave-mesh > ../mesh.out
+echo "Mesh load&save outputs saved in load-save/mesh.out"
+cd ../space
+make
+./01-loadSave-space > ../space.out
+echo "Space load&save outputs saved in load-save/space.out"
+cd ../solution
+make
+./01-loadSave-solution > ../solution.out
+echo "Solution load&save outputs saved in load-save/solution.out"
+echo "Load-save tests - Done."
+
 echo "Processing internal tests..."
 cd inner-functionality
 make -j4

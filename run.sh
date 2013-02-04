@@ -131,16 +131,16 @@ if [ "$ans" = "y" ]; then
 	echo "Processing load-save tests..."
   cd load-save/mesh
   make
-  ./01-loadSave-mesh
-  echo "Mesh load&save outputs saved in load-save"
+  ./01-loadSave-mesh > ../mesh.out
+  echo "Mesh load&save outputs saved in load-save/mesh.out"
   cd ../space
   make
-  ./01-loadSave-space
-  echo "Space load&save outputs saved in load-save"
+  ./01-loadSave-space > ../space.out
+  echo "Space load&save outputs saved in load-save/space.out"
   cd ../solution
   make
-  ./01-loadSave-solution
-  echo "Solution load&save outputs saved in load-save"
+  ./01-loadSave-solution > ../solution.out
+  echo "Solution load&save outputs saved in load-save/solution.out"
   echo "Load-save tests - Done."
   cd ../../..
 fi

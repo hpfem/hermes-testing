@@ -114,7 +114,7 @@ int main(int argc, char* argv[])
     vec->free();
   
     delete top_abs_ref_mag;
-    delete abs_ref_mag;
+		delete abs_ref_mag;
     delete ref_mag;
     delete sln;
   }
