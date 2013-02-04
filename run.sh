@@ -3,7 +3,7 @@ echo "This test suite will fail if you do not have Hermes, or Valgrind, etc.."
 echo "CMake generation done."
 echo "Run memory-leaks tests? (y-yes:basic, f-yes:full, anything else:no) [FOR DEVELOPERS ONLY] (Long)"
 read ans
-if [ "$ans" = "y" || "$ans" = "f"]; then
+if [ "$ans" = "y" ] || [ "$ans" = "f" ]; then
   memory_start_time=`date +%s`
 	echo "Processing memory leaks tests..."
   cd memory-leaks
@@ -47,7 +47,7 @@ if [ "$ans" = "y" || "$ans" = "f"]; then
 fi
 echo "Run performance tests? (y-yes:basic, f-yes:full, anything else:no) [FOR DEVELOPERS ONLY] (Long)"
 read ans
-if [ "$ans" = "y" || "$ans" = "f"]; then
+if [ "$ans" = "y" ] || [ "$ans" = "f" ]; then
   perf_start_time=`date +%s`
 	echo "Processing performance tests..."
   echo "In the meantime:"
