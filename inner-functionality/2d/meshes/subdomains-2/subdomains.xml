@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<domain:domain xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:domain="XMLSubdomains"
+  xsi:schemaLocation="XMLSubdomains ../../../xml_schemas/subdomains_h2d_xml.xsd">
+  <variables>
+    <var name="a" value="1.0" />
+    <var name="two_a" value="2.0" />
+  </variables>
+
+  <vertices>
+    <v x="0" y="0" i="0"/>
+    <v x="a" y="0" i="1" />
+    <v x="two_a" y="0" i="2" />
+    <v x="two_a" y="a" i="3" />
+    <v x="two_a" y="two_a" i="4" />
+    <v x="a" y="two_a" i="5" />
+    <v x="0" y="two_a" i="6" />
+    <v x="0" y="a" i="7" />
+    <v x="a" y="a" i="8" />
+  </vertices>
+
+  <elements>
+    <domain:q v1="0" v2="1" v3="8" v4="7" m="Bottom Left" i="0"/>
+    <domain:q v1="1" v2="2" v3="3" v4="8" m="Bottom Right" i="1" />
+    <domain:q v1="8" v2="3" v3="4" v4="5" m="Top Right" i="2" />
+    <domain:q v1="7" v2="8" v3="5" v4="6" m="Top Left" i="3" />
+  </elements>
+
+  <edges>
+    <ed v1="0" v2="1" m="Bottom Left" i="0"/>
+    <ed v1="1" v2="2" m="Bottom Right" i="1"/>
+    
+    <ed v1="2" v2="3" m="Bottom Right" i="2" />
+    <ed v1="3" v2="4" m="Top Right" i="3" />
+    
+    <ed v1="4" v2="5" m="Top Right" i="4" />
+    <ed v1="5" v2="6" m="Top Left" i="5" />
+    
+    <ed v1="6" v2="7" m="Top Left" i="6" />
+    <ed v1="7" v2="0" m="Bottom Left" i="7" />
+    
+    <ed v1="1" v2="8" m="Vertical Bottom" i="8" />
+    <ed v1="8" v2="1" m="Vertical Bottom" i="9" />
+    <ed v1="8" v2="5" m="Vertical Top" i="10" />
+    <ed v1="5" v2="8" m="Vertical Top" i="11" />
+    
+    <ed v1="7" v2="8" m="Horizontal Left" i="12" />
+    <ed v1="8" v2="7" m="Horizontal Left" i="13" />
+    <ed v1="8" v2="3" m="Horizontal Right" i="14" />
+    <ed v1="3" v2="8" m="Horizontal Right" i="15" />
+  </edges>
+  
+  <subdomains>
+    <subdomain name="Vertical" >
+      <elements>
+        <i>0</i>
+        <i>3</i>
+      </elements>
+      <boundary_edges>
+        <i>0</i>
+        <i>8</i>
+        <i>10</i>
+        <i>6</i>
+        <i>5</i>
+        <i>7</i>
+      </boundary_edges>
+    </subdomain>
+    <subdomain name="Horizontal">
+      <elements>
+        <i>2</i>
+        <i>3</i>
+      </elements>
+      <boundary_edges>
+        <i>14</i>
+        <i>3</i>
+        <i>4</i>
+        <i>5</i>
+        <i>6</i>
+        <i>12</i>
+      </boundary_edges>
+    </subdomain>
+  </subdomains>
+</domain:domain>

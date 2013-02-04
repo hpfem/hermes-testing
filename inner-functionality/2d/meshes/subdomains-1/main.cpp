@@ -31,8 +31,6 @@ int main(int argc, char* argv[])
   mloader.save("subdomains2.xml", meshes);
   mloader.load("subdomains2.xml", meshes);
 
-
-
   // Initialize essential boundary conditions.
   DefaultEssentialBCConst<double> bc_essential_whole_domain(Hermes::vector<std::string>("Bottom Left", "Bottom Right", "Top Left", "Top Right"), 0.0);
   EssentialBCs<double> bcs_whole_domain(&bc_essential_whole_domain);
