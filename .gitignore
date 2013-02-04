@@ -24,7 +24,6 @@ tutorial.*
 *.png
 *.bmp
 *.user
-*make*
 *.bak
 
 # top-level files
