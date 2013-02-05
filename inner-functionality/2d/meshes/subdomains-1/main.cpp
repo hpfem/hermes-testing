@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
 {
   // Load the mesh.
   Mesh mesh_whole_domain, mesh_bottom_left_corner, mesh_complement;
-  Hermes::vector<Mesh*> meshes (&mesh_whole_domain, &mesh_bottom_left_corner, &mesh_complement);
+  Hermes::vector<Mesh*> meshes (&mesh_bottom_left_corner, &mesh_whole_domain, &mesh_complement);
   MeshReaderH2DXML mloader;
   mloader.set_validation(false);
   mloader.load("subdomains.xml", meshes);

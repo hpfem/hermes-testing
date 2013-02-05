@@ -51,7 +51,6 @@
   </edges>
   
   <subdomains>
-    <subdomain name="Whole domain" />
     <subdomain name="Bottom Left Corner" >
       <vertices>
         <i>0</i>
@@ -69,6 +68,7 @@
         <i>7</i>
       </boundary_edges>
     </subdomain>
+    <subdomain name="Whole domain" />
     <subdomain name="complement of Bottom Left Corner">
       <vertices>
         <i>1</i>
