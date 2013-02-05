@@ -66,7 +66,8 @@ int main(int argc, char* argv[])
 
   // Initialize the weak formulation.
   CustomWeakFormWaveIE wf(time_step, C_SQUARED, &E_sln, &F_sln);
-  
+  wf.set_verbose_output(false);
+
   // Initialize boundary conditions
   DefaultEssentialBCConst<double> bc_essential("Perfect conductor", 0.0);
   EssentialBCs<double> bcs(&bc_essential);
@@ -76,7 +77,6 @@ int main(int argc, char* argv[])
   HcurlSpace<double> F_space(&mesh, &bcs, P_INIT);
   Hermes::vector<const Space<double> *> spaces = Hermes::vector<const Space<double> *>(&E_space, &F_space);
   int ndof = HcurlSpace<double>::get_num_dofs(spaces);
-  Hermes::Mixins::Loggable::Static::info("ndof = %d.", ndof);
 
   // Initialize the FE problem.
   DiscreteProblem<double>* dp = new DiscreteProblem<double>(&wf, spaces);
@@ -98,6 +98,7 @@ int main(int argc, char* argv[])
     // Perform Newton's iteration.
     try
     {
+      newton.set_verbose_output(false);
       newton.set_newton_max_iter(NEWTON_MAX_ITER);
       newton.set_newton_tol(NEWTON_TOL);
       newton.solve_keep_jacobian(coeff_vec);

@@ -134,6 +134,7 @@ int main(int argc, char* argv[])
   CustomNonlinearity lambda(alpha);
   Hermes2DFunction<double> f(heat_src);
   WeakFormsH1::DefaultWeakFormPoisson<double> wf(HERMES_ANY, &lambda, &f);
+  wf.set_verbose_output(false);
 
   // Next time level solution.
   Solution<double> sln_time_new(&mesh);

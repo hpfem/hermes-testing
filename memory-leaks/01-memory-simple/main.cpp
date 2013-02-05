@@ -38,6 +38,8 @@ const double FIXED_BDY_TEMP = 20.0;        // Fixed temperature on the boundary.
 
 int main(int argc, char* argv[])
 {
+  Hermes2DApi.set_integral_param_value(numThreads,1);
+
   if(argc > 1)
     {
       if(argc > 2)
@@ -64,7 +66,7 @@ int main(int argc, char* argv[])
   CustomWeakFormPoisson wf("Aluminum", new Hermes::Hermes1DFunction<double>(LAMBDA_AL), "Copper",
     new Hermes::Hermes1DFunction<double>(LAMBDA_CU), new Hermes::Hermes2DFunction<double>(-VOLUME_HEAT_SRC));
 
-wf.set_verbose_output(false);
+    wf.set_verbose_output(false);
   
 	Hermes2DApi.set_text_param_value(xmlSchemasDirPath, "asfd");
 
@@ -105,14 +107,14 @@ wf.set_verbose_output(false);
   // Initialize linear solver.
   Hermes::Hermes2D::LinearSolver<double> linear_solver(&wf, new_space);
   linear_solver.set_verbose_output(false);
-
+  
   // Solve the linear problem.
   try
   {
     linear_solver.solve();
 
     // Get the solution vector.
-    double* sln_vector = linear_solver.get_sln_vector();
+		double* sln_vector = linear_solver.get_sln_vector();
 
     // Translate the solution vector into the previously initialized Solution.
     Hermes::Hermes2D::Solution<double>::vector_to_solution(sln_vector, new_space, sln);

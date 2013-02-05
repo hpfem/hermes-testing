@@ -48,12 +48,14 @@ int main(int argc, char* argv[])
 
   // Initialize the weak formulation.
   CustomWeakFormAcoustics wf("Wall", RHO, SOUND_SPEED, OMEGA);
+  wf.set_verbose_output(false);
 
   // Assemble the reference problem.
   DiscreteProblem<std::complex<double> > dp(&wf, &space);
 
   // Perform Newton's iteration.
   Hermes::Hermes2D::NewtonSolver<std::complex<double> > newton(&dp);
+  newton.set_verbose_output(false);
 
   //Tests.
   Linearizer* lin = new Linearizer();
