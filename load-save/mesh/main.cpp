@@ -18,6 +18,7 @@ int main(int argc, char* argv[])
   meshes1.push_back(&mesh2);
   Hermes::Hermes2D::MeshReaderH2DXML mloader;
   bool exceptionCaughtCorrectly = false;
+  mloader.set_validation(true);
   try
   {
     exceptionCaughtCorrectly = false;
