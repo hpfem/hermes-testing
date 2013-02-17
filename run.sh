@@ -142,7 +142,7 @@ if [ "$ans" = "y" ]; then
   ./01-loadSave-solution > ../solution.out
   echo "Solution load&save outputs saved in load-save/solution.out"
   echo "Load-save tests - Done."
-  cd ../../..
+  cd ../..
 fi
 echo "Run inner-functionality tests? (y-yes, anything else:no) (Very short)"
 read ans
