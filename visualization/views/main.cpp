@@ -26,7 +26,7 @@
 // The following parameters can be changed:
 
 const bool HERMES_VISUALIZATION = true;           // Set to "false" to suppress Hermes OpenGL visualization.
-const bool VTK_VISUALIZATION = true;              // Set to "true" to enable VTK output.
+const bool VTK_VISUALIZATION = false;              // Set to "true" to enable VTK output.
 const int P_INIT = 1;                             // Uniform polynomial degree of mesh elements.
 const int INIT_REF_NUM = 1;                       // Number of initial uniform mesh refinements.
 
@@ -124,9 +124,9 @@ int main(int argc, char* argv[])
       viewS.save_screenshot("002-contours2.bmp");
       viewS.show_contours(5.0);
       viewS.save_screenshot("003-contours3.bmp");
-      //viewS.set_3d_mode(true);
+      viewS.set_3d_mode(true);
       viewS.save_screenshot("004-3D.bmp");
-      //viewS.set_3d_mode(false);
+      viewS.set_3d_mode(false);
       viewS.save_screenshot("005-backTo2D.bmp");
       viewS.hide_contours();
       viewS.save_screenshot("006-noContours.bmp");
@@ -162,11 +162,13 @@ int main(int argc, char* argv[])
               ref_space->get_mesh()->refine_element_id(j);
       }
       ConstantSolution<double> slnConstRefined(ref_space->get_mesh(), 1.234567);
-      viewS.show(&slnConstRefined);
+      TestExactSolution1 c1s(ref_space->get_mesh());
+      TestExactSolution2 c2s(ref_space->get_mesh());
+      
+      viewS.show(&slnConstRefined, Views::HERMES_EPS_NORMAL, 1, &c1s, &c2s, 0.4);
       //viewS.set_3d_mode(true);
-      viewS.save_screenshot("013-constSolutionRef.bmp");
-
-      viewO.show(&space);
+      viewS.save_screenshot("013-constSolutionRefWithDisplacement.bmp");
+      viewO.show(&space); 
       viewO.save_screenshot("100-space.bmp");
       viewO.set_b_orders(true);
       viewO.save_screenshot("101-spaceBOrders.bmp");
@@ -185,6 +187,10 @@ int main(int argc, char* argv[])
       viewV.set_mode(1);
       viewV.show(&sln, &sln);
       viewV.save_screenshot("303-vectorizerArrowsMode.bmp");
+      TestExactSolution1 c1v(&mesh);
+      TestExactSolution2 c2v(&mesh);
+      viewV.show(&sln, &sln, Hermes::Hermes2D::Views::HERMES_EPS_NORMAL, 1, 1, &c1v, &c2v, 0.5);
+      viewV.save_screenshot("303-vectorizerArrowsModeWithDisplacement.bmp");
     }
   }
   catch(std::exception& e)
