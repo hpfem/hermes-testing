@@ -4,7 +4,7 @@
 /* Weak forms */
 
 using namespace Hermes;
-using namespace Hermes::Hermes2D;
+using namespace Hermes::Hermes2D;;
 
 class CustomWeakFormHeatRK : public WeakForm<double>
 {

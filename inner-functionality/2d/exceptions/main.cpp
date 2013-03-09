@@ -8,12 +8,12 @@ using namespace Hermes::Hermes2D;
 
 int main(int argc, char* argv[])
 {
-  Hermes2D::Solution<double> sln;
+  MeshFunctionSharedPtr<double> sln(new Solution<double>());
 
   //NullException test
   try
   {
-    sln.get_ref_value(NULL,0,0,0,0);
+    ((Solution<double>*)sln.get())->get_ref_value(NULL,0,0,0,0);
     std::cout << "Failure - get_ref_value!";
     return -1;
   }
@@ -28,11 +28,11 @@ int main(int argc, char* argv[])
 
   //LengthException test
   double solution_vector[3];
-  Hermes::vector<const Hermes2D::Space<double>*> spaces(NULL,NULL,NULL,NULL);
-  Hermes::vector<Hermes2D::Solution<double>*> solutions(NULL,NULL,NULL);
+  Hermes::vector<SpaceSharedPtr<double> > spaces(NULL,NULL,NULL,NULL);
+  Hermes::vector<MeshFunctionSharedPtr<double> > solutions(NULL,NULL,NULL);
   try
   {
-    sln.vector_to_solutions(solution_vector,spaces,solutions);
+    Solution<double>::vector_to_solutions(solution_vector,spaces,solutions);
     std::cout << "Failure - vector_to_solutions!";
     return -1;
   }
@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
   }
 
   //ValueException test
-  Hermes::vector<Hermes2D::Space<double>*> spaces2;
+  Hermes::vector<SpaceSharedPtr<double> > spaces2;
   Hermes::vector<Hermes2D::ProjNormType> proj_norms;
   for (int i=0;i>H2D_MAX_COMPONENTS+1;i++)
   {
@@ -86,9 +86,9 @@ int main(int argc, char* argv[])
 
   try
   {
-    Hermes::Hermes2D::Mesh mesh;
-    Hermes::Hermes2D::MeshReaderH2DXML reader;
-    reader.load("domain.xml", &mesh);
+    MeshSharedPtr mesh(new Mesh);
+    MeshReaderH2DXML reader;
+    reader.load("domain.xml", mesh);
     std::cout << "Failure - mesh!";
     return -1;
   }
@@ -99,9 +99,9 @@ int main(int argc, char* argv[])
 
   try
   {
-    Hermes::Hermes2D::Mesh mesh;
-    H1Space<double> space(&mesh);
-    space.get_num_dofs();
+    MeshSharedPtr mesh(new Mesh);
+    SpaceSharedPtr<double> space(new H1Space<double>(mesh));
+    space->get_num_dofs();
     std::cout << "Failure - space!";
     return -1;
   }
@@ -112,16 +112,16 @@ int main(int argc, char* argv[])
 
   try
   {
-    // Load the mesh.
-    Hermes::Hermes2D::Mesh mesh;
-    Hermes::Hermes2D::MeshReaderH2D mloader;
-    mloader.load("domain.mesh", &mesh);
+    // Load the mesh->
+    MeshSharedPtr mesh(new Mesh);
+    MeshReaderH2D mloader;
+    mloader.load("domain.mesh", mesh);
 
     // Create an H1 space with default shapeset.
-    Hermes::Hermes2D::L2Space<double> space(&mesh, 3);
+    SpaceSharedPtr<double> space(new L2Space<double>(mesh, 3));
 
     LinearSolver<double> ls;
-    ls.set_space(&space);
+    ls.set_space(space);
     ls.solve();
     std::cout << "Failure - solver!";
     return -1;

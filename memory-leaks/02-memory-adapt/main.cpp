@@ -81,10 +81,10 @@ const double EPS_AIR = 1.0 * EPS0;
 
 int main(int argc, char* argv[])
 {
-  // Load the mesh.
-  Mesh mesh;
+  // Load the mesh->
+  MeshSharedPtr mesh(new Mesh);
   MeshReaderH2D mloader;
-  mloader.load("domain.mesh", &mesh);
+  mloader.load("domain.mesh", mesh);
 
   // Initialize the weak formulation.
   CustomWeakFormPoisson wf("Motor", EPS_MOTOR, "Air", EPS_AIR);
@@ -96,10 +96,10 @@ int main(int argc, char* argv[])
   EssentialBCs<double> bcs(Hermes::vector<EssentialBoundaryCondition<double> *>(&bc_essential_out, &bc_essential_stator));
 
   // Create an H1 space with default shapeset.
-  H1Space<double> space(&mesh, &bcs, P_INIT);
+  SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
 
   // Initialize coarse and fine mesh solution.
-  Solution<double> sln, ref_sln;
+  MeshFunctionSharedPtr<double> sln(new Solution<double>), ref_sln(new Solution<double>);
 
   // Initialize refinement selector.
   H1ProjBasedSelector<double> selector(CAND_LIST, CONV_EXP, H2DRS_DEFAULT_ORDER);
@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
   // Time measurement.
   Hermes::Mixins::TimeMeasurable cpu_time;
 
-  DiscreteProblem<double> dp(&wf, &space);
+  DiscreteProblem<double> dp(&wf, space);
   NewtonSolver<double> newton(&dp);
   newton.set_verbose_output(false);
 
@@ -127,11 +127,11 @@ int main(int argc, char* argv[])
     // Time measurement.
     cpu_time.tick();
 
-    // Construct globally refined mesh and setup fine mesh space.
-    Mesh::ReferenceMeshCreator ref_mesh_creator(&mesh);
-    Mesh* ref_mesh = ref_mesh_creator.create_ref_mesh();
-    Space<double>::ReferenceSpaceCreator ref_space_creator(&space, ref_mesh);
-    Space<double>* ref_space = ref_space_creator.create_ref_space();
+    // Construct globally refined mesh and setup fine mesh space->
+    Mesh::ReferenceMeshCreator ref_mesh_creator(mesh);
+    MeshSharedPtr ref_mesh = ref_mesh_creator.create_ref_mesh();
+    Space<double>::ReferenceSpaceCreator ref_space_creator(space, ref_mesh);
+    SpaceSharedPtr<double> ref_space = ref_space_creator.create_ref_space();
     int ndof_ref = ref_space->get_num_dofs();
 
     newton.set_space(ref_space);
@@ -147,10 +147,10 @@ int main(int argc, char* argv[])
     }
 
     // Translate the resulting coefficient vector into the instance of Solution.
-    Solution<double>::vector_to_solution(newton.get_sln_vector(), ref_space, &ref_sln);
+    Solution<double>::vector_to_solution(newton.get_sln_vector(), ref_space, ref_sln);
     
-    // Project the fine mesh solution onto the coarse mesh.
-    OGProjection<double> ogProjection; ogProjection.project_global(&space, &ref_sln, &sln);
+    // Project the fine mesh solution onto the coarse mesh->
+    OGProjection<double> ogProjection; ogProjection.project_global(space, ref_sln, sln);
 
     // Time measurement.
     cpu_time.tick();
@@ -158,15 +158,15 @@ int main(int argc, char* argv[])
     // View the coarse mesh solution and polynomial orders.
     if (HERMES_VISUALIZATION) 
     {
-      sview.show(&sln);
-      oview.show(&space);
+      sview.show(sln);
+      oview.show(space);
     }
 
     // Skip visualization time.
     cpu_time.tick();
 
     // Calculate element errors and total error estimate.
-    Adapt<double> adaptivity(&space);
+    Adapt<double> adaptivity(space);
     bool solutions_for_adapt = true;
     // In the following function, the Boolean parameter "solutions_for_adapt" determines whether
     // the calculated errors are intended for use with adaptivity (this may not be the case, for example,
@@ -175,20 +175,20 @@ int main(int argc, char* argv[])
     // absolute or relative. Its default value is error_flags = HERMES_TOTAL_ERROR_REL | HERMES_ELEMENT_ERROR_REL.
     // In subsequent examples and benchmarks, these two parameters will be often used with
     // their default values, and thus they will not be present in the code explicitly.
-    double err_est_rel = adaptivity.calc_err_est(&sln, &ref_sln, solutions_for_adapt,
+    double err_est_rel = adaptivity.calc_err_est(sln, ref_sln, solutions_for_adapt,
                          HERMES_TOTAL_ERROR_REL | HERMES_ELEMENT_ERROR_REL) * 100;
 
     // Add entry to DOF and CPU convergence graphs.
     cpu_time.tick();    
     graph_cpu.add_values(cpu_time.accumulated(), err_est_rel);
     graph_cpu.save("conv_cpu_est.dat");
-    graph_dof.add_values(space.get_num_dofs(), err_est_rel);
+    graph_dof.add_values(space->get_num_dofs(), err_est_rel);
     graph_dof.save("conv_dof_est.dat");
     
     // Skip the time spent to save the convergence graphs.
     cpu_time.tick();
 
-    // If err_est too large, adapt the mesh.
+    // If err_est too large, adapt the mesh->
     if (err_est_rel < ERR_STOP) 
       done = true;
     else
@@ -199,13 +199,8 @@ int main(int argc, char* argv[])
       if (done == false)  
         as++;
     }
-    if (space.get_num_dofs() >= NDOF_STOP) 
+    if (space->get_num_dofs() >= NDOF_STOP) 
       done = true;
-
-    // Keep the mesh from final step to allow further work with the final fine mesh solution.
-    if(done == false) 
-      delete ref_space->get_mesh(); 
-    delete ref_space;
   }
   while (done == false);
 
@@ -215,14 +210,13 @@ int main(int argc, char* argv[])
 	{
 		sview.set_title("Fine mesh solution");
 		sview.show_mesh(false);
-		sview.show(&ref_sln);
+		sview.show(ref_sln);
   }
 
   // Wait for all views to be closed.
-if(HERMES_VISUALIZATION)
-  Views::View::wait();
+  if(HERMES_VISUALIZATION)
+    Views::View::wait();
 
-  delete ref_sln.get_mesh();
   std::cout << "OK";
   return 0;
 }

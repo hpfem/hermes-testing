@@ -23,14 +23,14 @@ const double BDY_C_PARAM = 20.0;
 
 int main(int argc, char* argv[])
 {
-  // Load the mesh.
-  Hermes::Hermes2D::Mesh mesh;
-  Hermes::Hermes2D::MeshReaderH2D mloader;
-  mloader.load("domain.mesh", &mesh);
+  // Load the mesh->
+  MeshSharedPtr mesh(new Mesh);
+  MeshReaderH2D mloader;
+  mloader.load("domain.mesh", mesh);
 
   // Perform initial mesh refinements (optional).
   for (int i = 0; i < INIT_REF_NUM; i++)
-    mesh.refine_all_elements();
+    mesh->refine_all_elements();
 
   // Initialize the weak formulation.
   CustomWeakFormPoissonNewton wf("Aluminum", new Hermes::Hermes1DFunction<double>(LAMBDA_AL),
@@ -41,29 +41,29 @@ int main(int argc, char* argv[])
   // Initialize boundary conditions.
   CustomDirichletCondition bc_essential(Hermes::vector<std::string>("Bottom", "Inner", "Left"),
     BDY_A_PARAM, BDY_B_PARAM, BDY_C_PARAM);
-  Hermes::Hermes2D::EssentialBCs<double> bcs(&bc_essential);
+  EssentialBCs<double> bcs(&bc_essential);
 
   // Create an H1 space with default shapeset.
-  Hermes::Hermes2D::H1Space<double> space(&mesh, &bcs, P_INIT);
+  SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
 
   // Testing n_dof and correctness of solution vector
   // for p_init = 1, 2, ..., 10
   bool success = true;
   for (int p_init = 1; p_init <= 10; p_init++)
   {
-    space.set_uniform_order(p_init);
-    space.assign_dofs();
-    int ndof = space.get_num_dofs();
+    space->set_uniform_order(p_init);
+    space->assign_dofs();
+    int ndof = space->get_num_dofs();
 
     // Initial coefficient vector for the Newton's method.
     double* coeff_vec = new double[ndof];
     memset(coeff_vec, 0, ndof*sizeof(double));
 
     // Initialize the Newton solver.
-    Hermes::Hermes2D::NewtonSolver<double> newton(&wf, &space);
+    NewtonSolver<double> newton(&wf, space);
 
     // Perform Newton's iteration and translate the resulting coefficient vector into a Solution.
-    Hermes::Hermes2D::Solution<double> sln;
+    MeshFunctionSharedPtr<double> sln(new Solution<double>());
     try
     {
       newton.solve(coeff_vec);
@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
     {
       e.print_msg();
     }
-    Hermes::Hermes2D::Solution<double>::vector_to_solution(newton.get_sln_vector(), &space, &sln);
+    Solution<double>::vector_to_solution(newton.get_sln_vector(), space, sln);
 
     double sum = 0;
     for (int i = 0; i < ndof; i++) sum += coeff_vec[i];

@@ -7,7 +7,7 @@
 #include <iostream>
 
 using namespace Hermes;
-using namespace Hermes::Hermes2D;
+using namespace Hermes::Hermes2D;;
 using std::cout;
 using std::endl;
 
@@ -36,7 +36,7 @@ const int INIT_REF_NUM = 2; // Number of initial uniform mesh refinements.
 //------------------------------------------------------------------------------
 // Compute marked boundary length
 //
-double CalculateBoundaryLength(Mesh* mesh, int bdryMarker)
+double CalculateBoundaryLength(MeshSharedPtr mesh, int bdryMarker)
 {
   // Variables declaration.
   Element* e;
@@ -79,17 +79,17 @@ int main(int argc, char* argv[])
     return -1;
   }
 
-  // Load the mesh.
-  Mesh mesh;
+  // Load the mesh->
+  MeshSharedPtr mesh(new Mesh);
   MeshReaderH2D mloader;
-  mloader.load(argv[1], &mesh);
+  mloader.load(argv[1], mesh);
 
   /*
   //Graphics not allowed on test versions; user may uncomment for debugging; vfda
-  // Display the mesh.
+  // Display the mesh->
   // (100, 0) is the upper left corner position, 600 x 500 is the window size
   MeshView mview("Mesh", 100, 0, 600, 500);
-  mview.show(&mesh);
+  mview.show(mesh);
   // Wait for the view to be closed.
   View::wait();
   */
@@ -97,25 +97,25 @@ int main(int argc, char* argv[])
   double bdryLengthInput = atof(argv[2]);
 
   // Perform initial mesh refinements.
-  for (int i = 0; i<INIT_REF_NUM; i++) mesh.refine_all_elements();
+  for (int i = 0; i<INIT_REF_NUM; i++) mesh->refine_all_elements();
 
   // Create H1 space with a default shapeset.
-  H1Space<double> space(&mesh, P_INIT);
+  H1Space<double> space(mesh, P_INIT);
 
   // FIXME: This Solution is artificial here and it should be removed. The
   // function CalculateBoundaryLength() should only take a pointer to Mesh and
   // a boundary marker as parameters.
   //Solution sln;
-  //sln.set_zero(&mesh);
+  //sln.set_zero(mesh);
 
   // Calculate the length of the four boundaries segments.
-  double l1 = CalculateBoundaryLength(&mesh, 1);
+  double l1 = CalculateBoundaryLength(mesh, 1);
 
-  double l2 = CalculateBoundaryLength(&mesh, 2);
+  double l2 = CalculateBoundaryLength(mesh, 2);
 
-  double l3 = CalculateBoundaryLength(&mesh, 3);
+  double l3 = CalculateBoundaryLength(mesh, 3);
 
-  double l4 = CalculateBoundaryLength(&mesh, 4);
+  double l4 = CalculateBoundaryLength(mesh, 4);
 
   double perimeter = l1 + l2 + l3 + l4;
 

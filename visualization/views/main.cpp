@@ -39,13 +39,13 @@ const double FIXED_BDY_TEMP = 20.0;        // Fixed temperature on the boundary.
 int main(int argc, char* argv[])
 {
 
-  // Load the mesh.
-  Hermes::Hermes2D::Mesh mesh;
-  Hermes::Hermes2D::MeshReaderH2DXML mloader;
+  // Load the mesh->
+  MeshSharedPtr mesh(new Mesh);
+  MeshReaderH2DXML mloader;
   mloader.set_validation(false);
   try
   {
-    mloader.load("domain.xml", &mesh);
+    mloader.load("domain.xml", mesh);
   }
   catch(std::exception& e)
   {
@@ -53,35 +53,35 @@ int main(int argc, char* argv[])
   }
 
   // Perform initial mesh refinements (optional).
-  mesh.refine_in_areas(Hermes::vector<std::string>("Aluminum", "Copper"), INIT_REF_NUM);
-  mesh.refine_in_area("Aluminum");
+  mesh->refine_in_areas(Hermes::vector<std::string>("Aluminum", "Copper"), INIT_REF_NUM);
+  mesh->refine_in_area("Aluminum");
 
   // Initialize the weak formulation.
   CustomWeakFormPoisson wf("Aluminum", new Hermes::Hermes1DFunction<double>(LAMBDA_AL), "Copper",
     new Hermes::Hermes1DFunction<double>(LAMBDA_CU), new Hermes::Hermes2DFunction<double>(-VOLUME_HEAT_SRC));
 
   // Initialize essential boundary conditions.
-  Hermes::Hermes2D::DefaultEssentialBCConst<double> bc_essential(Hermes::vector<std::string>("Bottom", "Inner", "Outer", "Left"),
+  DefaultEssentialBCConst<double> bc_essential(Hermes::vector<std::string>("Bottom", "Inner", "Outer", "Left"),
     FIXED_BDY_TEMP);
-  Hermes::Hermes2D::EssentialBCs<double> bcs(&bc_essential);
+  EssentialBCs<double> bcs(&bc_essential);
 
   // Create an H1 space with default shapeset.
-  Hermes::Hermes2D::H1Space<double> space(&mesh, &bcs, P_INIT);
+  SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
 
-  Hermes::Hermes2D::Element* e;
+  Element* e;
   int i = 1;
-  for_all_active_elements(e, &mesh)
+  for_all_active_elements(e, mesh)
   {
-    space.set_element_order(e->id, i++ % 9 + 1);
+    space->set_element_order(e->id, i++ % 9 + 1);
   }
 
-  space.assign_dofs();
+  space->assign_dofs();
 
   // Initialize the solution.
-  Hermes::Hermes2D::Solution<double> sln;
+  MeshFunctionSharedPtr<double> sln(new Solution<double>());
 
   // Initialize linear solver.
-  Hermes::Hermes2D::LinearSolver<double> linear_solver(&wf, &space);
+  LinearSolver<double> linear_solver(&wf, space);
 
   // Solve the linear problem.
   try
@@ -92,31 +92,31 @@ int main(int argc, char* argv[])
     double* sln_vector = linear_solver.get_sln_vector();
 
     // Translate the solution vector into the previously initialized Solution.
-    Hermes::Hermes2D::Solution<double>::vector_to_solution(sln_vector, &space, &sln);
+    Solution<double>::vector_to_solution(sln_vector, space, sln);
 
     // VTK output.
     if(VTK_VISUALIZATION)
     {
       // Output solution in VTK format.
-      Hermes::Hermes2D::Views::Linearizer lin;
+      Views::Linearizer lin;
       bool mode_3D = false;
-      lin.save_solution_vtk(&sln, "sln.vtk", "Temperature", mode_3D, 1, Hermes::Hermes2D::Views::HERMES_EPS_LOW);
+      lin.save_solution_vtk(sln, "sln.vtk", "Temperature", mode_3D, 1, Views::HERMES_EPS_LOW);
 
       // Output mesh and element orders in VTK format.
-      Hermes::Hermes2D::Views::Orderizer ord;
-      ord.save_mesh_vtk(&space, "mesh.vtk");
-      ord.save_orders_vtk(&space, "ord.vtk");
+      Views::Orderizer ord;
+      ord.save_mesh_vtk(space, "mesh->vtk");
+      ord.save_orders_vtk(space, "ord.vtk");
     }
 
     // Visualize the solution.
-    Hermes::Hermes2D::Views::ScalarView viewS("Solution", new Hermes::Hermes2D::Views::WinGeom(50, 50, 1000, 800));
-    Hermes::Hermes2D::Views::OrderView viewO("Orders", new Hermes::Hermes2D::Views::WinGeom(50, 50, 1000, 800));
-    Hermes::Hermes2D::Views::VectorView viewV("Vectors", new Hermes::Hermes2D::Views::WinGeom(50, 50, 1000, 800));
-    Hermes::Hermes2D::Views::MeshView viewM("Mesh", new Hermes::Hermes2D::Views::WinGeom(50, 50, 1000, 800));
+    Views::ScalarView viewS("Solution", new Views::WinGeom(50, 50, 1000, 800));
+    Views::OrderView viewO("Orders", new Views::WinGeom(50, 50, 1000, 800));
+    Views::VectorView viewV("Vectors", new Views::WinGeom(50, 50, 1000, 800));
+    Views::MeshView viewM("Mesh", new Views::WinGeom(50, 50, 1000, 800));
 
     if(HERMES_VISUALIZATION)
     {
-      viewS.show(&sln);
+      viewS.show(sln);
       viewS.save_screenshot("000-base.bmp");
       viewS.show_contours(1.0);
       viewS.save_screenshot("001-contours1.bmp");
@@ -135,23 +135,23 @@ int main(int argc, char* argv[])
       viewS.set_palette_filter(true);
       viewS.save_screenshot("008-paletteBack.bmp");
       viewS.show_mesh(false);
-      viewS.save_screenshot("009-noMesh.bmp");
+      viewS.save_screenshot("009-nomesh->bmp");
       viewS.set_scale_size(40, 1230, 14);
       viewS.save_screenshot("010-scaleSize.bmp");
 
-      ZeroSolution<double> slnZero(&mesh);
+      MeshFunctionSharedPtr<double> slnZero(new ZeroSolution<double>(mesh));
       //viewS.set_3d_mode(false);
       viewS.show_mesh(true);
       viewS.set_scale_size(30, 120, 14);
-      viewS.show(&slnZero);
+      viewS.show(slnZero);
       viewS.save_screenshot("011-zeroSolution.bmp");
 
-      Mesh::ReferenceMeshCreator ref_mesh_creator(&mesh);
-      Mesh* ref_mesh = ref_mesh_creator.create_ref_mesh();
-      Space<double>::ReferenceSpaceCreator ref_space_creator(&space, ref_mesh);
-      Space<double>* ref_space = ref_space_creator.create_ref_space();
-      ZeroSolution<double> slnZeroReference(ref_space->get_mesh());
-      viewS.show(&slnZeroReference);
+      Mesh::ReferenceMeshCreator ref_mesh_creator(mesh);
+      MeshSharedPtr ref_mesh = ref_mesh_creator.create_ref_mesh();
+      Space<double>::ReferenceSpaceCreator ref_space_creator(space, ref_mesh);
+      SpaceSharedPtr<double> ref_space = ref_space_creator.create_ref_space();
+      MeshFunctionSharedPtr<double> slnZeroReference(new ZeroSolution<double>(ref_space->get_mesh()));
+      viewS.show(slnZeroReference);
       viewS.save_screenshot("012-zeroSolutionRef1.bmp");
       for(int i = 0; i < 4; i++)
       {
@@ -161,35 +161,37 @@ int main(int argc, char* argv[])
             if(ref_space->get_mesh()->get_element(j)->active)
               ref_space->get_mesh()->refine_element_id(j);
       }
-      ConstantSolution<double> slnConstRefined(ref_space->get_mesh(), 1.234567);
-      TestExactSolution1 c1s(ref_space->get_mesh());
-      TestExactSolution2 c2s(ref_space->get_mesh());
+      MeshFunctionSharedPtr<double> slnConstRefined(new ConstantSolution<double>(ref_space->get_mesh(), 1.234567));
+      MeshFunctionSharedPtr<double> c1s(new TestExactSolution1(ref_space->get_mesh()));
+      MeshFunctionSharedPtr<double> c2s(new TestExactSolution2(ref_space->get_mesh()));
       
-      viewS.show(&slnConstRefined, Views::HERMES_EPS_NORMAL, 1, &c1s, &c2s, 0.4);
+      viewS.show(slnConstRefined, Views::HERMES_EPS_NORMAL, 1, c1s, c2s, 0.4);
       //viewS.set_3d_mode(true);
       viewS.save_screenshot("013-constSolutionRefWithDisplacement.bmp");
-      viewO.show(&space); 
-      viewO.save_screenshot("100-space.bmp");
+      viewO.show(space); 
+      viewO.save_screenshot("100-space->bmp");
       viewO.set_b_orders(true);
       viewO.save_screenshot("101-spaceBOrders.bmp");
-      viewM.show(&mesh);
-      viewM.save_screenshot("200-mesh.bmp");
+      viewM.show(mesh);
+      viewM.save_screenshot("200-mesh->bmp");
       viewM.set_b_elem_mrk(true);
       viewM.save_screenshot("201-meshBElemMrk.bmp");
-      viewV.show(&sln, &sln);
+      viewV.show(sln, sln);
       viewV.save_screenshot("300-vectorizer.bmp");
-      viewV.show(&sln, &sln, Hermes::Hermes2D::Views::HERMES_EPS_VERYHIGH);
+      viewV.show(sln, sln, Views::HERMES_EPS_VERYHIGH);
       viewV.save_screenshot("301-vectorizerFiner.bmp");
       viewV.get_vectorizer()->set_curvature_epsilon(1e-5);
-      viewV.show(&sln, &sln);
+      viewV.show(sln, sln);
       viewV.save_screenshot("302-vectorizerFinerWithFinerCurves.bmp");
       viewV.get_vectorizer()->set_curvature_epsilon(1e-3);
       viewV.set_mode(1);
-      viewV.show(&sln, &sln);
+      viewV.show(sln, sln);
       viewV.save_screenshot("303-vectorizerArrowsMode.bmp");
-      TestExactSolution1 c1v(&mesh);
-      TestExactSolution2 c2v(&mesh);
-      viewV.show(&sln, &sln, Hermes::Hermes2D::Views::HERMES_EPS_NORMAL, 1, 1, &c1v, &c2v, 0.5);
+      
+      MeshFunctionSharedPtr<double> c1v(new TestExactSolution1(mesh));
+      MeshFunctionSharedPtr<double> c2v(new TestExactSolution2(mesh));
+      
+      viewV.show(sln, sln, Views::HERMES_EPS_NORMAL, 1, 1, c1v, c2v, 0.5);
       viewV.save_screenshot("303-vectorizerArrowsModeWithDisplacement.bmp");
     }
   }

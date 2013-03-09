@@ -12,7 +12,7 @@ using namespace Hermes::Hermes2D::RefinementSelectors;
 //
 //  Known exact solution, see class CustomExactSolution in definitions.cpp.
 //
-//  Domain: square domain (0, pi) x (0, pi), mesh file square_quad.mesh.
+//  Domain: square domain (0, pi) x (0, pi), mesh file square_quad.mesh->
 //
 //  BC:  Dirichlet, given by exact solution.
 //
@@ -51,19 +51,19 @@ Hermes::MatrixSolverType matrix_solver = Hermes::SOLVER_UMFPACK;  // Possibiliti
 
 int main(int argc, char* argv[])
 {
-  // Load the mesh.
-  Mesh mesh;
+  // Load the mesh->
+  MeshSharedPtr mesh(new Mesh);
   MeshReaderH2D mloader;
-  mloader.load("square_quad.mesh", &mesh);
+  mloader.load("square_quad.mesh", mesh);
 
   // Avoid zero ndof situation.
   if(P_INIT == 1) {
     if(is_hp(CAND_LIST)) P_INIT++;
-    else mesh.refine_element_id(0, 0);
+    else mesh->refine_element_id(0, 0);
   }
 
   // Define exact solution.
-  CustomExactSolution exact_sln(&mesh);
+  MeshFunctionSharedPtr<double> exact_sln(new CustomExactSolution(mesh));
 
   // Initialize the weak formulation.
   Hermes1DFunction<double> lambda(1.0);
@@ -75,26 +75,26 @@ int main(int argc, char* argv[])
   EssentialBCs<double> bcs(&bc_essential);
 
   // Create an H1 space with default shapeset.
-  H1Space<double> space(&mesh, &bcs, P_INIT);
+  SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
 
   // Initialize approximate solution.
-  Solution<double> sln;
+  MeshFunctionSharedPtr<double> sln(new Solution<double>());
 
   // Initialize refinement selector.
   H1ProjBasedSelector<double> selector(CAND_LIST, CONV_EXP, H2DRS_DEFAULT_ORDER);
 
   // Assemble the discrete problem.
-  DiscreteProblem<double> dp(&wf, &space);
+  DiscreteProblem<double> dp(&wf, space);
 
   // Adaptivity loop:
   int as = 1; bool done = false;
   do
   {
-    // Construct globally refined reference mesh and setup reference space.
-    Mesh::ReferenceMeshCreator ref_mesh_creator(&mesh);
-    Mesh* ref_mesh = ref_mesh_creator.create_ref_mesh();
-    Space<double>::ReferenceSpaceCreator ref_space_creator(&space, ref_mesh);
-    Space<double>* ref_space = ref_space_creator.create_ref_space();
+    // Construct globally refined reference mesh and setup reference space->
+    Mesh::ReferenceMeshCreator ref_mesh_creator(mesh);
+    MeshSharedPtr ref_mesh = ref_mesh_creator.create_ref_mesh();
+    Space<double>::ReferenceSpaceCreator ref_space_creator(space, ref_mesh);
+    SpaceSharedPtr<double> ref_space = ref_space_creator.create_ref_space();
 
     int ndof_ref = ref_space->get_num_dofs();
 
@@ -107,7 +107,8 @@ int main(int argc, char* argv[])
     NewtonSolver<double> newton(&dp);
     newton.set_verbose_output(false);
 
-    Solution<double> ref_sln;
+    MeshFunctionSharedPtr<double> ref_sln(new Solution<double>());
+
     try{
       newton.solve(coeff_vec);
     }
@@ -116,24 +117,22 @@ int main(int argc, char* argv[])
       e.print_msg();
     }
     // Translate the resulting coefficient vector into the instance of Solution.
-    Solution<double>::vector_to_solution(newton.get_sln_vector(), ref_space, &ref_sln);
+    Solution<double>::vector_to_solution(newton.get_sln_vector(), ref_space, ref_sln);
 
-    // Project the fine mesh solution onto the coarse mesh.
+    // Project the fine mesh solution onto the coarse mesh->
     OGProjection<double> ogProjection;
-    ogProjection.project_global(&space, &ref_sln, &sln);
+    ogProjection.project_global(space, ref_sln, sln);
 
     // Calculate element errors and total error estimate.
-    Adapt<double> adaptivity(&space);
-    double err_est_rel = adaptivity.calc_err_est(&sln, &ref_sln) * 100;
+    Adapt<double> adaptivity(space);
+    double err_est_rel = adaptivity.calc_err_est(sln, ref_sln) * 100;
 
     // Calculate exact error.
-    double err_exact_rel = Global<double>::calc_rel_error(&sln, &exact_sln, HERMES_H1_NORM) * 100;
+    double err_exact_rel = Global<double>::calc_rel_error(sln.get(), exact_sln.get(), HERMES_H1_NORM) * 100;
 
-    // Report results.
-
-    // If err_est too large, adapt the mesh. The NDOF test must be here, so that the solution may be visualized
+    // If err_est too large, adapt the mesh-> The NDOF test must be here, so that the solution may be visualized
     // after ending due to this criterion.
-    if(err_exact_rel < ERR_STOP || space.get_num_dofs() >= NDOF_STOP)
+    if(err_exact_rel < ERR_STOP || space->get_num_dofs() >= NDOF_STOP)
       done = true;
     else
       done = adaptivity.adapt(&selector, THRESHOLD, STRATEGY, MESH_REGULARITY);
@@ -144,14 +143,10 @@ int main(int argc, char* argv[])
 
     // Clean up.
     delete [] coeff_vec;
-
-    if(done == false)
-      delete ref_space->get_mesh();
-    delete ref_space;
   }
   while (done == false);
 
-  if(space.get_num_dofs() == 169)
+  if(space->get_num_dofs() == 169)
   {
     return 0;
   }

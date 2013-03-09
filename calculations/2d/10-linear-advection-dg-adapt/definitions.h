@@ -10,7 +10,7 @@ using namespace Hermes::Hermes2D::RefinementSelectors;
 class CustomWeakForm : public WeakForm<double>
 {
 public:
-  CustomWeakForm(std::string left_bottom_bnd_part, Mesh* mesh);
+  CustomWeakForm(std::string left_bottom_bnd_part, MeshSharedPtr mesh);
   WeakForm<double>* clone() const;
 
 private:
@@ -71,11 +71,11 @@ private:
     };
 
     template<typename Real, typename Scalar>
-    Scalar matrix_form(int n, double *wt, Func<Scalar> *u_ext[], Func<Real> *u, Func<Real> *v, Geom<Real> *e, Func<Scalar> **ext) const;
+    Scalar matrix_form(int n, double *wt, DiscontinuousFunc<Real> *u, DiscontinuousFunc<Real> *v, Geom<Real> *e, DiscontinuousFunc<Scalar> **ext) const;
 
-    virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, Func<double> *v, Geom<double> *e, Func<double> **ext) const;
+    virtual double value(int n, double *wt, DiscontinuousFunc<double> *u, DiscontinuousFunc<double> *v, Geom<double> *e, DiscontinuousFunc<double> **ext) const;
 
-    virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, Geom<Ord> *e, Func<Ord> **ext) const;
+    virtual Ord ord(int n, double *wt, DiscontinuousFunc<Ord> *u, DiscontinuousFunc<Ord> *v, Geom<Ord> *e, DiscontinuousFunc<Ord> **ext) const;
 
     MatrixFormDG<double>* clone() const;
 
@@ -110,5 +110,5 @@ private:
 
   Ord upwind_flux(Ord u_cent, Ord u_neib, Ord a_dot_n) const;
 
-  Mesh* mesh;
+  MeshSharedPtr mesh;
 };

@@ -2,7 +2,7 @@
 #include "definitions.h"
 
 using namespace Hermes;
-using namespace Hermes::Hermes2D;
+using namespace Hermes::Hermes2D;;
 
 int main(int argc, char* argv[])
 {

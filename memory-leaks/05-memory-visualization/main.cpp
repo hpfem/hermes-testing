@@ -29,21 +29,21 @@ const std::complex<double> P_SOURCE(1.0, 0.0);
 
 int main(int argc, char* argv[])
 {
-  // Load the mesh.
-  Mesh mesh;
+  // Load the mesh->
+  MeshSharedPtr mesh(new Mesh);
   MeshReaderH2D mloader;
-  mloader.load("domain.mesh", &mesh);
+  mloader.load("domain.mesh", mesh);
 
   // Perform initial mesh refinements.
-  for (int i = 0; i < INIT_REF_NUM; i++) mesh.refine_all_elements();
+  for (int i = 0; i < INIT_REF_NUM; i++) mesh->refine_all_elements();
 
   // Initialize boundary conditions.
   DefaultEssentialBCConst<std::complex<double> > bc_essential("Source", P_SOURCE);
   EssentialBCs<std::complex<double> > bcs(&bc_essential);
 
   // Create an H1 space with default shapeset.
-  H1Space<std::complex<double> > space(&mesh, &bcs, P_INIT);
-  int ndof = Space<std::complex<double> >::get_num_dofs(&space);
+  SpaceSharedPtr<std::complex<double> > space(new H1Space<std::complex<double> > (mesh, &bcs, P_INIT));
+  int ndof = Space<std::complex<double> >::get_num_dofs(space);
   Hermes::Mixins::Loggable::Static::info("ndof = %d", ndof);
 
   // Initialize the weak formulation.
@@ -51,10 +51,10 @@ int main(int argc, char* argv[])
   wf.set_verbose_output(false);
 
   // Assemble the reference problem.
-  DiscreteProblem<std::complex<double> > dp(&wf, &space);
+  DiscreteProblem<std::complex<double> > dp(&wf, space);
 
   // Perform Newton's iteration.
-  Hermes::Hermes2D::NewtonSolver<std::complex<double> > newton(&dp);
+  NewtonSolver<std::complex<double> > newton(&dp);
   newton.set_verbose_output(false);
 
   //Tests.
@@ -76,14 +76,14 @@ int main(int argc, char* argv[])
     };
     
     // Initialize coarse and reference mesh solution.
-    Solution<std::complex<double> >* sln = new Solution<std::complex<double> >();
+    MeshFunctionSharedPtr<std::complex<double> > sln(new Solution<std::complex<double> >());
 
     // Translate the resulting coefficient vector into the Solution<std::complex<double> > sln.
-    Hermes::Hermes2D::Solution<std::complex<double> >::vector_to_solution(newton.get_sln_vector(), &space, sln);
+    Solution<std::complex<double> >::vector_to_solution(newton.get_sln_vector(), space, sln);
 
     RealFilter* ref_mag = new RealFilter(sln);
     AbsFilter* abs_ref_mag = new AbsFilter(ref_mag);
-    TopValFilter* top_abs_ref_mag = new TopValFilter(Hermes::vector<MeshFunction<double>*>(ref_mag, abs_ref_mag), Hermes::vector<double>(0.4, 0.5));
+    TopValFilter* top_abs_ref_mag = new TopValFilter(Hermes::vector<MeshFunctionSharedPtr<double> >(ref_mag, abs_ref_mag), Hermes::vector<double>(0.4, 0.5));
 
     //std::cout << "Linearizer #1" << std::endl;
     lin->process_solution(ref_mag);
@@ -96,17 +96,15 @@ int main(int argc, char* argv[])
     lin->free();
 
     //std::cout << "Orderizer #1" << std::endl;
-    ord->process_space(&space);
+    ord->process_space(space);
     ord->free();
-    Mesh::ReferenceMeshCreator ref_mesh_creator(&mesh);
-		Mesh* ref_mesh = ref_mesh_creator.create_ref_mesh();
-		Space<std::complex<double> >::ReferenceSpaceCreator ref_space_creator(&space, ref_mesh);
-		Space<std::complex<double> >* ref_space = ref_space_creator.create_ref_space();
+    Mesh::ReferenceMeshCreator ref_mesh_creator(mesh);
+		MeshSharedPtr ref_mesh = ref_mesh_creator.create_ref_mesh();
+		Space<std::complex<double> >::ReferenceSpaceCreator ref_space_creator(space, ref_mesh);
+		SpaceSharedPtr<std::complex<double> > ref_space = ref_space_creator.create_ref_space();
     //std::cout << "Orderizer #2" << std::endl;
     ord->process_space(ref_space);
     ord->free();
-    delete ref_space;
-    delete ref_mesh;
 
     //std::cout << "Vectorizer #1" << std::endl;
     vec->process_solution(ref_mag, abs_ref_mag, H2D_FN_VAL_0, H2D_FN_VAL_0);
@@ -118,7 +116,6 @@ int main(int argc, char* argv[])
     delete top_abs_ref_mag;
 		delete abs_ref_mag;
     delete ref_mag;
-    delete sln;
   }
 
   delete lin;

@@ -1,7 +1,7 @@
 #include "hermes2d.h"
 
 using namespace Hermes;
-using namespace Hermes::Hermes2D;
+using namespace Hermes::Hermes2D;;
 
 
 class WeakFormNSSimpleLinearization : public WeakForm<double>
@@ -195,7 +195,7 @@ protected:
 class WeakFormNSNewton : public WeakForm<double>
 {
 public:
-  WeakFormNSNewton(bool Stokes, double Reynolds, double time_step, MeshFunction<double>* xvel_prev_time, MeshFunction<double>* yvel_prev_time) : WeakForm<double>(3), Stokes(Stokes), 
+  WeakFormNSNewton(bool Stokes, double Reynolds, double time_step, MeshFunctionSharedPtr<double> xvel_prev_time, MeshFunctionSharedPtr<double> yvel_prev_time) : WeakForm<double>(3), Stokes(Stokes), 
     Reynolds(Reynolds)
   {
     this->current_time_step = time_step;
@@ -601,8 +601,6 @@ protected:
   // Members.
   bool Stokes;
   double Reynolds;
-  Solution<double>* x_vel_previous_time;
-  Solution<double>* y_vel_previous_time;
 };
 
 class EssentialBCNonConst : public EssentialBoundaryCondition<double>

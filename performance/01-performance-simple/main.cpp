@@ -52,13 +52,13 @@ int main(int argc, char* argv[])
       }
     }
 
-  Hermes::Hermes2D::H1Space<double>* space = NULL;
-  Hermes::Hermes2D::Mesh* mesh = new Mesh();
+  SpaceSharedPtr<double> space;
+  MeshSharedPtr mesh(new Mesh());
 
   // Initialize essential boundary conditions.
-  Hermes::Hermes2D::DefaultEssentialBCConst<double> bc_essential(Hermes::vector<std::string>("Bottom", "Inner", "Outer", "Left"),
+  DefaultEssentialBCConst<double> bc_essential(Hermes::vector<std::string>("Bottom", "Inner", "Outer", "Left"),
     FIXED_BDY_TEMP);
-  Hermes::Hermes2D::EssentialBCs<double> bcs(&bc_essential);
+  EssentialBCs<double> bcs(&bc_essential);
 
   // Initialize the weak formulation.
   CustomWeakFormPoisson wf("Aluminum", new Hermes::Hermes1DFunction<double>(LAMBDA_AL), "Copper",
@@ -70,8 +70,8 @@ wf.set_verbose_output(false);
 
   // This is in a block to test that the instances mesh and space can be deleted after being copied with no harm.
   {
-    // Load the mesh.
-    Hermes::Hermes2D::MeshReaderH2DXML mloader;
+    // Load the mesh->
+    MeshReaderH2DXML mloader;
     mloader.set_validation(false);
     mloader.load("domain.xml", mesh);
 
@@ -80,17 +80,14 @@ wf.set_verbose_output(false);
     mesh->refine_in_area("Aluminum");
 
     // Create an H1 space with default shapeset.
-    space = new Hermes::Hermes2D::H1Space<double>(mesh, &bcs, P_INIT);
+    space = SpaceSharedPtr<double>(new H1Space<double>(mesh, &bcs, P_INIT));
   }
 
-  Mesh* new_mesh = new Mesh();
-  H1Space<double>* new_space = new H1Space<double>();
+  MeshSharedPtr new_mesh(new Mesh());
+  SpaceSharedPtr<double> new_space(new H1Space<double>());
   new_space->copy(space, new_mesh);
 
-  delete space;
-  delete mesh;
-
-  Hermes::Hermes2D::Element* e;
+  Element* e;
   int i = 1;
   for_all_active_elements(e, new_mesh)
   {
@@ -100,10 +97,10 @@ wf.set_verbose_output(false);
   new_space->assign_dofs();
 
   // Initialize the solution.
-  Hermes::Hermes2D::Solution<double>* sln = new Hermes::Hermes2D::Solution<double>();
+  MeshFunctionSharedPtr<double> sln(new Solution<double>());
 
   // Initialize linear solver.
-  Hermes::Hermes2D::LinearSolver<double> linear_solver(&wf, new_space);
+  LinearSolver<double> linear_solver(&wf, new_space);
   linear_solver.set_verbose_output(false);
 
   // Solve the linear problem.
@@ -115,7 +112,7 @@ wf.set_verbose_output(false);
     double* sln_vector = linear_solver.get_sln_vector();
 
     // Translate the solution vector into the previously initialized Solution.
-    Hermes::Hermes2D::Solution<double>::vector_to_solution(sln_vector, new_space, sln);
+    Solution<double>::vector_to_solution(sln_vector, new_space, sln);
   }
   catch(std::exception& e)
   {
@@ -127,10 +124,6 @@ wf.set_verbose_output(false);
   lin->free();
   lin->process_solution(sln);
   lin->free();
-
-  delete sln;
-  delete new_space;
-  delete new_mesh;
 
   std::cout << "OK";
   return 0;

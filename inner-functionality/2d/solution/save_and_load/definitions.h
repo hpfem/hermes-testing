@@ -2,7 +2,7 @@
 
 /* Weak forms */
 
-class CustomWeakFormPoisson : public Hermes::Hermes2D::WeakForm<double>
+class CustomWeakFormPoisson : public WeakForm<double>
 {
 public:
   CustomWeakFormPoisson(std::string mat_al, Hermes::Hermes1DFunction<double>* lambda_al,

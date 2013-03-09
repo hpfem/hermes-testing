@@ -1,14 +1,14 @@
 #define HERMES_REPORT_ALL
 #include "hermes2d.h"
 
-using namespace Hermes::Hermes2D;
+using namespace Hermes::Hermes2D;;
 
 // This is a test of spaces in Hermes2D.
 
 class CustomExactSol : public ExactSolutionScalar<double>
 {
 public:
-  CustomExactSol(Mesh* mesh_lshape) : ExactSolutionScalar<double>(mesh_lshape) {};
+  CustomExactSol(MeshSharedPtr mesh_lshape) : ExactSolutionScalar<double>(mesh_lshape) {};
 
   double value (double x, double y) const { return std::pow(x + y, 2.0); };
 
@@ -44,20 +44,20 @@ int main(int argc, char* argv[])
     Hermes::vector<int>(19, 71, 291));
 
   // Load the mesh_lshape.
-  Mesh mesh_lshape, mesh_square;
+  MeshSharedPtr mesh_lshape(new Mesh), mesh_square(new Mesh);
   MeshReaderH2D mloader;
-  mloader.load("domain.mesh", &mesh_lshape);
-  mloader.load("square.mesh", &mesh_square);
+  mloader.load("domain.mesh", mesh_lshape);
+  mloader.load("square.mesh", mesh_square);
 
   // Basic DOFs assignment and BC values testing.
   for(unsigned int refinement_i = 0; refinement_i < 3; refinement_i++)
   {
     // Mesh refinement.
-    mesh_lshape.refine_all_elements();
-    mesh_square.refine_all_elements();
+    mesh_lshape->refine_all_elements();
+    mesh_square->refine_all_elements();
 
     // H1Spaces from order 1 for various boundary conditions:
-    CustomExactSol exact(&mesh_lshape);
+    CustomExactSol exact(mesh_lshape);
     Hermes::vector<BCNonConst> bc_essential(
       BCNonConst("Bottom", &exact),
       BCNonConst("Outer", &exact),
@@ -69,19 +69,19 @@ int main(int argc, char* argv[])
       {
         // Create a space and record its DOFs.
         EssentialBCs<double> bcs(&(bc_essential[bc_i]));
-        H1Space<double>* space = new H1Space<double>(&mesh_lshape, &bcs, poly_order_i);
+        H1Space<double>* space = new H1Space<double>(mesh_lshape, &bcs, poly_order_i);
 
         space->save("space.xml");
         space->set_validation(false);
-        space->load("space.xml", &mesh_lshape, &bcs);
+        space->load("space.xml", mesh_lshape, &bcs);
 
         dofs.push_back(space->get_num_dofs());
 
         SurfPos surf_pos;
-        surf_pos.base = mesh_lshape.get_element_fast(element_ids_boundary[bc_i][refinement_i]);
+        surf_pos.base = mesh_lshape->get_element_fast(element_ids_boundary[bc_i][refinement_i]);
         if(bc_i == 0) {
           surf_pos.surf_num = 0;
-          surf_pos.marker = mesh_lshape.get_boundary_markers_conversion().get_internal_marker("Bottom").marker;
+          surf_pos.marker = mesh_lshape->get_boundary_markers_conversion().get_internal_marker("Bottom").marker;
         }
         if(bc_i == 1) {
           // This would be for NURBS boundaries, there is a separate test for this.
@@ -89,11 +89,11 @@ int main(int argc, char* argv[])
         }
         if(bc_i == 2) {
           surf_pos.surf_num = 0;
-          surf_pos.marker = mesh_lshape.get_boundary_markers_conversion().get_internal_marker("Inner").marker;
+          surf_pos.marker = mesh_lshape->get_boundary_markers_conversion().get_internal_marker("Inner").marker;
         }
         if(bc_i == 3) {
           surf_pos.surf_num = 3;
-          surf_pos.marker = mesh_lshape.get_boundary_markers_conversion().get_internal_marker("Left").marker;
+          surf_pos.marker = mesh_lshape->get_boundary_markers_conversion().get_internal_marker("Left").marker;
         }
         surf_pos.lo = surf_pos.hi = 0;
 
@@ -104,20 +104,20 @@ int main(int argc, char* argv[])
       for(unsigned int poly_order_i = 0; poly_order_i < 10; poly_order_i++)
       {
         // Create a space and record its DOFs.
-        L2Space<double> space(&mesh_lshape, poly_order_i);
-        dofs.push_back(space.get_num_dofs());
+        SpaceSharedPtr<double>space(new L2Space<double>(mesh_lshape, poly_order_i));
+        dofs.push_back(space->get_num_dofs());
       }
 
       // HCurl & HDiv spaces from order 1.
       for(unsigned int poly_order_i = 1; poly_order_i < 10; poly_order_i++)
       {
         // Create a space and record its DOFs.
-        HcurlSpace<double> space1(&mesh_lshape, poly_order_i);
+        HcurlSpace<double> space1(mesh_lshape, poly_order_i);
         dofs.push_back(space1.get_num_dofs());
 
         // Create a space and record its DOFs.
         /// \todo HDiv shapeset on triangles?
-        HdivSpace<double> space2(&mesh_square, poly_order_i);
+        HdivSpace<double> space2(mesh_square, poly_order_i);
         dofs.push_back(space2.get_num_dofs());
       }
   }

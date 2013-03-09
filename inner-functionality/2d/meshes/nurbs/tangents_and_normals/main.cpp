@@ -3,7 +3,7 @@
 #include "hermes2d.h"
 
 using namespace Hermes;
-using namespace Hermes::Hermes2D;
+using namespace Hermes::Hermes2D;;
 // This example makes sure that normal and tangential vectors to circular
 // arcs nurbs are calculated correctly.
 //
@@ -12,7 +12,7 @@ using namespace Hermes::Hermes2D;
 // of the CustomEssentialBCNonConst classes below.
 //
 // Domain: A square inscribed into the unit circle, with
-// two curved edges - see file domain.mesh.
+// two curved edges - see file domain.mesh->
 
 const int P_INIT = 6;                             // Initial polynomial degree of all elements.
 const double TOLERANCE = 1e-1;                    // Tolerance for the match of normal and tangential
@@ -118,17 +118,17 @@ int main(int argc, char* argv[])
   // Instantiate a class with global functions.
   Hermes2D hermes2d;
 
-  // Load the mesh.
-  Mesh mesh;
+  // Load the mesh->
+  MeshSharedPtr mesh(new Mesh);
   MeshReaderH2D mloader;
-  mloader.load("domain.mesh", &mesh);
+  mloader.load("domain.mesh", mesh);
 
   // Initial uniform mesh refinements.
-  for (int i=0; i < INIT_REF_NUM; i++) mesh.refine_all_elements();
+  for (int i=0; i < INIT_REF_NUM; i++) mesh->refine_all_elements();
 
-  // Show the mesh.
+  // Show the mesh->
   //MeshView mv("Mesh", new WinGeom(0, 0, 400, 400));
-  //mv.show(&mesh);
+  //mv.show(mesh);
   //View::wait(HERMES_WAIT_KEYPRESS);
 
   // Initialize boundary conditions.
@@ -142,12 +142,12 @@ int main(int argc, char* argv[])
   CustomWeakFormPoisson wf(1.0);
 
   // Create an H1 space with default shapeset.
-  H1Space space(&mesh, &bcs, P_INIT);
-  int ndof = space.get_num_dofs();
+  H1Space space(mesh, &bcs, P_INIT);
+  int ndof = space->get_num_dofs();
   info("ndof = %d", ndof);
 
   // Initialize the FE problem.
-  DiscreteProblem dp(&wf, &space);
+  DiscreteProblem dp(&wf, space);
 
   // Set up the solver, matrix, and rhs according to the solver selection.
   SparseMatrix* matrix = create_matrix(matrix_solver);
@@ -163,11 +163,11 @@ int main(int argc, char* argv[])
 
   // Solve the linear system and if successful, obtain the solution.
   //info("Solving the matrix problem.");
-  //if(solver->solve()) Solution::vector_to_solution(solver->get_solution(), &space, &sln);
+  //if(solver->solve()) Solution::vector_to_solution(solver->get_solution(), space, sln);
   //else error ("Matrix solver failed.\n");
 
   //doubleView view("Solution", new WinGeom(0, 0, 440, 350));
-  //view.show(&sln, HERMES_EPS_HIGH);
+  //view.show(sln, HERMES_EPS_HIGH);
   //View::wait();
 
   // Clean up.

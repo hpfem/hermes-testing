@@ -2,7 +2,7 @@
 #include "hermes2d.h"
 
 using namespace Hermes;
-using namespace Hermes::Hermes2D;
+using namespace Hermes::Hermes2D;;
 
 // This test makes sure that subdomains work correctly.
 
@@ -16,9 +16,9 @@ Hermes::MatrixSolverType matrix_solver_type = Hermes::SOLVER_UMFPACK;
 
 int main(int argc, char* argv[])
 {
-  // Load the mesh.
-  Mesh mesh_whole_domain, mesh_bottom_left_corner, mesh_complement;
-  Hermes::vector<Mesh*> meshes (&mesh_bottom_left_corner, &mesh_whole_domain, &mesh_complement);
+  // Load the mesh->
+  MeshSharedPtr mesh_whole_domain(new Mesh), mesh_bottom_left_corner(new Mesh), mesh_complement(new Mesh);
+  Hermes::vector<MeshSharedPtr> meshes (mesh_bottom_left_corner, mesh_whole_domain, mesh_complement);
   MeshReaderH2DXML mloader;
   mloader.set_validation(false);
   mloader.load("subdomains.xml", meshes);
@@ -42,14 +42,14 @@ int main(int argc, char* argv[])
   EssentialBCs<double> bcs_complement(&bc_essential_complement);
 
   // Create H1 spaces with default shapeset.
-  H1Space<double> space_whole_domain(&mesh_whole_domain, &bcs_whole_domain, P_INIT);
-  int ndof_whole_domain = space_whole_domain.get_num_dofs();
+  SpaceSharedPtr<double> space_whole_domain(new H1Space<double>(mesh_whole_domain, &bcs_whole_domain, P_INIT));
+  int ndof_whole_domain = space_whole_domain->get_num_dofs();
 
-  H1Space<double> space_bottom_left_corner(&mesh_bottom_left_corner, &bcs_bottom_left_corner, P_INIT);
-  int ndof_bottom_left_corner = space_bottom_left_corner.get_num_dofs();
+  SpaceSharedPtr<double> space_bottom_left_corner(new H1Space<double>(mesh_bottom_left_corner, &bcs_bottom_left_corner, P_INIT));
+  int ndof_bottom_left_corner = space_bottom_left_corner->get_num_dofs();
 
-  H1Space<double> space_complement(&mesh_complement, &bcs_complement, P_INIT);
-  int ndof_complement = space_complement.get_num_dofs();
+  SpaceSharedPtr<double> space_complement(new H1Space<double>(mesh_complement, &bcs_complement, P_INIT));
+  int ndof_complement = space_complement->get_num_dofs();
 
   if(ndof_whole_domain == 225 && ndof_bottom_left_corner == 56 && ndof_complement == 161)
   {

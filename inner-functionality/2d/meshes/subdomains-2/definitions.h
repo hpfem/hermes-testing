@@ -4,7 +4,7 @@
 using namespace Hermes;
 using namespace Hermes::Hermes2D;
 
-class CustomWeakForm : public Hermes::Hermes2D::WeakForm<double>
+class CustomWeakForm : public WeakForm<double>
 {
 public:
   CustomWeakForm(std::string mat_left);

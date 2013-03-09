@@ -5,7 +5,7 @@ using namespace Hermes::Hermes2D;
 
 /* Weak forms */
 
-class CustomWeakFormPoisson : public Hermes::Hermes2D::WeakForm<double>
+class CustomWeakFormPoisson : public WeakForm<double>
 {
 public:
   CustomWeakFormPoisson(std::string mat_al, Hermes::Hermes1DFunction<double>* lambda_al,
@@ -16,7 +16,7 @@ public:
 class TestExactSolution1 : public ExactSolutionScalar<double>
 {
 public:
-  TestExactSolution1(const Mesh* mesh);
+  TestExactSolution1(MeshSharedPtr mesh);
 
   virtual double value(double x, double y) const;
 
@@ -32,7 +32,7 @@ public:
 class TestExactSolution2 : public ExactSolutionScalar<double>
 {
 public:
-  TestExactSolution2(const Mesh* mesh);
+  TestExactSolution2(MeshSharedPtr mesh);
 
   virtual double value(double x, double y) const;
 

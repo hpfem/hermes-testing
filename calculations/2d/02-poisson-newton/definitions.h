@@ -1,8 +1,9 @@
 #include "hermes2d.h"
 
-/* Weak forms */
+using namespace Hermes;
+using namespace Hermes::Hermes2D;
 
-class CustomWeakFormPoissonNewton : public Hermes::Hermes2D::WeakForm<double>
+class CustomWeakFormPoissonNewton : public WeakForm<double>
 {
 public:
   CustomWeakFormPoissonNewton(std::string mat_al, Hermes::Hermes1DFunction<double>* lambda_al,
@@ -13,7 +14,7 @@ public:
 
 /* Custom non-constant Dirichlet condition */
 
-class CustomDirichletCondition : public Hermes::Hermes2D::EssentialBoundaryCondition<double>
+class CustomDirichletCondition : public EssentialBoundaryCondition<double>
 {
 public:
   CustomDirichletCondition(Hermes::vector<std::string> markers, double A, double B, double C);

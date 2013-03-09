@@ -40,7 +40,7 @@ const int P_INIT_V = 1;
 // Number of initial boundary refinements
 const int INIT_REF_BDY = 5;                       
 // MULTI = true  ... use multi-mesh,
-// MULTI = false ... use single-mesh.
+// MULTI = false ... use single-mesh->
 // Note: In the single mesh option, the meshes are
 // forced to be geometrically the same but the
 // polynomial degrees can still vary.
@@ -98,21 +98,21 @@ int main(int argc, char* argv[])
   Hermes::Mixins::TimeMeasurable cpu_time;
   cpu_time.tick();
 
-  // Load the mesh.
-  Mesh u_mesh, v_mesh;
+  // Load the mesh->
+  MeshSharedPtr u_mesh(new Mesh), v_mesh(new Mesh);
   MeshReaderH2D mloader;
-  mloader.load("domain.mesh", &u_mesh);
-  if (MULTI == false) u_mesh.refine_towards_boundary("Bdy", INIT_REF_BDY);
+  mloader.load("domain.mesh", u_mesh);
+  if (MULTI == false) u_mesh->refine_towards_boundary("Bdy", INIT_REF_BDY);
 
   // Create initial mesh (master mesh).
-  v_mesh.copy(&u_mesh);
+  v_mesh->copy(u_mesh);
 
   // Initial mesh refinements in the v_mesh towards the boundary.
-  if (MULTI == true) v_mesh.refine_towards_boundary("Bdy", INIT_REF_BDY);
+  if (MULTI == true) v_mesh->refine_towards_boundary("Bdy", INIT_REF_BDY);
 
   // Set exact solutions.
-  ExactSolutionFitzHughNagumo1 exact_u(&u_mesh);
-  ExactSolutionFitzHughNagumo2 exact_v(&v_mesh, K);
+  MeshFunctionSharedPtr<double> exact_u(new ExactSolutionFitzHughNagumo1 (u_mesh));
+  MeshFunctionSharedPtr<double> exact_v(new ExactSolutionFitzHughNagumo2 (v_mesh, K));
 
   // Define right-hand sides.
   CustomRightHandSide1 g1(K, D_u, SIGMA);
@@ -128,12 +128,11 @@ int main(int argc, char* argv[])
   EssentialBCs<double> bcs_v(&bc_v);
 
   // Create H1 spaces with default shapeset for both displacement components.
-  H1Space<double> u_space(&u_mesh, &bcs_u, P_INIT_U);
-  H1Space<double> v_space(MULTI ? &v_mesh : &u_mesh, &bcs_v, P_INIT_V);
-
+  SpaceSharedPtr<double> u_space(new H1Space<double>(u_mesh, &bcs_u, P_INIT_U));
+  SpaceSharedPtr<double> v_space(new H1Space<double>(MULTI ? v_mesh : u_mesh, &bcs_v, P_INIT_V));
 
   // Initialize coarse and reference mesh solutions.
-  Solution<double> u_sln, v_sln, u_ref_sln, v_ref_sln;
+  MeshFunctionSharedPtr<double> u_sln(new Solution<double>()), v_sln(new Solution<double>()), u_ref_sln(new Solution<double>()), v_ref_sln(new Solution<double>());
 
   // Initialize refinement selector.
   H1ProjBasedSelector<double> selector(CAND_LIST, CONV_EXP, H2DRS_DEFAULT_ORDER);
@@ -145,17 +144,17 @@ int main(int argc, char* argv[])
   bool done = false;
   do
   {
-    // Construct globally refined reference mesh and setup reference space.
-    Mesh::ReferenceMeshCreator u_ref_mesh_creator(&u_mesh);
-    Mesh* u_ref_mesh = u_ref_mesh_creator.create_ref_mesh();
-    Mesh::ReferenceMeshCreator v_ref_mesh_creator(&v_mesh);
-    Mesh* v_ref_mesh = v_ref_mesh_creator.create_ref_mesh();
-    Space<double>::ReferenceSpaceCreator u_ref_space_creator(&u_space, u_ref_mesh);
-    Space<double>* u_ref_space = u_ref_space_creator.create_ref_space();
-    Space<double>::ReferenceSpaceCreator v_ref_space_creator(&v_space, v_ref_mesh);
-    Space<double>* v_ref_space = v_ref_space_creator.create_ref_space();
+    // Construct globally refined reference mesh and setup reference space->
+    Mesh::ReferenceMeshCreator u_ref_mesh_creator(u_mesh);
+    MeshSharedPtr u_ref_mesh = u_ref_mesh_creator.create_ref_mesh();
+    Mesh::ReferenceMeshCreator v_ref_mesh_creator(v_mesh);
+    MeshSharedPtr v_ref_mesh = v_ref_mesh_creator.create_ref_mesh();
+    Space<double>::ReferenceSpaceCreator u_ref_space_creator(u_space, u_ref_mesh);
+    SpaceSharedPtr<double> u_ref_space = u_ref_space_creator.create_ref_space();
+    Space<double>::ReferenceSpaceCreator v_ref_space_creator(v_space, v_ref_mesh);
+    SpaceSharedPtr<double> v_ref_space = v_ref_space_creator.create_ref_space();
 
-    Hermes::vector<const Space<double> *> ref_spaces_const(u_ref_space, v_ref_space);
+    Hermes::vector<SpaceSharedPtr<double> > ref_spaces_const(u_ref_space, v_ref_space);
 
     int ndof_ref = Space<double>::get_num_dofs(ref_spaces_const);
 
@@ -180,24 +179,24 @@ int main(int argc, char* argv[])
     }
 
     // Translate the resulting coefficient vector into the instance of Solution.
-    Solution<double>::vector_to_solutions(newton.get_sln_vector(), ref_spaces_const,
-                                          Hermes::vector<Solution<double> *>(&u_ref_sln, &v_ref_sln));
+    Solution<double>::vector_to_solutions(newton.get_sln_vector(), ref_spaces_const, Hermes::vector<MeshFunctionSharedPtr<double> >(u_ref_sln, v_ref_sln));
 
-    // Project the fine mesh solution onto the coarse mesh.
-    OGProjection<double> ogProjection; ogProjection.project_global(Hermes::vector<const Space<double> *>(&u_space, &v_space),
-                                                                   Hermes::vector<Solution<double> *>(&u_ref_sln, &v_ref_sln),
-                                                                   Hermes::vector<Solution<double> *>(&u_sln, &v_sln));
+    // Project the fine mesh solution onto the coarse mesh->
+    OGProjection<double> ogProjection; ogProjection.project_global(Hermes::vector<SpaceSharedPtr<double> >(u_space, v_space),
+                                                                   Hermes::vector<MeshFunctionSharedPtr<double> >(u_ref_sln, v_ref_sln),
+                                                                   Hermes::vector<MeshFunctionSharedPtr<double> >(u_sln, v_sln));
+
 
     // Calculate element errors.
-    Adapt<double>* adaptivity = new Adapt<double>(Hermes::vector<Space<double> *>(&u_space, &v_space));
+    Adapt<double>* adaptivity = new Adapt<double>(Hermes::vector<SpaceSharedPtr<double> >(u_space, v_space));
 
     // Calculate error estimate for each solution component and the total error estimate.
     Hermes::vector<double> err_est_rel;
-    double err_est_rel_total = adaptivity->calc_err_est(Hermes::vector<Solution<double> *>(&u_sln, &v_sln),
-                                                        Hermes::vector<Solution<double> *>(&u_ref_sln, &v_ref_sln),
+    double err_est_rel_total = adaptivity->calc_err_est(Hermes::vector<MeshFunctionSharedPtr<double> >(u_sln, v_sln),
+                                                        Hermes::vector<MeshFunctionSharedPtr<double> >(u_ref_sln, v_ref_sln),
                                                         &err_est_rel) * 100;
 
-    // If err_est too large, adapt the mesh.
+    // If err_est too large, adapt the mesh->
     if (err_est_rel_total < ERR_STOP)
       done = true;
     else
@@ -205,7 +204,7 @@ int main(int argc, char* argv[])
       done = adaptivity->adapt(Hermes::vector<RefinementSelectors::Selector<double> *>(&selector, &selector),
                                THRESHOLD, STRATEGY, MESH_REGULARITY);
     }
-    if (Space<double>::get_num_dofs(Hermes::vector<const Space<double> *>(&u_space, &v_space)) >= NDOF_STOP) done = true;
+    if (Space<double>::get_num_dofs(Hermes::vector<SpaceSharedPtr<double> >(u_space, v_space)) >= NDOF_STOP) done = true;
 
     // Clean up.
     delete adaptivity;
@@ -215,64 +214,64 @@ int main(int argc, char* argv[])
   }
   while (done == false);
 
-	if(std::abs(u_ref_sln.get_pt_value(-0.98, -0.98)->val[0]- 0.000986633) > 1e-4) 
+	if(std::abs(u_ref_sln->get_pt_value(-0.98, -0.98)->val[0]- 0.000986633) > 1e-4) 
 	{
 		printf("Failure!\n");
 		return -1;
 	}
-	if(std::abs(v_ref_sln.get_pt_value(-0.98, -0.98)->val[0]- 0.747675) > 1e-4) 
+	if(std::abs(v_ref_sln->get_pt_value(-0.98, -0.98)->val[0]- 0.747675) > 1e-4) 
 	{
 		printf("Failure!\n");
 		return -1;
 	}
-	if(std::abs(u_ref_sln.get_pt_value(-0.98, 0.98)->val[0]- 0.000986633) > 1e-4) 
+	if(std::abs(u_ref_sln->get_pt_value(-0.98, 0.98)->val[0]- 0.000986633) > 1e-4) 
 	{
 		printf("Failure!\n");
 		return -1;
 	}
-	if(std::abs(v_ref_sln.get_pt_value(-0.98, 0.98)->val[0]- 0.747675) > 1e-4) 
-	{
-		printf("Failure!\n");
-		return -1;
-	}
-
-	if(std::abs(u_ref_sln.get_pt_value(-0.98, -0.98)->dx[0]- 0.0493155) > 1e-4) 
-	{
-		printf("Failure!\n");
-		return -1;
-	}
-	if(std::abs(v_ref_sln.get_pt_value(-0.98, -0.98)->dx[0]- 11.7667) > 1e-4) 
-	{
-		printf("Failure!\n");
-		return -1;
-	}
-	if(std::abs(u_ref_sln.get_pt_value(-0.98, 0.98)->dx[0]- 0.0493155) > 1e-4) 
-	{
-		printf("Failure!\n");
-		return -1;
-	}
-	if(std::abs(v_ref_sln.get_pt_value(-0.98, 0.98)->dx[0]- 11.7667) > 1e-4) 
+	if(std::abs(v_ref_sln->get_pt_value(-0.98, 0.98)->val[0]- 0.747675) > 1e-4) 
 	{
 		printf("Failure!\n");
 		return -1;
 	}
 
-	if(std::abs(u_ref_sln.get_pt_value(-0.98, -0.98)->dy[0]- 0.0493155) > 1e-4) 
+	if(std::abs(u_ref_sln->get_pt_value(-0.98, -0.98)->dx[0]- 0.0493155) > 1e-4) 
 	{
 		printf("Failure!\n");
 		return -1;
 	}
-	if(std::abs(v_ref_sln.get_pt_value(-0.98, -0.98)->dy[0]- 11.7667) > 1e-4) 
+	if(std::abs(v_ref_sln->get_pt_value(-0.98, -0.98)->dx[0]- 11.7667) > 1e-4) 
 	{
 		printf("Failure!\n");
 		return -1;
 	}
-	if(std::abs(u_ref_sln.get_pt_value(-0.98, 0.98)->dy[0] + 0.0493155) > 1e-4) 
+	if(std::abs(u_ref_sln->get_pt_value(-0.98, 0.98)->dx[0]- 0.0493155) > 1e-4) 
 	{
 		printf("Failure!\n");
 		return -1;
 	}
-	if(std::abs(v_ref_sln.get_pt_value(-0.98, 0.98)->dy[0] + 11.7667) > 1e-4) 
+	if(std::abs(v_ref_sln->get_pt_value(-0.98, 0.98)->dx[0]- 11.7667) > 1e-4) 
+	{
+		printf("Failure!\n");
+		return -1;
+	}
+
+	if(std::abs(u_ref_sln->get_pt_value(-0.98, -0.98)->dy[0]- 0.0493155) > 1e-4) 
+	{
+		printf("Failure!\n");
+		return -1;
+	}
+	if(std::abs(v_ref_sln->get_pt_value(-0.98, -0.98)->dy[0]- 11.7667) > 1e-4) 
+	{
+		printf("Failure!\n");
+		return -1;
+	}
+	if(std::abs(u_ref_sln->get_pt_value(-0.98, 0.98)->dy[0] + 0.0493155) > 1e-4) 
+	{
+		printf("Failure!\n");
+		return -1;
+	}
+	if(std::abs(v_ref_sln->get_pt_value(-0.98, 0.98)->dy[0] + 11.7667) > 1e-4) 
 	{
 		printf("Failure!\n");
 		return -1;

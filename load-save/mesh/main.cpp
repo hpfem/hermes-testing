@@ -8,15 +8,15 @@ int main(int argc, char* argv[])
 {
   Hermes::Mixins::TimeMeasurable time;
   time.tick();
-  // Load the mesh.
-  Hermes::Hermes2D::Mesh mesh1;
-  Hermes::Hermes2D::Mesh mesh2;
-  Hermes::vector<Mesh*> meshes;
-  Hermes::vector<Mesh*> meshes1;
-  meshes.push_back(&mesh1);
-  meshes1.push_back(&mesh1);
-  meshes1.push_back(&mesh2);
-  Hermes::Hermes2D::MeshReaderH2DXML mloader;
+  // Load the mesh->
+  MeshSharedPtr mesh1(new Mesh);
+  MeshSharedPtr mesh2(new Mesh);
+  Hermes::vector<MeshSharedPtr> meshes;
+  Hermes::vector<MeshSharedPtr> meshes1;
+  meshes.push_back(mesh1);
+  meshes1.push_back(mesh1);
+  meshes1.push_back(mesh2);
+  MeshReaderH2DXML mloader;
   bool exceptionCaughtCorrectly = false;
   mloader.set_validation(true);
   try
@@ -173,15 +173,15 @@ int main(int argc, char* argv[])
     }
 
     mloader.load("bad-1.xml", meshes1);
-    int nelem = mesh1.get_num_active_elements();
-    mesh1.refine_all_elements();
+    int nelem = mesh1->get_num_active_elements();
+    mesh1->refine_all_elements();
     
-    if(mesh1.get_num_active_elements() != 4 * nelem)
+    if(mesh1->get_num_active_elements() != 4 * nelem)
       throw Hermes::Exceptions::Exception("fail");
-    mesh1.unrefine_all_elements();
+    mesh1->unrefine_all_elements();
     mloader.save("saved2.xml", meshes);
     mloader.load("saved2.xml", meshes);
-    if(mesh1.get_num_active_elements() != nelem)
+    if(mesh1->get_num_active_elements() != nelem)
       throw Hermes::Exceptions::Exception("fail");
   }
   catch(std::exception& e)

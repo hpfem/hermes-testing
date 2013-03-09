@@ -20,32 +20,32 @@ const double FIXED_BDY_TEMP = 20.0;        // Fixed temperature on the boundary.
 
 int main(int argc, char* argv[])
 {
-  // Load the mesh.
-  Hermes::Hermes2D::Mesh mesh;
-  Hermes::Hermes2D::MeshReaderH2DXML mloader;
+  // Load the mesh->
+  MeshSharedPtr mesh(new Mesh);
+  MeshReaderH2DXML mloader;
   mloader.set_validation(false);
-  mloader.load("domain.xml", &mesh);
+  mloader.load("domain.xml", mesh);
 
   // Perform initial mesh refinements (optional).
-  mesh.refine_in_areas(Hermes::vector<std::string>("Aluminum", "Copper"), INIT_REF_NUM);
+  mesh->refine_in_areas(Hermes::vector<std::string>("Aluminum", "Copper"), INIT_REF_NUM);
 
   // Initialize the weak formulation.
   CustomWeakFormPoisson wf("Aluminum", new Hermes::Hermes1DFunction<double>(LAMBDA_AL), "Copper",
     new Hermes::Hermes1DFunction<double>(LAMBDA_CU), new Hermes::Hermes2DFunction<double>(-VOLUME_HEAT_SRC));
 
   // Initialize essential boundary conditions.
-  Hermes::Hermes2D::DefaultEssentialBCConst<double> bc_essential(Hermes::vector<std::string>("Bottom", "Inner", "Outer", "Left"),
+  DefaultEssentialBCConst<double> bc_essential(Hermes::vector<std::string>("Bottom", "Inner", "Outer", "Left"),
     FIXED_BDY_TEMP);
-  Hermes::Hermes2D::EssentialBCs<double> bcs(&bc_essential);
+  EssentialBCs<double> bcs(&bc_essential);
 
   // Create an H1 space with default shapeset.
-  Hermes::Hermes2D::H1Space<double> space(&mesh, &bcs, P_INIT);
+  SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
 
   // Initialize the solution.
-  Hermes::Hermes2D::Solution<double> sln;
+  MeshFunctionSharedPtr<double> sln(new Solution<double>());
 
   // Initialize linear solver.
-  Hermes::Hermes2D::LinearSolver<double> linear_solver(&wf, &space);
+  LinearSolver<double> linear_solver(&wf, space);
 
   // Solve the linear problem.
   linear_solver.solve();
@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
   // current shapeset. If you change the shapeset,
   // you need to correct these numbers.
   double sum = 0;
-  for (int i = 0; i < space.get_num_dofs(); i++)
+  for (int i = 0; i < space->get_num_dofs(); i++)
     sum += linear_solver.get_sln_vector()[i];
   printf("coefficient sum = %f\n", sum);
 

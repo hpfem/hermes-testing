@@ -44,38 +44,38 @@ int main(int argc, char* argv[])
   // Choose a Butcher's table or define your own.
   ButcherTable bt(butcher_table_type);
 
-  // Load the mesh.
-  Mesh mesh;
+  // Load the mesh->
+  MeshSharedPtr mesh(new Mesh);
   MeshReaderH2D mloader;
-  mloader.load("cathedral.mesh", &mesh);
+  mloader.load("cathedral.mesh", mesh);
 
   // Perform initial mesh refinements.
   for(int i = 0; i < INIT_REF_NUM; i++)
-    mesh.refine_all_elements();
-  mesh.refine_towards_boundary("Boundary_air", INIT_REF_NUM_BDY);
-  mesh.refine_towards_boundary("Boundary_ground", INIT_REF_NUM_BDY);
+    mesh->refine_all_elements();
+  mesh->refine_towards_boundary("Boundary_air", INIT_REF_NUM_BDY);
+  mesh->refine_towards_boundary("Boundary_ground", INIT_REF_NUM_BDY);
 
   // Previous and next time level solutions.
-  Solution<double>* sln_time_prev = new ConstantSolution<double>(&mesh, TEMP_INIT);
-  Solution<double>* sln_time_new = new Solution<double>(&mesh);
+  MeshFunctionSharedPtr<double> sln_time_prev(new ConstantSolution<double>(mesh, TEMP_INIT));
+  MeshFunctionSharedPtr<double> sln_time_new(new Solution<double>(mesh));
 
   // Initialize the weak formulation.
-  double current_time = 0;
+	double current_time = 0;
 
   CustomWeakFormHeatRK wf("Boundary_air", ALPHA, LAMBDA, HEATCAP, RHO,
                           &current_time, TEMP_INIT, T_FINAL);
   wf.set_global_integration_order(10);
 
   // Initialize boundary conditions.
-  Hermes::Hermes2D::DefaultEssentialBCConst<double> bc_essential("Boundary_ground", TEMP_INIT);
-  Hermes::Hermes2D::EssentialBCs<double>bcs(&bc_essential);
+  DefaultEssentialBCConst<double> bc_essential("Boundary_ground", TEMP_INIT);
+  EssentialBCs<double>bcs(&bc_essential);
 
   // Create an H1 space with default shapeset.
-  H1Space<double> space(&mesh, &bcs, P_INIT);
-  int ndof = space.get_num_dofs();
+  SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
+  int ndof = space->get_num_dofs();
 
   // Initialize Runge-Kutta time stepping.
-  RungeKutta<double> runge_kutta(&wf, &space, &bt);
+  RungeKutta<double> runge_kutta(&wf, space, &bt);
 
   runge_kutta.set_verbose_output(true);
 
@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
     // Perform one Runge-Kutta time step according to the selected Butcher's table.
     try
     {
-      runge_kutta.set_space(&space);
+      runge_kutta.set_space(space);
       runge_kutta.set_time(current_time);
       runge_kutta.set_time_step(time_step);
       runge_kutta.rk_time_step_newton(sln_time_prev, sln_time_new);

@@ -78,7 +78,7 @@ const int NDOF_STOP = 60000;
 MatrixSolverType matrix_solver = SOLVER_UMFPACK;  
 
 // Newton's method
-// Stopping criterion for Newton on fine mesh.
+// Stopping criterion for Newton on fine mesh->
 const double NEWTON_TOL = 1e-5;                   
 // Maximum allowed number of Newton iterations.
 const int NEWTON_MAX_ITER = 20;                   
@@ -110,25 +110,25 @@ int main(int argc, char* argv[])
   // Choose a Butcher's table or define your own.
   ButcherTable bt(butcher_table_type);
 
-  // Load the mesh.
-  Mesh mesh, basemesh;
+  // Load the mesh->
+  MeshSharedPtr mesh(new Mesh), basemesh(new Mesh);
   MeshReaderH2D mloader;
-  mloader.load("square.mesh", &basemesh);
+  mloader.load("square.mesh", basemesh);
 
   // Perform initial mesh refinements.
-  for(int i = 0; i < INIT_REF_NUM; i++) basemesh.refine_all_elements(0, true);
-  mesh.copy(&basemesh);
+  for(int i = 0; i < INIT_REF_NUM; i++) basemesh->refine_all_elements(0, true);
+  mesh->copy(basemesh);
   
   // Initialize boundary conditions.
   EssentialBCNonConst bc_essential("Bdy");
   EssentialBCs<double> bcs(&bc_essential);
 
   // Create an H1 space with default shapeset.
-  H1Space<double> space(&mesh, &bcs, P_INIT);
-  int ndof_coarse = space.get_num_dofs();
+  SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
+  int ndof_coarse = space->get_num_dofs();
 
   // Previous time level solution (initialized by initial condition).
-  CustomInitialCondition sln_time_prev(&mesh);
+  MeshFunctionSharedPtr<double> sln_time_prev(new CustomInitialCondition (mesh));
 
   // Initialize the weak formulation
   CustomNonlinearity lambda(alpha);
@@ -137,13 +137,14 @@ int main(int argc, char* argv[])
   wf.set_verbose_output(false);
 
   // Next time level solution.
-  Solution<double> sln_time_new(&mesh);
+  MeshFunctionSharedPtr<double> sln_time_new(new Solution<double>());
+  MeshFunctionSharedPtr<double> sln_coarse(new Solution<double>());
 
   // Create a refinement selector.
   H1ProjBasedSelector<double> selector(CAND_LIST, CONV_EXP, H2DRS_DEFAULT_ORDER);
   
   // Initialize Runge-Kutta time stepping.
-  RungeKutta<double> runge_kutta(&wf, &space, &bt);
+  RungeKutta<double> runge_kutta(&wf, space, &bt);
       
   // Time stepping loop.
   double current_time = 0; int ts = 1;
@@ -153,19 +154,19 @@ int main(int argc, char* argv[])
     if (ts > 1 && ts % UNREF_FREQ == 0) 
     {
       switch (UNREF_METHOD) {
-        case 1: mesh.copy(&basemesh);
-                space.set_uniform_order(P_INIT);
+        case 1: mesh->copy(basemesh);
+                space->set_uniform_order(P_INIT);
                 break;
-        case 2: mesh.unrefine_all_elements();
-                space.set_uniform_order(P_INIT);
+        case 2: mesh->unrefine_all_elements();
+                space->set_uniform_order(P_INIT);
                 break;
-        case 3: mesh.unrefine_all_elements();
-                space.adjust_element_order(-1, -1, P_INIT, P_INIT);
+        case 3: mesh->unrefine_all_elements();
+                space->adjust_element_order(-1, -1, P_INIT, P_INIT);
                 break;
       }
 
-      space.assign_dofs();
-      ndof_coarse = Space<double>::get_num_dofs(&space);
+      space->assign_dofs();
+      ndof_coarse = Space<double>::get_num_dofs(space);
     }
 
     // Spatial adaptivity loop. Note: sln_time_prev must not be changed 
@@ -173,11 +174,11 @@ int main(int argc, char* argv[])
     bool done = false; int as = 1;
     double err_est;
     do {
-      // Construct globally refined reference mesh and setup reference space.
-      Mesh::ReferenceMeshCreator ref_mesh_creator(&mesh);
-		  Mesh* ref_mesh = ref_mesh_creator.create_ref_mesh();
-		  Space<double>::ReferenceSpaceCreator ref_space_creator(&space, ref_mesh);
-		  Space<double>* ref_space = ref_space_creator.create_ref_space();
+      // Construct globally refined reference mesh and setup reference space->
+      Mesh::ReferenceMeshCreator ref_mesh_creator(mesh);
+		  MeshSharedPtr ref_mesh = ref_mesh_creator.create_ref_mesh();
+		  Space<double>::ReferenceSpaceCreator ref_space_creator(space, ref_mesh);
+		  SpaceSharedPtr<double> ref_space = ref_space_creator.create_ref_space();
       int ndof_ref = Space<double>::get_num_dofs(ref_space);
 
       // Perform one Runge-Kutta time step according to the selected Butcher's table.
@@ -187,28 +188,27 @@ int main(int argc, char* argv[])
         runge_kutta.set_verbose_output(false);
         runge_kutta.set_time(current_time);
         runge_kutta.set_time_step(time_step);
-        runge_kutta.rk_time_step_newton(&sln_time_prev, &sln_time_new);
+        runge_kutta.rk_time_step_newton(sln_time_prev, sln_time_new);
       }
       catch(Exceptions::Exception& e)
       {
         std::cout << e.what();
       }
 
-      // Project the fine mesh solution onto the coarse mesh.
-      Solution<double> sln_coarse;
-      OGProjection<double> ogProjection; ogProjection.project_global(&space, &sln_time_new, &sln_coarse); 
+      // Project the fine mesh solution onto the coarse mesh->
+      OGProjection<double> ogProjection; ogProjection.project_global(space, sln_time_new, sln_coarse); 
 
       // Calculate element errors and total error estimate.
-      Adapt<double>* adaptivity = new Adapt<double>(&space);
-      double err_est_rel_total = adaptivity->calc_err_est(&sln_coarse, &sln_time_new) * 100;
+      Adapt<double>* adaptivity = new Adapt<double>(space);
+      double err_est_rel_total = adaptivity->calc_err_est(sln_coarse, sln_time_new) * 100;
 
-      // If err_est too large, adapt the mesh.
+      // If err_est too large, adapt the mesh->
       if (err_est_rel_total < ERR_STOP) done = true;
       else 
       {
         done = adaptivity->adapt(&selector, THRESHOLD, STRATEGY, MESH_REGULARITY);
 
-        if (Space<double>::get_num_dofs(&space) >= NDOF_STOP) 
+        if (Space<double>::get_num_dofs(space) >= NDOF_STOP) 
           done = true;
         else
           // Increase the counter of performed adaptivity steps.
@@ -217,15 +217,10 @@ int main(int argc, char* argv[])
       
       // Clean up.
       delete adaptivity;
-      if(!done)
-        delete sln_time_new.get_mesh();
-      delete ref_space;
     }
     while (done == false);
 
-    if(ts > 1)
-      delete sln_time_prev.get_mesh();
-    sln_time_prev.copy(&sln_time_new);
+    sln_time_prev->copy(sln_time_new);
 
     // Increase current time and counter of time steps.
     current_time += time_step;

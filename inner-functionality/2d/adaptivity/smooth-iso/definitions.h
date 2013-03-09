@@ -1,6 +1,6 @@
 #include "hermes2d.h"
 
-using namespace Hermes::Hermes2D;
+using namespace Hermes::Hermes2D;;
 using namespace WeakFormsH1;
 using Hermes::Ord;
 
@@ -9,8 +9,13 @@ using Hermes::Ord;
 class CustomExactSolution : public ExactSolutionScalar<double>
 {
 public:
-  CustomExactSolution(Mesh* mesh) : ExactSolutionScalar<double>(mesh)
+  CustomExactSolution(MeshSharedPtr mesh) : ExactSolutionScalar<double>(mesh)
   {
+  }
+
+  ~CustomExactSolution()
+  {
+    this->a = 0;
   }
 
   virtual void derivatives(double x, double y, double& dx, double& dy) const;
@@ -18,6 +23,10 @@ public:
   virtual double value(double x, double y) const;
 
   virtual Ord ord(Ord x, Ord y) const;
+
+  virtual MeshFunction<double>* clone() const { return new CustomExactSolution(this->mesh); }
+
+  int a;
 };
 
 /* Custom function f */
