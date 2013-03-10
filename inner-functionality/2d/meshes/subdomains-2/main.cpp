@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
     try
     {
       solver.solve();
-      Solution<double>::vector_to_solutions(solver.get_sln_vector(), Hermes::vector<SpaceSharedPtr<double>>(spaceTemperature, spaceAdvectionDiffusion), Hermes::vector<MeshFunctionSharedPtr<double>>(slnTemp, slnAdv));
+      Solution<double>::vector_to_solutions(solver.get_sln_vector(), Hermes::vector<SpaceSharedPtr<double> >(spaceTemperature, spaceAdvectionDiffusion), Hermes::vector<MeshFunctionSharedPtr<double> >(slnTemp, slnAdv));
     }
     catch(std::exception& e)
     {
