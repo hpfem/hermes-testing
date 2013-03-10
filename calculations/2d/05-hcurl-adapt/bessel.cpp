@@ -2369,6 +2369,11 @@ double exp(), log(), sin(), cos(), acos(), pow(), gamma(), lgam();
 static double recur(), jvs(), hankel(), jnx(), jnt();
 #endif
 
+#ifndef _MSC_VER
+  #define _j0(x) j0(x)
+  #define _j1(x) j1(x)
+#endif
+
 extern double MAXNUM, MACHEP, MINLOG, MAXLOG;
 #define BIG  1.44115188075855872E+17
 
@@ -2398,9 +2403,9 @@ double jv(double n, double x)
       x = -x;
     }
     if( n == 0.0 )
-      return( j0(x) );
+      return( _j0(x) );
     if( n == 1.0 )
-      return( sign * j1(x) );
+      return( sign * _j1(x) );
   }
 
   if( (x < 0.0) && (y != an) )
@@ -2434,12 +2439,12 @@ double jv(double n, double x)
       q = recur( &n, x, &k, 1 );
       if( k == 0.0 )
       {
-        y = j0(x)/q;
+        y = _j0(x)/q;
         goto done;
       }
       if( k == 1.0 )
       {
-        y = j1(x)/q;
+        y = _j1(x)/q;
         goto done;
       }
     }
