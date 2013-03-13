@@ -43,5 +43,5 @@ Ord CustomWeakForm::CustomFormAdvection::ord(int n, double *wt, Func<Ord> *u_ext
 
 MatrixFormVol<double>* CustomWeakForm::CustomFormAdvection::clone() const
 {
-  return new CustomFormAdvection(*this);
+  return new CustomFormAdvection(i, j, this->areas[0]);
 }

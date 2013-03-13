@@ -70,7 +70,7 @@ wf.set_verbose_output(false);
 
   // This is in a block to test that the instances mesh and space can be deleted after being copied with no harm.
   {
-    // Load the mesh->
+    // Load the mesh.
     MeshReaderH2DXML mloader;
     mloader.set_validation(false);
     mloader.load("domain.xml", mesh);

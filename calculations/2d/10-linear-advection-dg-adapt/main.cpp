@@ -59,7 +59,7 @@ const char* preconditioner = "jacobi";
 
 int main(int argc, char* args[])
 {
-  // Load the mesh->
+  // Load the mesh.
   MeshSharedPtr mesh(new Mesh);
   MeshReaderH2D mloader;
   mloader.load("square.mesh", mesh);

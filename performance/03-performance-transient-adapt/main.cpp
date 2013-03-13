@@ -110,7 +110,7 @@ int main(int argc, char* argv[])
   // Choose a Butcher's table or define your own.
   ButcherTable bt(butcher_table_type);
 
-  // Load the mesh->
+  // Load the mesh.
   MeshSharedPtr mesh(new Mesh), basemesh(new Mesh);
   MeshReaderH2D mloader;
   mloader.load("square.mesh", basemesh);

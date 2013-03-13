@@ -8,7 +8,7 @@ int main(int argc, char* argv[])
 {
   Hermes::Mixins::TimeMeasurable time;
   time.tick();
-  // Load the mesh->
+  // Load the mesh.
   MeshSharedPtr mesh1(new Mesh);
   MeshSharedPtr mesh2(new Mesh);
   Hermes::vector<MeshSharedPtr> meshes;

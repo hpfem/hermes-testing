@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
     return -1;
   }
 
-  // Load the mesh->
+  // Load the mesh.
   MeshSharedPtr mesh(new Mesh);
   MeshReaderH2D mloader;
   mloader.load(argv[1], mesh);

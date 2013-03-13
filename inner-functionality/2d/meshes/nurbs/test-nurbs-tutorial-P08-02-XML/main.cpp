@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
   if(argc < 2)
     throw Hermes::Exceptions::Exception("Not enough parameters.");
 
-  // Load the mesh->
+  // Load the mesh.
   MeshSharedPtr mesh(new Mesh);
   MeshReaderH2DXML mloader;
   mloader.set_validation(false);

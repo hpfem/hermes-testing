@@ -64,7 +64,7 @@ using namespace Hermes::Hermes2D::RefinementSelectors;
 
 int main(int argc, char* argv[])
 {
-  // Load the mesh->
+  // Load the mesh.
   MeshSharedPtr mesh(new Mesh);
   MeshReaderH2D mloader;
   mloader.load("lshape3q.mesh", mesh);    // quadrilaterals

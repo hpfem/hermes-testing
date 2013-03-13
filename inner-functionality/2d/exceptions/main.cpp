@@ -112,7 +112,7 @@ int main(int argc, char* argv[])
 
   try
   {
-    // Load the mesh->
+    // Load the mesh.
     MeshSharedPtr mesh(new Mesh);
     MeshReaderH2D mloader;
     mloader.load("domain.mesh", mesh);
