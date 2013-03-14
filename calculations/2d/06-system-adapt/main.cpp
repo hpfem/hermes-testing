@@ -181,7 +181,7 @@ int main(int argc, char* argv[])
     // Translate the resulting coefficient vector into the instance of Solution.
     Solution<double>::vector_to_solutions(newton.get_sln_vector(), ref_spaces_const, Hermes::vector<MeshFunctionSharedPtr<double> >(u_ref_sln, v_ref_sln));
 
-    // Project the fine mesh solution onto the coarse mesh->
+    // Project the fine mesh solution onto the coarse mesh.
     OGProjection<double> ogProjection; ogProjection.project_global(Hermes::vector<SpaceSharedPtr<double> >(u_space, v_space),
                                                                    Hermes::vector<MeshFunctionSharedPtr<double> >(u_ref_sln, v_ref_sln),
                                                                    Hermes::vector<MeshFunctionSharedPtr<double> >(u_sln, v_sln));

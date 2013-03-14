@@ -17,16 +17,17 @@ Hermes::MatrixSolverType matrix_solver_type = Hermes::SOLVER_UMFPACK;
 
 int main(int argc, char* argv[])
 {
-  Hermes2DApi.set_integral_param_value(numThreads, 2);
-
   // Load the mesh.
   MeshSharedPtr meshVertical(new Mesh), meshHorizontal(new Mesh);
   Hermes::vector<MeshSharedPtr> meshes (meshVertical, meshHorizontal);
   MeshReaderH2DXML mloader;
-  mloader.set_validation(false);
+	mloader.set_validation(false);
   mloader.load("subdomains.xml", meshes);
 
   // Perform initial mesh refinements (optional).
+  for(int i = 0; i < INIT_REF_NUM; i++)
+    for(unsigned int meshes_i = 0; meshes_i < meshes.size(); meshes_i++)
+      meshes[meshes_i]->refine_all_elements();
 
   DefaultEssentialBCConst<double> bc_essentialTemperature(HERMES_ANY, 0.0);
   EssentialBCs<double> bcsTemperature(&bc_essentialTemperature);
@@ -64,7 +65,7 @@ int main(int argc, char* argv[])
 
   // Values as of 04022013
   /*
-    9.7117986964428873v
+    9.7117986964428873
     -21.846810183868349
     -1.1517121406884645
     0.070238847349849406

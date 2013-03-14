@@ -195,7 +195,7 @@ int main(int argc, char* argv[])
         std::cout << e.what();
       }
 
-      // Project the fine mesh solution onto the coarse mesh->
+      // Project the fine mesh solution onto the coarse mesh.
       OGProjection<double> ogProjection; ogProjection.project_global(space, sln_time_new, sln_coarse); 
 
       // Calculate element errors and total error estimate.
