@@ -38,7 +38,6 @@ const double FIXED_BDY_TEMP = 20.0;        // Fixed temperature on the boundary.
 
 int main(int argc, char* argv[])
 {
-
   // Load the mesh.
   MeshSharedPtr mesh(new Mesh);
   MeshReaderH2DXML mloader;
@@ -135,7 +134,7 @@ int main(int argc, char* argv[])
       viewS.set_palette_filter(true);
       viewS.save_screenshot("008-paletteBack.bmp");
       viewS.show_mesh(false);
-      viewS.save_screenshot("009-nomesh->bmp");
+      viewS.save_screenshot("009-nomesh.bmp");
       viewS.set_scale_size(40, 1230, 14);
       viewS.save_screenshot("010-scaleSize.bmp");
 
