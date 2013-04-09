@@ -84,7 +84,8 @@ int main(int argc, char* args[])
   CustomWeakForm wf("Bdy_bottom_left", mesh);
 
   // Initialize the FE problem.
-  DiscreteProblemLinear<double> dp(&wf, space);
+  DiscreteProblem<double> dp(&wf, space);
+  dp.set_linear();
 
   // Initialize linear solver.
   LinearSolver<double> linear_solver(&dp);

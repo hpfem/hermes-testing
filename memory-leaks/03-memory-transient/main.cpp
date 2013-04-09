@@ -90,6 +90,10 @@ int main(int argc, char* argv[])
 
   // Initialize Newton solver.
   NewtonSolver<double> newton(dp);
+  newton.set_verbose_output(false);
+  newton.set_newton_max_iter(NEWTON_MAX_ITER);
+  newton.set_newton_tol(NEWTON_TOL);
+  newton.set_jacobian_constant();
 
   // Time stepping loop.
   double current_time = 0; int ts = 1;
@@ -98,10 +102,7 @@ int main(int argc, char* argv[])
     // Perform Newton's iteration.
     try
     {
-      newton.set_verbose_output(false);
-      newton.set_newton_max_iter(NEWTON_MAX_ITER);
-      newton.set_newton_tol(NEWTON_TOL);
-      newton.solve_keep_jacobian(coeff_vec);
+      newton.solve();
     }
     catch(Hermes::Exceptions::Exception e)
     {

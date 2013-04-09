@@ -106,7 +106,8 @@ int main(int argc, char* argv[])
 	// Initialize the Newton solver.
 	NewtonSolver<double> newton;
 	newton.set_weak_formulation(wf);
-	newton.set_spaces(Hermes::vector<SpaceSharedPtr<double> >(xvel_space, yvel_space, p_space));
+  Hermes::vector<SpaceSharedPtr<double> > spaces(xvel_space, yvel_space, p_space);
+	newton.set_spaces(spaces);
 
   // Project the initial condition on the FE space to obtain initial
   // coefficient vector for the Newton's method.
@@ -119,6 +120,8 @@ int main(int argc, char* argv[])
 
   newton.set_newton_max_iter(NEWTON_MAX_ITER);
   newton.set_newton_tol(NEWTON_TOL);
+	newton.set_weak_formulation(wf);
+  newton.set_jacobian_constant();
 
   // Time-stepping loop:
   int num_time_steps = T_FINAL / TAU;
@@ -133,8 +136,7 @@ int main(int argc, char* argv[])
     // Perform Newton's iteration and translate the resulting coefficient vector into previous time level solutions.
     try
     {
-			newton.set_weak_formulation(wf);
-      newton.solve_keep_jacobian(coeff_vec);
+      newton.solve();
     }
     catch(Hermes::Exceptions::Exception& e)
     {
