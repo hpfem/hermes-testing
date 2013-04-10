@@ -138,7 +138,11 @@ int main(int argc, char* argv[])
   H1ProjBasedSelector<double> selector(CAND_LIST, CONV_EXP, H2DRS_DEFAULT_ORDER);
 
   NewtonSolver<double> newton;
+  newton.set_weak_formulation(&wf);
 
+      newton.set_newton_tol(1e-1);
+
+      
   // Adaptivity loop:
   int as = 1;
   bool done = false;
@@ -162,10 +166,6 @@ int main(int argc, char* argv[])
     try
     {
       newton.set_spaces(ref_spaces_const);
-
-      newton.set_weak_formulation(&wf);
-
-      newton.set_newton_tol(1e-1);
 
       newton.solve();
     }
