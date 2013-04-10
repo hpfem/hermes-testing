@@ -47,7 +47,8 @@ int main(int argc, char* argv[])
   ScalarView sTemp("Temperature");
   ScalarView sAdv("Advection");
 
-  LinearSolver<double> solver(&wf, Hermes::vector<SpaceSharedPtr<double> >(spaceTemperature, spaceAdvectionDiffusion));
+  Hermes::vector<SpaceSharedPtr<double> > spaces(spaceTemperature, spaceAdvectionDiffusion);
+  LinearSolver<double> solver(&wf, spaces);
   for(int step = 0; step <= 1; step++)
   {
     try
