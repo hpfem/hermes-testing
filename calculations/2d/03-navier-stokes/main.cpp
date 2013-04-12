@@ -118,8 +118,8 @@ int main(int argc, char* argv[])
     Hermes::vector<MeshFunctionSharedPtr<double> >(xvel_prev_time, yvel_prev_time, p_prev_time),
     coeff_vec, Hermes::vector<ProjNormType>(vel_proj_norm, vel_proj_norm, p_proj_norm));
 
-  newton.set_newton_max_iter(NEWTON_MAX_ITER);
-  newton.set_newton_tol(NEWTON_TOL);
+	newton.set_max_allowed_iterations(NEWTON_MAX_ITER);
+  newton.set_tolerance(NEWTON_TOL);
 	newton.set_weak_formulation(wf);
   newton.set_jacobian_constant();
 

@@ -140,8 +140,7 @@ int main(int argc, char* argv[])
   NewtonSolver<double> newton;
   newton.set_weak_formulation(&wf);
 
-      newton.set_newton_tol(1e-1);
-
+  newton.set_tolerance(1e-1);
       
   // Adaptivity loop:
   int as = 1;
@@ -185,7 +184,6 @@ int main(int argc, char* argv[])
     OGProjection<double> ogProjection; ogProjection.project_global(Hermes::vector<SpaceSharedPtr<double> >(u_space, v_space),
                                                                    Hermes::vector<MeshFunctionSharedPtr<double> >(u_ref_sln, v_ref_sln),
                                                                    Hermes::vector<MeshFunctionSharedPtr<double> >(u_sln, v_sln));
-
 
     // Calculate element errors.
     Adapt<double>* adaptivity = new Adapt<double>(Hermes::vector<SpaceSharedPtr<double> >(u_space, v_space));
