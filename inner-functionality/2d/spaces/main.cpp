@@ -20,7 +20,7 @@ public:
 class BCNonConst : public DefaultEssentialBCNonConst<double>
 {
 public:
-  BCNonConst(std::string marker, ExactSolutionScalar<double>* exact_solution) : DefaultEssentialBCNonConst<double>(marker, exact_solution) {};
+  BCNonConst(std::string marker, MeshFunctionSharedPtr<double> exact_solution) : DefaultEssentialBCNonConst<double>(marker, exact_solution) {};
 
   double value(double x, double y, double n_x, double n_y, double t_x, double t_y) const
   {
@@ -57,12 +57,11 @@ int main(int argc, char* argv[])
     mesh_square->refine_all_elements();
 
     // H1Spaces from order 1 for various boundary conditions:
-    CustomExactSol exact(mesh_lshape);
-    Hermes::vector<BCNonConst> bc_essential(
-      BCNonConst("Bottom", &exact),
-      BCNonConst("Outer", &exact),
-      BCNonConst("Inner", &exact),
-      BCNonConst("Left", &exact));
+    MeshFunctionSharedPtr<double> exact(new CustomExactSol(mesh_lshape));
+    Hermes::vector<BCNonConst> bc_essential(BCNonConst("Bottom", exact),
+      BCNonConst("Outer", exact),
+      BCNonConst("Inner", exact),
+      BCNonConst("Left", exact));
 
     for(unsigned int poly_order_i = 1; poly_order_i < 10; poly_order_i++)
       for(unsigned int bc_i = 0; bc_i < 4; bc_i++)
