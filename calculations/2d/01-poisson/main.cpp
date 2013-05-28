@@ -1,16 +1,8 @@
 #define HERMES_REPORT_ALL
 #include "definitions.h"
 
-// This test makes sure that example 03-poisson works correctly.
-// CAUTION: This test will fail when any changes to the shapeset
-// are made, but it is easy to fix (see below).
-
 const int P_INIT = 2;                             // Uniform polynomial degree of mesh elements.
 const int INIT_REF_NUM = 3;                       // Number of initial uniform mesh refinements.
-
-// Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-// SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
-Hermes::MatrixSolverType matrix_solver_type = Hermes::SOLVER_UMFPACK;
 
 // Problem parameters.
 const double LAMBDA_AL = 236.0;            // Thermal cond. of Al for temperatures around 20 deg Celsius.
@@ -59,7 +51,8 @@ int main(int argc, char* argv[])
   printf("coefficient sum = %f\n", sum);
 
   bool success = true;
-  if(std::abs(sum + 2740.325815) > 1e-4) success = false;
+  if(std::abs(sum - 3200.074172) > 1e-5)
+    success = false;
 
   if(success == true)
   {

@@ -23,7 +23,7 @@ endif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 
 # Enabling multiprocessor build on MSVC
 if(MSVC)
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /openmp")
 else(MSVC)
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 endif(MSVC)
@@ -44,6 +44,8 @@ include_directories(${DEP_INCLUDE_PATHS})
 
 enable_testing()
 
+set(TESTING_CORE_LIBRARY "testing-core")
+add_subdirectory(testing-core)
 add_subdirectory(visualization)
 add_subdirectory(load-save)
 add_subdirectory(inner-functionality)

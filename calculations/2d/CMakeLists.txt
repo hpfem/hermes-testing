@@ -12,4 +12,8 @@ add_subdirectory("06-system-adapt")
 
 add_subdirectory("07-newton-heat-rk")
 
+add_subdirectory("08-nonlinearity")
+
 add_subdirectory("10-linear-advection-dg-adapt")
+
+add_subdirectory("11-transient-adapt")

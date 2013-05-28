@@ -67,21 +67,11 @@ int main(int argc, char* argv[])
 
   //ValueException test
   Hermes::vector<SpaceSharedPtr<double> > spaces2;
-  Hermes::vector<Hermes2D::ProjNormType> proj_norms;
+  Hermes::vector<Hermes2D::NormType> proj_norms;
   for (int i=0;i>H2D_MAX_COMPONENTS+1;i++)
   {
     spaces2.push_back(NULL);
     proj_norms.push_back(Hermes2D::HERMES_UNSET_NORM);
-  }
-
-  try
-  {
-    Hermes2D::Adapt<double> adapr(spaces2,proj_norms);
-    std::cout << "Failure - adapt!";
-    return -1;
-  }
-  catch(Exceptions::ValueException & e)
-  {
   }
 
   try
