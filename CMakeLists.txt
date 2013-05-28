@@ -34,8 +34,6 @@ find_package(UMFPACK REQUIRED)
 include_directories(${UMFPACK_INCLUDE_DIRS})
 
 find_package(PTHREAD REQUIRED)
-find_package(TCMALLOC REQUIRED)
-include_directories(${TCMALLOC_INCLUDE_DIR})
 
 set(HERMES2D_INCLUDE_PATH ${HERMES_INCLUDE_PATH}/hermes2d)
 set(HERMES_COMMON_INCLUDE_PATH ${HERMES_INCLUDE_PATH}/hermes_common)
