@@ -226,8 +226,10 @@ int main(int argc, char* argv[])
 
   std::cout << Hermes::Testing::get_current_virtual_memory() / 1048576. << " MB" << std::endl;
   Hermes::Testing::check_expected_memory(expected_memory + 7e6);
-    
+
+#ifdef _WINDOWS
   std::cout << "Peak memory: " << Hermes::Testing::get_peak_virtual_memory() / 1048576. << " MB" << std::endl;
+#endif
 
   if(success)
   {

@@ -28,7 +28,7 @@ namespace Hermes
         return i;
     }
 
-    long get_used_virtual_memory()
+    long get_current_virtual_memory()
     { //Note: this value is in KB!
         FILE* file = fopen("/proc/self/status", "r");
         int result = -1;
@@ -51,7 +51,7 @@ namespace Hermes
       long actual_memory = get_current_virtual_memory();
 #ifndef _WINDOWS
       // Linux function is in kB.
-      actual_memory *= 1024;
+      actual_memory /= 1024;
 #endif
       if(actual_memory > expected_memory)
       {
