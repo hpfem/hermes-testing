@@ -29,6 +29,10 @@ else(MSVC)
 endif(MSVC)
 
 include_directories("${PTHREAD_ROOT}/include")
+
+find_package(UMFPACK REQUIRED)
+include_directories(${UMFPACK_INCLUDE_DIRS})
+
 find_package(PTHREAD REQUIRED)
 find_package(TCMALLOC REQUIRED)
 include_directories(${TCMALLOC_INCLUDE_DIR})
