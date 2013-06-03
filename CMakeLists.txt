@@ -2,7 +2,14 @@ project(hermes_testing)
 cmake_minimum_required(VERSION 2.8)
 
 set(CMAKE_MODULE_PATH ${CMAKE_HOME_DIRECTORY}/cmake)
-      include(CommonTargetProperties)
+include(CommonTargetProperties)
+
+# For Win64
+if(${CMAKE_CL_64})
+  set(WIN64 YES)
+else(${CMAKE_CL_64})
+  set(WIN64 NO)
+endif(${CMAKE_CL_64})
 
 # Where to look for the static libraries.
 set(HERMES_DIRECTORY /usr/local/lib)
@@ -24,6 +31,12 @@ endif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 # Enabling multiprocessor build on MSVC
 if(MSVC)
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /openmp")
+  if(64_BIT)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DWIN64")
+      string (REPLACE "/DWIN32" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+  else(64_BIT)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DWIN32")
+  endif(64_BIT)
 else(MSVC)
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 endif(MSVC)
