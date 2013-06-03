@@ -16,6 +16,8 @@ set(HERMES_DIRECTORY /usr/local/lib)
 set(HERMES_INCLUDE_PATH /usr/local/include)
 set(DEP_INCLUDE_PATHS /usr/local/include)
 
+set(WITH_PARALUTION YES)
+
 # Allow to override the default values in CMake.vars:
 include(CMake.vars OPTIONAL)
 
@@ -50,6 +52,11 @@ find_package(PTHREAD REQUIRED)
 
 find_package(TCMALLOC REQUIRED)
 include_directories(${TCMALLOC_INCLUDE_DIR})
+
+if(WITH_PARALUTION)
+  find_package(PARALUTION REQUIRED)
+  include_directories(${PARALUTION_INCLUDE_DIR})
+endif(WITH_PARALUTION)
 
 set(HERMES2D_INCLUDE_PATH ${HERMES_INCLUDE_PATH}/hermes2d)
 set(HERMES_COMMON_INCLUDE_PATH ${HERMES_INCLUDE_PATH}/hermes_common)
