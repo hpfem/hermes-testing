@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
   catch(Hermes::Exceptions::MeshLoadFailureException& e)
   {
     std::cout << e.what();
-    if(!strcmp(e.what(), "Some of the vertices of element #2 are identical which is impossible.\n"))
+    if(!strcmp(e.what(), "Some of the vertices of element #2 are identical which is not right.\n"))
       exceptionCaughtCorrectly = true;
   }
 
@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
   catch(Hermes::Exceptions::MeshLoadFailureException& e)
   {
     std::cout << e.what();
-    if(!strcmp(e.what(), "Some of the vertices of element #10 are identical which is impossible.\n"))
+    if(!strcmp(e.what(), "Some of the vertices of element #10 are identical which is not right.\n"))
       exceptionCaughtCorrectly = true;
   }
 
