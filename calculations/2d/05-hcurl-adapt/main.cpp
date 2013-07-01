@@ -151,7 +151,7 @@ int main_element_type_spec(int argc, char* argv[], bool use_triangles)
   }
   else
   {
-    success = (Testing::test_value(sum.real(), -0.4003548701023980, "sum - quads - real") || Testing::test_value(sum.real(), -0.442415, "sum - quads - real")) && success; // Tested value as of May 2013.
+    success = Testing::test_value(sum.real(), -0.414547, "sum - quads - real") && success; // Tested value as of May 2013.
     success = Testing::test_value(sum.imag(), -0.0005088685276074, "sum - quads - complex") && success; // Tested value as of May 2013.
   }
 
