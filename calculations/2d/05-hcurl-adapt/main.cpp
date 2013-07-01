@@ -37,6 +37,9 @@ const double LAMBDA = 1.0;
 
 int main_element_type_spec(int argc, char* argv[], bool use_triangles)
 {
+  // Set just one thread.
+  Hermes::HermesCommonApi.set_integral_param_value(numThreads, 1);
+
   if(!use_triangles)
     ERR_STOP = 1.0;
   else
