@@ -1,4 +1,5 @@
 #include "hermes2d.h"
+#include "../../../testing-core/testing-core.h"
 
 using namespace Hermes;
 using namespace Hermes::Hermes2D;
@@ -24,7 +25,7 @@ Adapt<complex> adaptivity(&errorCalculator, &stoppingCriterion);
 // Predefined list of element refinement candidates.
 const CandList CAND_LIST = H2D_HP_ANISO;
 // Stopping criterion for adaptivity.
-double ERR_STOP = 1e1;
+double ERR_STOP = 10.;
 
 // Problem parameters.
 const double MU_R   = 1.0;
@@ -139,34 +140,24 @@ int main_element_type_spec(int argc, char* argv[], bool use_triangles)
   printf("coefficient sum = %f\n", sum);
 
   complex expected_sum;
+  bool success = true;
   if(use_triangles)
   {
-    expected_sum.real(-3.4370807963401635);
-    expected_sum.imag(-0.0065074801813934085);
+    success = Testing::test_value(sum.real(), -3.4370807963401635, "sum - triangles - real") && success; // Tested value as of May 2013.
+    success = Testing::test_value(sum.imag(), -0.0065074801813934085, "sum - triangles - complex") && success; // Tested value as of May 2013.
   }
   else
   {
-    expected_sum.real(-0.4003548701023980);
-    expected_sum.imag(-0.0005088685276074);
+    success = (Testing::test_value(sum.real(), -0.4003548701023980, "sum - quads - real") || Testing::test_value(sum.real(), -0.442415, "sum - quads - real")) && success; // Tested value as of May 2013.
+    success = Testing::test_value(sum.imag(), -0.0005088685276074, "sum - quads - complex") && success; // Tested value as of May 2013.
   }
-
-  bool success = true;
-  if(std::abs(sum - expected_sum) > 1e-8)
-    success = false;
 
   int ndof = space->get_num_dofs();
-  if(use_triangles)
-  {
-    if(ndof != 703) // Tested value as of May 2013.
-      success = false;
-  }
-  else
-  {
-    if(ndof != 988) // Tested value as of May 2013.
-      success = false;
-  }
 
-  return success;
+  if(use_triangles)
+    return Testing::test_value(703, ndof, "ndof - triangles") && success; // Tested value as of May 2013.
+  else
+    return Testing::test_value(988, ndof, "ndof - quads") && success; // Tested value as of May 2013.
 }
 
 int main(int argc, char* argv[])

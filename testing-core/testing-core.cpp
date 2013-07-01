@@ -62,5 +62,17 @@ namespace Hermes
 
       return true;
     }
+
+    bool test_value(double obtained_value, double expected_value, const char* identifier, double absolute_precision)
+    {
+      if(std::abs(expected_value - obtained_value) < absolute_precision) 
+        return true;
+      else
+      {
+        std::cout << "Failed test: " << identifier << std::endl;
+        std::cout << "Difference: " << expected_value << " - " << obtained_value << " higher than the precision (" << absolute_precision << ")." << std::endl;
+        return false;
+      }
+    }
   }
 }

@@ -24,5 +24,7 @@ namespace Hermes
 #endif
 
     bool check_expected_memory(long expected_memory);
+
+    bool test_value(double obtained_value, double expected_value, const char* identifier, double absolute_precision = 1e-4);
   }
 }
