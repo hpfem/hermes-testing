@@ -90,14 +90,6 @@ int main(int argc, char* argv[])
   int as = 1;
   bool done = false;
 
-  // Initialize views.
-    Views::ScalarView s_view_0("Solution[0]", new Views::WinGeom(0, 0, 440, 350));
-    s_view_0.show_mesh(false);
-    Views::OrderView  o_view_0("Mesh[0]", new Views::WinGeom(450, 0, 420, 350));
-    Views::ScalarView s_view_1("Solution[1]", new Views::WinGeom(880, 0, 440, 350));
-    s_view_1.show_mesh(false);
-    Views::OrderView o_view_1("Mesh[1]", new Views::WinGeom(1330, 0, 420, 350));
-
   do
   {
     // Construct globally refined reference mesh and setup reference space->
@@ -142,13 +134,6 @@ int main(int argc, char* argv[])
 
     errorCalculator.calculate_errors(slns, ref_slns, true);
     double err_est_rel_total = errorCalculator.get_total_error_squared() * 100;
-
-    
-  // View the coarse mesh solution and polynomial orders.
-    s_view_0.show(u_sln);
-    o_view_0.show(u_space);
-    s_view_1.show(v_sln);
-    o_view_1.show(v_space);
 
     adaptivity.set_spaces(Hermes::vector<SpaceSharedPtr<double> >(u_space, v_space));
 
