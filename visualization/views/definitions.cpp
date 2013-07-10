@@ -15,7 +15,7 @@ CustomWeakFormPoisson::CustomWeakFormPoisson(std::string mat_al, Hermes::Hermes1
 };
 
 TestExactSolution1::TestExactSolution1(MeshSharedPtr mesh)
-     : ExactSolutionScalar<double>(mesh) 
+     : ExactSolutionScalar<double>(mesh)
 {
 }
 

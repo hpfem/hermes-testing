@@ -1,4 +1,4 @@
-#define HERMES_REPORT_ALL
+
 #include "definitions.h"
 
 const int P_INIT = 2;                             // Uniform polynomial degree of mesh elements.

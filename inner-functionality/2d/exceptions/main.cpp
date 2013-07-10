@@ -1,4 +1,4 @@
-#define HERMES_REPORT_ALL
+
 #include "hermes2d.h"
 
 using namespace Hermes;

@@ -1,4 +1,4 @@
-#define HERMES_REPORT_ALL
+
 #include "definitions.h"
 
 // This example shows how to solve a simple PDE that describes stationary
