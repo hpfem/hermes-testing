@@ -155,13 +155,21 @@ int main(int argc, char* argv[])
 #endif
 #endif
 
-  success = Testing::compare_files("saved_sln_r-final.xml", "saved_sln_r-template.xml") && success;
-  success = Testing::compare_files("saved_sln_r-final.bson", "saved_sln_r-template.bson") &&  success;
-  success = Testing::compare_files("saved_sln_c-final.xml", "saved_sln_c-template.xml") &&  success;
-  success = Testing::compare_files("saved_sln_c-final.bson", "saved_sln_c-template.bson") &&  success;
-  success = Testing::compare_files("constant_sln-final.xml", "constant_sln-template.xml") &&  success;
-  success = Testing::compare_files("constant_sln-final.bson", "constant_sln-template.bson") && success;
-
+#if defined (_WINDOWS) || defined (WIN32) || defined (_MSC_VER)
+  success = Testing::compare_files("saved_sln_r-final.xml", "win\saved_sln_r-template.xml") && success;
+  success = Testing::compare_files("saved_sln_r-final.bson", "win\saved_sln_r-template.bson") &&  success;
+  success = Testing::compare_files("saved_sln_c-final.xml", "win\saved_sln_c-template.xml") &&  success;
+  success = Testing::compare_files("saved_sln_c-final.bson", "win\saved_sln_c-template.bson") &&  success;
+  success = Testing::compare_files("constant_sln-final.xml", "win\constant_sln-template.xml") &&  success;
+  success = Testing::compare_files("constant_sln-final.bson", "win\constant_sln-template.bson") && success;
+#else
+  success = Testing::compare_files("saved_sln_r-final.xml", "linux/saved_sln_r-template.xml") && success;
+  success = Testing::compare_files("saved_sln_r-final.bson", "linux/saved_sln_r-template.bson") &&  success;
+  success = Testing::compare_files("saved_sln_c-final.xml", "linux/saved_sln_c-template.xml") &&  success;
+  success = Testing::compare_files("saved_sln_c-final.bson", "linux/saved_sln_c-template.bson") &&  success;
+  success = Testing::compare_files("constant_sln-final.xml", "linux/constant_sln-template.xml") &&  success;
+  success = Testing::compare_files("constant_sln-final.bson", "linux/constant_sln-template.bson") && success;
+#endif
   if(success)
   {
     printf("Success!\n");
