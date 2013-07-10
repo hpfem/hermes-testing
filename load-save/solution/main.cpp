@@ -156,12 +156,12 @@ int main(int argc, char* argv[])
 #endif
 
 #if defined (_WINDOWS) || defined (WIN32) || defined (_MSC_VER)
-  success = Testing::compare_files("saved_sln_r-final.xml", "win\saved_sln_r-template.xml") && success;
-  success = Testing::compare_files("saved_sln_r-final.bson", "win\saved_sln_r-template.bson") &&  success;
-  success = Testing::compare_files("saved_sln_c-final.xml", "win\saved_sln_c-template.xml") &&  success;
-  success = Testing::compare_files("saved_sln_c-final.bson", "win\saved_sln_c-template.bson") &&  success;
-  success = Testing::compare_files("constant_sln-final.xml", "win\constant_sln-template.xml") &&  success;
-  success = Testing::compare_files("constant_sln-final.bson", "win\constant_sln-template.bson") && success;
+  success = Testing::compare_files("saved_sln_r-final.xml", "win\\saved_sln_r-template.xml") && success;
+  success = Testing::compare_files("saved_sln_r-final.bson", "win\\saved_sln_r-template.bson") &&  success;
+  success = Testing::compare_files("saved_sln_c-final.xml", "win\\saved_sln_c-template.xml") &&  success;
+  success = Testing::compare_files("saved_sln_c-final.bson", "win\\saved_sln_c-template.bson") &&  success;
+  success = Testing::compare_files("constant_sln-final.xml", "win\\constant_sln-template.xml") &&  success;
+  success = Testing::compare_files("constant_sln-final.bson", "win\\constant_sln-template.bson") && success;
 #else
   success = Testing::compare_files("saved_sln_r-final.xml", "linux/saved_sln_r-template.xml") && success;
   success = Testing::compare_files("saved_sln_r-final.bson", "linux/saved_sln_r-template.bson") &&  success;
