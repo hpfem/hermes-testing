@@ -1,14 +1,22 @@
 #include "hermes2d.h"
 
+#define complex std::complex<double>
+
 using namespace Hermes;
 using namespace Hermes::Hermes2D;
+using namespace Hermes::Hermes2D::Views;
 
-/* Weak forms */
-
-class CustomWeakFormPoisson : public WeakForm<double>
+class CustomInitialCondition : public ExactSolutionScalar<double>
 {
 public:
-  CustomWeakFormPoisson(std::string mat_al, Hermes::Hermes1DFunction<double>* lambda_al,
-                        std::string mat_cu, Hermes::Hermes1DFunction<double>* lambda_cu,
-                        Hermes::Hermes2DFunction<double>* src_term);
+  CustomInitialCondition(MeshSharedPtr mesh) : ExactSolutionScalar<double>(mesh) {};
+  ~CustomInitialCondition();
+
+  virtual void derivatives (double x, double y, double& dx, double& dy) const;
+
+  virtual double value (double x, double y) const;
+
+  virtual Ord ord(Ord x, Ord y) const;
+
+  MeshFunction<double>* clone() const;
 };
