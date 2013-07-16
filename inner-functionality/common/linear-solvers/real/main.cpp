@@ -248,9 +248,9 @@ void build_matrix_block(int n, std::map<unsigned int, MatrixEntry> &ar_mat, std:
 }
 
 // Test code.
-void solve(LinearMatrixSolver<double> &solver, int n) {
-  if(!solver.solve())
-    printf("Unable to solve.\n");
+void solve(LinearMatrixSolver<double> &solver, int n)
+{
+	solver.solve();
 }
 
 int main(int argc, char *argv[]) {

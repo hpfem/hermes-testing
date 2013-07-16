@@ -211,17 +211,15 @@ void build_matrix_block(int n, std::map<unsigned int, MatrixEntry> &ar_mat, std:
 }
 
 // Test code.
-void solve(LinearMatrixSolver<std::complex<double> > &solver, int n) {
-  if(solver.solve()) {
-    std::complex<double> *sln = solver.get_sln_vector();
-    for (int i = 0; i < n; i++)
-      if(sln[i].imag() < 0.0)
-        std::cout << std::endl << sln[i].real() << sln[i].imag();
-      else
-        std::cout << std::endl << sln[i].real() << ' + ' << sln[i].imag();
-  }
-  else
-    printf("Unable to solve.\n");
+void solve(LinearMatrixSolver<std::complex<double> > &solver, int n)
+{
+  solver.solve();
+  std::complex<double> *sln = solver.get_sln_vector();
+  for (int i = 0; i < n; i++)
+    if(sln[i].imag() < 0.0)
+      std::cout << std::endl << sln[i].real() << sln[i].imag();
+    else
+      std::cout << std::endl << sln[i].real() << ' + ' << sln[i].imag();
 }
 
 int main(int argc, char *argv[]) {
