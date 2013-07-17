@@ -1,14 +1,26 @@
 #include "hermes2d.h"
 
+/* Weak forms */
 using namespace Hermes;
 using namespace Hermes::Hermes2D;
 
-/* Weak forms */
-
-class CustomWeakFormPoisson : public WeakForm<double>
+class CustomWeakForm : public WeakForm<double>
 {
 public:
-  CustomWeakFormPoisson(std::string mat_al, Hermes::Hermes1DFunction<double>* lambda_al,
-                        std::string mat_cu, Hermes::Hermes1DFunction<double>* lambda_cu,
-                        Hermes::Hermes2DFunction<double>* src_term);
+  CustomWeakForm();
+
+private:
+    class CustomFormAdvection : public MatrixFormVol<double>
+    {
+    public:
+      CustomFormAdvection(int i, int j, std::string area);
+
+      virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u,
+        Func<double> *v, Geom<double> *e, Func<double> **ext) const;
+
+      virtual Hermes::Ord ord(int n, double *wt, Func<Hermes::Ord> *u_ext[], Func<Hermes::Ord> *u, Func<Hermes::Ord> *v,
+        Geom<Hermes::Ord> *e, Func<Ord> **ext) const;
+
+      virtual MatrixFormVol<double>* clone() const;
+    };
 };

@@ -2,14 +2,45 @@
 
 /* Weak forms */
 
-CustomWeakFormPoisson::CustomWeakFormPoisson(std::string mat_al, Hermes::Hermes1DFunction<double>* lambda_al,
-                                             std::string mat_cu, Hermes::Hermes1DFunction<double>* lambda_cu,
-                                             Hermes::Hermes2DFunction<double>* src_term) : WeakForm<double>(1)
+CustomWeakForm::CustomWeakForm() : WeakForm<double>(2)
 {
   // Jacobian forms.
-  add_matrix_form(new WeakFormsH1::DefaultMatrixFormDiffusion<double>(0, 0, mat_al, lambda_al));
-  add_matrix_form(new WeakFormsH1::DefaultMatrixFormDiffusion<double>(0, 0, mat_cu, lambda_cu));
+  add_matrix_form(new WeakFormsH1::DefaultMatrixFormDiffusion<double>(0, 0));
+  add_matrix_form(new WeakFormsH1::DefaultMatrixFormDiffusion<double>(1, 1));
 
   // Residual forms.
-  add_vector_form(new WeakFormsH1::DefaultVectorFormVol<double>(0, Hermes::HERMES_ANY, src_term));
+  add_vector_form(new WeakFormsH1::DefaultVectorFormVol<double>(0, Hermes::HERMES_ANY, new Hermes2DFunction<double>(100.0)));
+  add_vector_form(new WeakFormsH1::DefaultVectorFormVol<double>(1, Hermes::HERMES_ANY, new Hermes2DFunction<double>(1.0)));
 };
+
+CustomWeakForm::CustomFormAdvection::CustomFormAdvection(int i, int j, std::string area) : MatrixFormVol<double>(i, j)
+{
+  this->set_area(area);
+}
+
+double CustomWeakForm::CustomFormAdvection::value(int n, double *wt, Func<double> *u_ext[], Func<double> *u,
+  Func<double> *v, Geom<double> *e, Func<double> **ext) const
+{
+  double result = 0;
+  for (int i = 0; i < n; i++) 
+  {
+    result += wt[i] * (ext[0]->dx[i] * u->dx[i] + ext[0]->dy[i] * u->dy[i]) * v->val[i];
+  }
+  return result;
+}
+
+Ord CustomWeakForm::CustomFormAdvection::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v,
+  Geom<Ord> *e, Func<Ord> **ext) const
+{
+  Ord result = Ord(0);
+  for (int i = 0; i < n; i++) 
+  {
+    result += wt[i] * (ext[0]->dx[i] * u->dx[i] + ext[0]->dy[i] * u->dy[i]) * v->val[i];
+  }
+  return result;
+}
+
+MatrixFormVol<double>* CustomWeakForm::CustomFormAdvection::clone() const
+{
+  return new CustomFormAdvection(*this);
+}

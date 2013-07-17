@@ -1,4 +1,3 @@
-
 #include "definitions.h"
 
 using namespace Hermes;
