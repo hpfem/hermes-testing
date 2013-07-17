@@ -164,12 +164,9 @@ int main(int argc, char* argv[])
 
   try
   {
-    if(argc == 1)
-    {
-      mloader.load("initial.xml", meshes);
-      mloader.save("saved.xml", meshes);
-      mloader.load("saved.xml", meshes);
-    }
+    mloader.load("initial.xml", meshes);
+    mloader.save("saved.xml", meshes);
+    mloader.load("saved.xml", meshes);
 
     mloader.load("bad-1.xml", meshes1);
     int nelem = mesh1->get_num_active_elements();

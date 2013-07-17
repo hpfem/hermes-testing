@@ -113,6 +113,31 @@ int main(int argc, char* argv[])
   if(std::abs(test_point_8 - testValues[7]) > 1e-6)
     return -1;
 
-  std::cout << "Success!" << std::endl;
-  return 0;
+  bool success = true;
+#ifdef WITH_BSON
+  int first_mesh_elem_count = meshes[0]->get_num_active_elements();
+  int second_mesh_elem_count = meshes[1]->get_num_active_elements();
+  meshes[0]->refine_all_elements();
+  meshes[1]->refine_all_elements(1);
+  meshes[1]->refine_all_elements(2);
+
+  Hermes2D::MeshReaderH2DBSON bson_loader;
+  bson_loader.save("meshes.bson", meshes);
+  MeshSharedPtr meshVertical2(new Mesh), meshHorizontal2(new Mesh);
+  Hermes::vector<MeshSharedPtr> meshes2(meshVertical2, meshHorizontal2);
+  bson_loader.load("meshes.bson", meshes2);
+  success = (4 * first_mesh_elem_count == meshes2[0]->get_num_active_elements()) && success;
+  success = (4 * second_mesh_elem_count == meshes2[1]->get_num_active_elements()) && success;
+#endif
+
+  if(success)
+  {
+    std::cout << "Success!" << std::endl;
+    return 0;
+  }
+  else
+  {
+    std::cout << "Failure!" << std::endl;
+    return -1;
+  }
 }
