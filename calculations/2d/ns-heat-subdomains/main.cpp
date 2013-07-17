@@ -179,7 +179,7 @@ int main(int argc, char* argv[])
   // Initialize the Newton solver.
   NewtonSolver<double> newton(&dp);
   newton.set_max_steps_with_reused_jacobian(0);
-  newton.set_tolerance(1e-3, ResidualNormAbsolute);
+  newton.set_tolerance(1e-6, ResidualNormAbsolute);
 
   // Initialize views.
   Views::VectorView vview("velocity [m/s]", new Views::WinGeom(0, 0, 700, 360));
@@ -245,7 +245,7 @@ int main(int argc, char* argv[])
 
   double norm = get_l2_norm(coeff_vec, Space<double>::get_num_dofs(all_spaces));
 
-  bool success = Testing::test_value(norm, 578.54853723222607, "sln-norm", 1e-6);
+  bool success = Testing::test_value(norm, 578.49360112096122, "sln-norm", 1e-5);
 
   delete [] coeff_vec;
 
