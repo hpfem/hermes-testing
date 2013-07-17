@@ -17,3 +17,5 @@ add_subdirectory("08-nonlinearity")
 add_subdirectory("10-linear-advection-dg-adapt")
 
 add_subdirectory("11-transient-adapt")
+
+add_subdirectory("ns-heat-subdomains")
