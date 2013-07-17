@@ -87,8 +87,8 @@ int main(int argc, char* argv[])
   // Create H1 spaces with default shapeset for both displacement components.
   SpaceSharedPtr<double> u_space(new H1Space<double>(mesh3, &bcs_u, 2));
   SpaceSharedPtr<double> v_space(new H1Space<double>(mesh4, &bcs_v, 2));
-
-  LinearSolver<double> solver(&wf, Hermes::vector<SpaceSharedPtr<double> >(u_space, v_space));
+  Hermes::vector<SpaceSharedPtr<double> > spaces(u_space, v_space);
+  LinearSolver<double> solver(&wf, spaces);
   solver.solve();
   double norm = get_l2_norm(solver.get_sln_vector(), Space<double>::get_num_dofs(Hermes::vector<SpaceSharedPtr<double> >(u_space, v_space)));
 
