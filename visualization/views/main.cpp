@@ -152,14 +152,6 @@ int main(int argc, char* argv[])
       MeshFunctionSharedPtr<double> slnZeroReference(new ZeroSolution<double>(ref_space->get_mesh()));
       viewS.show(slnZeroReference);
       viewS.save_screenshot("012-zeroSolutionRef1.bmp");
-      for(int i = 0; i < 4; i++)
-      {
-        int number = ref_space->get_mesh()->get_max_element_id();
-        for(int j = 0; j < number; j++)
-          if((j % 5) < 3)
-            if(ref_space->get_mesh()->get_element(j)->active)
-              ref_space->get_mesh()->refine_element_id(j);
-      }
       MeshFunctionSharedPtr<double> slnConstRefined(new ConstantSolution<double>(ref_space->get_mesh(), 1.234567));
       MeshFunctionSharedPtr<double> c1s(new TestExactSolution1(ref_space->get_mesh()));
       MeshFunctionSharedPtr<double> c2s(new TestExactSolution2(ref_space->get_mesh()));
@@ -168,11 +160,11 @@ int main(int argc, char* argv[])
       //viewS.set_3d_mode(true);
       viewS.save_screenshot("013-constSolutionRefWithDisplacement.bmp");
       viewO.show(space); 
-      viewO.save_screenshot("100-space->bmp");
+      viewO.save_screenshot("100-space.bmp");
       viewO.set_b_orders(true);
       viewO.save_screenshot("101-spaceBOrders.bmp");
       viewM.show(mesh);
-      viewM.save_screenshot("200-mesh->bmp");
+      viewM.save_screenshot("200-mesh.bmp");
       viewM.set_b_elem_mrk(true);
       viewM.save_screenshot("201-meshBElemMrk.bmp");
       viewV.show(sln, sln);
