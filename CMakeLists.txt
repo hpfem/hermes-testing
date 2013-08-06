@@ -14,6 +14,7 @@ endif(${CMAKE_CL_64})
 # This has to be the same as in the library's CMake.
 set(WITH_TC_MALLOC YES)
 set(WITH_MATIO NO)
+set(WITH_BSON NO)
 set(WITH_PARALUTION YES)
 
 # Where to look for the static libraries.
@@ -68,6 +69,11 @@ if(${WITH_MATIO})
   include_directories(${MATIO_INCLUDE_DIR})
 endif()
 
+if(${WITH_BSON})
+  find_package(BSON REQUIRED)
+  include_directories(${BSON_INCLUDE_DIR})
+endif()
+      
 set(HERMES2D_INCLUDE_PATH ${HERMES_INCLUDE_PATH}/hermes2d)
 set(HERMES_COMMON_INCLUDE_PATH ${HERMES_INCLUDE_PATH}/hermes_common)
 
