@@ -11,6 +11,9 @@ else(${CMAKE_CL_64})
   set(WIN64 NO)
 endif(${CMAKE_CL_64})
 
+# This has to be the same as in the library's CMake.
+set(WITH_TC_MALLOC YES)
+
 # Where to look for the static libraries.
 set(HERMES_DIRECTORY /usr/local/lib)
 set(HERMES_INCLUDE_PATH /usr/local/include)
@@ -50,8 +53,10 @@ include_directories(${UMFPACK_INCLUDE_DIRS})
 
 find_package(PTHREAD REQUIRED)
 
-find_package(TCMALLOC REQUIRED)
-include_directories(${TCMALLOC_INCLUDE_DIR})
+if(${WITH_TC_MALLOC})
+  find_package(TCMALLOC REQUIRED)
+  include_directories(${TCMALLOC_INCLUDE_DIR})
+endif()
 
 if(WITH_PARALUTION)
   find_package(PARALUTION REQUIRED)
