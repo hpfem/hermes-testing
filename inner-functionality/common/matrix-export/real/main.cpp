@@ -215,7 +215,7 @@ bool export_and_test_matrix(Matrix<double>* mat, int argc, char *argv[])
     {
       char* test_s = new char[1000];
       sprintf(test_s, "%s-stored", s);
-      //success = Testing::compare_files(s, test_s) && success;
+      success = Testing::compare_files(s, test_s) && success;
     } 
   }
 
@@ -250,7 +250,7 @@ bool export_and_test_vector(Vector<double>* vec, int argc, char *argv[])
     {
       char* test_s = new char[1000];
       sprintf(test_s, "%s-stored", s);
-      //success = Testing::compare_files(s, test_s) && success;
+      success = Testing::compare_files(s, test_s) && success;
     } 
   }
 
