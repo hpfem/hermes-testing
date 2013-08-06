@@ -13,13 +13,13 @@ endif(${CMAKE_CL_64})
 
 # This has to be the same as in the library's CMake.
 set(WITH_TC_MALLOC YES)
+set(WITH_MATIO NO)
+set(WITH_PARALUTION YES)
 
 # Where to look for the static libraries.
 set(HERMES_DIRECTORY /usr/local/lib)
 set(HERMES_INCLUDE_PATH /usr/local/include)
 set(DEP_INCLUDE_PATHS /usr/local/include)
-
-set(WITH_PARALUTION YES)
 
 # Allow to override the default values in CMake.vars:
 include(CMake.vars OPTIONAL)
@@ -58,10 +58,15 @@ if(${WITH_TC_MALLOC})
   include_directories(${TCMALLOC_INCLUDE_DIR})
 endif()
 
-if(WITH_PARALUTION)
+if(${WITH_PARALUTION})
   find_package(PARALUTION REQUIRED)
   include_directories(${PARALUTION_INCLUDE_DIR})
-endif(WITH_PARALUTION)
+endif()
+
+if(${WITH_MATIO})
+  find_package(MATIO REQUIRED)
+  include_directories(${MATIO_INCLUDE_DIR})
+endif()
 
 set(HERMES2D_INCLUDE_PATH ${HERMES_INCLUDE_PATH}/hermes2d)
 set(HERMES_COMMON_INCLUDE_PATH ${HERMES_INCLUDE_PATH}/hermes_common)
