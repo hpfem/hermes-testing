@@ -54,7 +54,11 @@ bool export_and_test_matrix(Matrix<complex>* mat, int argc, char *argv[])
     if(success)
     {
       char* test_s = new char[1000];
-      sprintf(test_s, "%s-stored", s);
+#ifdef WIN32
+      sprintf(test_s, "win\\%s-stored", s);
+#else
+      sprintf(test_s, "linux/%s-stored", s);
+#endif
       success = Testing::compare_files(s, test_s) && success;
     } 
   }
@@ -89,7 +93,11 @@ bool export_and_test_vector(Vector<complex>* vec, int argc, char *argv[])
     if(success)
     {
       char* test_s = new char[1000];
-      sprintf(test_s, "%s-stored", s);
+#ifdef WIN32
+      sprintf(test_s, "win\\%s-stored", s);
+#else
+      sprintf(test_s, "linux/%s-stored", s);
+#endif
       success = Testing::compare_files(s, test_s) && success;
     } 
   }
