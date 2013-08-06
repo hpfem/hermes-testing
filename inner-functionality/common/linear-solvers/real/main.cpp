@@ -201,7 +201,7 @@ int main(int argc, char *argv[]) {
   std::map<unsigned int, MatrixEntry> ar_mat;
   std::map<unsigned int, double > ar_rhs;
 
-  double* sln;
+  double* sln = NULL;
   switch(atoi(argv[2]))
   {
   case 1:
@@ -335,31 +335,36 @@ int main(int argc, char *argv[]) {
   else
     ret = -1;
 
-  switch(atoi(argv[2]))
+  if(sln)
   {
-  case 1:
-    if(std::abs(sln[0] - 4) > 1E-6 || std::abs(sln[1] - 2) > 1E-6 || std::abs(sln[2] - 3) > 1E-6)
-      ret = -1;
-    else
-      ret = 0;
-    break;
-  case 2:
-    if(std::abs(sln[0] - 2) > 1E-6 || std::abs(sln[1] - 3) > 1E-6 || std::abs(sln[2] - 1) > 1E-6 || std::abs(sln[3] + 3) > 1E-6 || std::abs(sln[4] + 1) > 1E-6)
-      ret = -1;
-    else
-      ret = 0;
-    break;
-  case 3:
-    if(std::abs(sln[0] - 1) > 1E-6 || std::abs(sln[1] - 2) > 1E-6 || std::abs(sln[2] - 3) > 1E-6 || std::abs(sln[3] - 4) > 1E-6 || std::abs(sln[4] - 5) > 1E-6)
-      ret = -1;
-    else
-      ret = 0;
-    break;
-  }
+    switch(atoi(argv[2]))
+    {
+    case 1:
+      if(std::abs(sln[0] - 4) > 1E-6 || std::abs(sln[1] - 2) > 1E-6 || std::abs(sln[2] - 3) > 1E-6)
+        ret = -1;
+      else
+        ret = 0;
+      break;
+    case 2:
+      if(std::abs(sln[0] - 2) > 1E-6 || std::abs(sln[1] - 3) > 1E-6 || std::abs(sln[2] - 1) > 1E-6 || std::abs(sln[3] + 3) > 1E-6 || std::abs(sln[4] + 1) > 1E-6)
+        ret = -1;
+      else
+        ret = 0;
+      break;
+    case 3:
+      if(std::abs(sln[0] - 1) > 1E-6 || std::abs(sln[1] - 2) > 1E-6 || std::abs(sln[2] - 3) > 1E-6 || std::abs(sln[3] - 4) > 1E-6 || std::abs(sln[4] - 5) > 1E-6)
+        ret = -1;
+      else
+        ret = 0;
+      break;
+    }
 
-  // Test
-  if(ret == -1)
-    printf("Failure!\n");
+    // Test
+    if(ret == -1)
+      printf("Failure!\n");
+    else
+      printf("Success!\n");
+  }
   else
-    printf("Success!\n");
+    return 0;
 }

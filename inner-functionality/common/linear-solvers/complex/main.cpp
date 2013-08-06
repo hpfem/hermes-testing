@@ -333,16 +333,21 @@ int main(int argc, char *argv[]) {
   else
     ret = -1;
 
-  std::cout << sln[0] << sln[1] << sln[2];
+  if(sln)
+  {
+    std::cout << sln[0] << sln[1] << sln[2];
 
-  if(std::abs(sln[0] - complex(0.800000, -0.600000)) > 1E-6 || std::abs(sln[1] - complex(0.470588, -0.882353)) > 1E-6 || std::abs(sln[2] - complex(0.486486, -0.918919)) > 1E-6)
-    ret = -1;
-  else
-    ret = 0;
+    if(std::abs(sln[0] - complex(0.800000, -0.600000)) > 1E-6 || std::abs(sln[1] - complex(0.470588, -0.882353)) > 1E-6 || std::abs(sln[2] - complex(0.486486, -0.918919)) > 1E-6)
+      ret = -1;
+    else
+      ret = 0;
 
-  // Test
-  if(ret == -1)
-    printf("Failure!\n");
+    // Test
+    if(ret == -1)
+      printf("Failure!\n");
+    else
+      printf("Success!\n");
+  }
   else
-    printf("Success!\n");
+    return 0;
 }
