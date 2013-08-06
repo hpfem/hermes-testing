@@ -47,6 +47,9 @@ const double heat_src = 1.0;
 
 int main(int argc, char* argv[])
 {
+  // Set just one thread.
+  Hermes::HermesCommonApi.set_integral_param_value(numThreads, 1);
+
   // Choose a Butcher's table or define your own.
   ButcherTable bt(butcher_table_type);
 
