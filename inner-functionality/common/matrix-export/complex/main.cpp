@@ -37,18 +37,18 @@ bool export_and_test_matrix(Matrix<complex>* mat, int argc, char *argv[])
     if(i == 0)
     {
       sprintf(s, "Complex-Matrix-%s-plain.mat", argv[1]);
-      success = mat->export(s, "A", EXPORT_FORMAT_PLAIN_ASCII) && success;
+      success = mat->export_to_file(s, "A", EXPORT_FORMAT_PLAIN_ASCII) && success;
     }
 
     if(i == 1)
     {
       sprintf(s, "Complex-Matrix-%s-matio.mat", argv[1]);
-      success = mat->export(s, "A", EXPORT_FORMAT_MATLAB_MATIO) && success;
+      success = mat->export_to_file(s, "A", EXPORT_FORMAT_MATLAB_MATIO) && success;
     }
     if(i == 2)
     {
       sprintf(s, "Complex-Matrix-%s-market.mat", argv[1]);
-      success = mat->export(s, "A", EXPORT_FORMAT_MATRIX_MARKET) && success;
+      success = mat->export_to_file(s, "A", EXPORT_FORMAT_MATRIX_MARKET) && success;
     }
 
     if(success)
@@ -72,18 +72,18 @@ bool export_and_test_vector(Vector<complex>* vec, int argc, char *argv[])
     if(i == 0)
     {
       sprintf(s, "Complex-Vector-%s-plain.vec", argv[1]);
-      success = vec->export(s, "b", EXPORT_FORMAT_PLAIN_ASCII) && success;
+      success = vec->export_to_file(s, "b", EXPORT_FORMAT_PLAIN_ASCII) && success;
     }
 
     if(i == 1)
     {
       sprintf(s, "Complex-Vector-%s-matio.vec", argv[1]);
-      success = vec->export(s, "b", EXPORT_FORMAT_MATLAB_MATIO) && success;
+      success = vec->export_to_file(s, "b", EXPORT_FORMAT_MATLAB_MATIO) && success;
     }
     if(i == 2)
     {
       sprintf(s, "Complex-Vector-%s-market.vec", argv[1]);
-      success = vec->export(s, "b", EXPORT_FORMAT_MATRIX_MARKET) && success;
+      success = vec->export_to_file(s, "b", EXPORT_FORMAT_MATRIX_MARKET) && success;
     }
 
     if(success)
