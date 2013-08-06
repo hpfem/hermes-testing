@@ -42,13 +42,18 @@ bool export_and_test_matrix(Matrix<complex>* mat, int argc, char *argv[])
 
     if(i == 1)
     {
-      sprintf(s, "Complex-Matrix-%s-matio.mat", argv[1]);
-      success = mat->export_to_file(s, "A", EXPORT_FORMAT_MATLAB_MATIO) && success;
-    }
-    if(i == 2)
-    {
       sprintf(s, "Complex-Matrix-%s-market.mat", argv[1]);
       success = mat->export_to_file(s, "A", EXPORT_FORMAT_MATRIX_MARKET) && success;
+    }
+
+    if(i == 2)
+    {
+#ifdef WITH_MATIO
+      sprintf(s, "Complex-Matrix-%s-matio.mat", argv[1]);
+      success = mat->export_to_file(s, "A", EXPORT_FORMAT_MATLAB_MATIO) && success;
+#else
+      break;
+#endif
     }
 
     if(success)
@@ -81,13 +86,18 @@ bool export_and_test_vector(Vector<complex>* vec, int argc, char *argv[])
 
     if(i == 1)
     {
-      sprintf(s, "Complex-Vector-%s-matio.vec", argv[1]);
-      success = vec->export_to_file(s, "b", EXPORT_FORMAT_MATLAB_MATIO) && success;
-    }
-    if(i == 2)
-    {
       sprintf(s, "Complex-Vector-%s-market.vec", argv[1]);
       success = vec->export_to_file(s, "b", EXPORT_FORMAT_MATRIX_MARKET) && success;
+    }
+
+    if(i == 2)
+    {
+#ifdef WITH_MATIO
+      sprintf(s, "Complex-Vector-%s-matio.vec", argv[1]);
+      success = vec->export_to_file(s, "b", EXPORT_FORMAT_MATLAB_MATIO) && success;
+#else
+      break;
+#endif
     }
 
     if(success)

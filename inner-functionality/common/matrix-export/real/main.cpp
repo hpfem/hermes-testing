@@ -199,16 +199,20 @@ bool export_and_test_matrix(Matrix<double>* mat, int argc, char *argv[])
       sprintf(s, "Real-Matrix-%s-%s-plain.mat", argv[1], argv[2]);
       success = mat->export_to_file(s, "A", EXPORT_FORMAT_PLAIN_ASCII) && success;
     }
-
     if(i == 1)
-    {
-      sprintf(s, "Real-Matrix-%s-%s-matio.mat", argv[1], argv[2]);
-      success = mat->export_to_file(s, "A", EXPORT_FORMAT_MATLAB_MATIO) && success;
-    }
-    if(i == 2)
     {
       sprintf(s, "Real-Matrix-%s-%s-market.mat", argv[1], argv[2]);
       success = mat->export_to_file(s, "A", EXPORT_FORMAT_MATRIX_MARKET) && success;
+    }
+
+    if(i == 2)
+    {
+#ifdef WITH_MATIO
+      sprintf(s, "Real-Matrix-%s-%s-matio.mat", argv[1], argv[2]);
+      success = mat->export_to_file(s, "A", EXPORT_FORMAT_MATLAB_MATIO) && success;
+#else
+      break;
+#endif
     }
 
     if(success)
@@ -241,13 +245,18 @@ bool export_and_test_vector(Vector<double>* vec, int argc, char *argv[])
 
     if(i == 1)
     {
-      sprintf(s, "Real-Vector-%s-%s-matio.vec", argv[1], argv[2]);
-      success = vec->export_to_file(s, "b", EXPORT_FORMAT_MATLAB_MATIO) && success;
-    }
-    if(i == 2)
-    {
       sprintf(s, "Real-Vector-%s-%s-market.vec", argv[1], argv[2]);
       success = vec->export_to_file(s, "b", EXPORT_FORMAT_MATRIX_MARKET) && success;
+    }
+
+    if(i == 2)
+    {
+#ifdef WITH_MATIO
+      sprintf(s, "Real-Vector-%s-%s-matio.vec", argv[1], argv[2]);
+      success = vec->export_to_file(s, "b", EXPORT_FORMAT_MATLAB_MATIO) && success;
+#else
+      break;
+#endif
     }
 
     if(success)
