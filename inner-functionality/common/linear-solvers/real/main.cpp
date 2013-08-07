@@ -313,7 +313,7 @@ int main(int argc, char *argv[]) {
   else if(strcasecmp(argv[1], "mumps") == 0) {
 #ifdef WITH_MUMPS
     MumpsMatrix<double> mat;
-    MumpsVector<double> rhs;
+    SimpleVector<double> rhs;
     build_matrix(n, ar_mat, ar_rhs, &mat, &rhs);
 
     MumpsSolver<double> solver(&mat, &rhs);
@@ -324,7 +324,7 @@ int main(int argc, char *argv[]) {
   else if(strcasecmp(argv[1], "mumps-block") == 0) {
 #ifdef WITH_MUMPS
     MumpsMatrix<double> mat;
-    MumpsVector<double> rhs;
+    SimpleVector<double> rhs;
     build_matrix_block(n, ar_mat, ar_rhs, &mat, &rhs);
 
     MumpsSolver<double> solver(&mat, &rhs);

@@ -362,14 +362,14 @@ int main(int argc, char *argv[])
   else if(strcasecmp(argv[1], "mumps") == 0) {
 #ifdef WITH_MUMPS
     mat = new MumpsMatrix<double>;
-    rhs = new MumpsVector<double>;
+    rhs = new SimpleVector<double>;
     build_matrix(n, ar_mat, ar_rhs, mat, rhs);
 #endif
   }
   else if(strcasecmp(argv[1], "mumps-block") == 0) {
 #ifdef WITH_MUMPS
     mat = new MumpsMatrix<double>;
-    rhs = new MumpsVector<double>;
+    rhs = new SimpleVector<double>;
     build_matrix_block(n, ar_mat, ar_rhs, mat, rhs);
 #endif
   }
