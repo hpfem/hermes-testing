@@ -365,7 +365,7 @@ int main(int argc, char *argv[])
 #endif
   }
 
-  if(mat && rhs)
+  if(mat || rhs)
   {
     bool success = mat ? export_and_test_matrix(mat, argc, argv) : true;
     success = rhs ? export_and_test_vector(rhs, argc, argv) && success : success;
@@ -382,4 +382,5 @@ int main(int argc, char *argv[])
       return -1;
     } 
   }
+  return 0;
 }

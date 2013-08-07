@@ -211,7 +211,7 @@ int main(int argc, char *argv[]) {
   std::map<unsigned int, MatrixEntry> ar_mat;
   std::map<unsigned int, complex > ar_rhs;
 
-  complex* sln;
+  complex* sln = NULL;
 
   if(read_matrix_and_rhs((char*)"in/linsys-cplx-4", n, nnz, ar_mat, ar_rhs) != 0)
     throw Hermes::Exceptions::Exception("Failed to read the matrix and rhs.");
