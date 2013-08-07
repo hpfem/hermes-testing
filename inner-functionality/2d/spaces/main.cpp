@@ -68,11 +68,11 @@ int main(int argc, char* argv[])
       {
         // Create a space and record its DOFs.
         EssentialBCs<double> bcs(&(bc_essential[bc_i]));
-        H1Space<double>* space = new H1Space<double>(mesh_lshape, &bcs, poly_order_i);
+        H1Space<double>* space_ = new H1Space<double>(mesh_lshape, &bcs, poly_order_i);
+        SpaceSharedPtr<double> space;
 
-        space->save("space.xml");
-        space->set_validation(false);
-        space->load("space.xml", mesh_lshape, &bcs);
+        space_->save("space.xml");
+        space = Space<double>::load("space.xml", mesh_lshape, false, &bcs);
 
         dofs.push_back(space->get_num_dofs());
 
