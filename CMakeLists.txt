@@ -16,6 +16,7 @@ set(WITH_TC_MALLOC YES)
 set(WITH_MATIO NO)
 set(WITH_BSON NO)
 set(WITH_PARALUTION YES)
+set(WITH_SUPERLU NO)
 
 # Where to look for the static libraries.
 set(HERMES_DIRECTORY /usr/local/lib)
@@ -74,6 +75,13 @@ if(${WITH_BSON})
   include_directories(${BSON_INCLUDE_DIR})
 endif()
       
+if(WITH_SUPERLU)
+  find_package(SUPERLU REQUIRED)
+  include_directories(${SUPERLU_INCLUDE_DIR})
+  if(SUPERLU_MT)
+    add_definitions(-DSLU_MT)
+  endif(SUPERLU_MT)
+endif(WITH_SUPERLU)
 set(HERMES2D_INCLUDE_PATH ${HERMES_INCLUDE_PATH}/hermes2d)
 set(HERMES_COMMON_INCLUDE_PATH ${HERMES_INCLUDE_PATH}/hermes_common)
 
