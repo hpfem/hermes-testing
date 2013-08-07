@@ -73,9 +73,11 @@ namespace L2_real
       ref_space->save("space-real.xml");
       ref_space->free();
       ref_space->load("space-real.xml");
+#ifdef WITH_BSON
       ref_space->save_bson("space-real.bson");
       ref_space->free();
       ref_space->load_bson("space-real.bson");
+#endif
 
       linear_solver.set_space(ref_space);
 
@@ -203,9 +205,11 @@ typedef std::complex<double> complex;
       ref_space->save("space-complex.xml");
       ref_space->free();
       ref_space->load("space-complex.xml");
+#ifdef WITH_BSON
       ref_space->save_bson("space-complex.bson");
       ref_space->free();
       ref_space->load_bson("space-complex.bson");
+#endif
 
       int ndof_ref = ref_space->get_num_dofs();
 
@@ -225,10 +229,15 @@ typedef std::complex<double> complex;
       // Project the fine mesh solution onto the coarse mesh.
       OGProjection<complex> ogProjection;
 
+#ifdef WITH_BSON
       space->save_bson("space-complex-coarse.bson");
       SpaceSharedPtr<complex> space_test2 = Space<complex>::load_bson("space-complex-coarse.bson", mesh, &bcs);
       ogProjection.project_global(space_test2, ref_sln, sln);
-
+#else
+      space->save("space-complex-coarse.xml2");
+      SpaceSharedPtr<complex> space_test2 = Space<complex>::load("space-complex-coarse.xml2", mesh, &bcs);
+      ogProjection.project_global(space_test2, ref_sln, sln);
+#endif
       // View the coarse mesh solution and polynomial orders.
 #ifdef SHOW_OUTPUT
       MeshFunctionSharedPtr<double> real_filter(new RealFilter(sln));
