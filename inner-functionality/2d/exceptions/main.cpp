@@ -47,12 +47,12 @@ int main(int argc, char* argv[])
 
   //1/2Exception test
 
-  UMFPackMatrix<double> mat;
+  CSCMatrix<double> mat;
   int ap[]={0,1,1};
   int ai[]={0};
   double ax[]={0.0};
   mat.create(2,1,ap,ai,ax);
-  UMFPackVector<double> vec(2);
+  SimpleVector<double> vec(2);
 
   UMFPackLinearMatrixSolver<double> linsolv(&mat,&vec);
   try

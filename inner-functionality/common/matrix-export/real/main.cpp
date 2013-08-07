@@ -317,15 +317,15 @@ int main(int argc, char *argv[])
   }
   else if(strcasecmp(argv[1], "umfpack") == 0) {
 #ifdef WITH_UMFPACK
-    mat = new UMFPackMatrix<double>;
-    rhs = new UMFPackVector<double>;
+    mat = new CSCMatrix<double>;
+    rhs = new SimpleVector<double>;
     build_matrix(n, ar_mat, ar_rhs, mat, rhs);
 #endif
   }
   else if(strcasecmp(argv[1], "umfpack-block") == 0) {
 #ifdef WITH_UMFPACK
-    mat = new UMFPackMatrix<double>;
-    rhs = new UMFPackVector<double>;
+    mat = new CSCMatrix<double>;
+    rhs = new SimpleVector<double>;
     build_matrix_block(n, ar_mat, ar_rhs, mat, rhs);
 #endif
   }

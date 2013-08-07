@@ -240,8 +240,8 @@ int main(int argc, char *argv[]) {
   }
   else if(strcasecmp(argv[1], "umfpack") == 0) {
 #ifdef WITH_UMFPACK
-    UMFPackMatrix<complex > mat;
-    UMFPackVector<complex > rhs;
+    CSCMatrix<complex > mat;
+    SimpleVector<complex > rhs;
     build_matrix(n, ar_mat, ar_rhs, &mat, &rhs);
 
     UMFPackLinearMatrixSolver<complex > solver(&mat, &rhs);
@@ -251,8 +251,8 @@ int main(int argc, char *argv[]) {
   }
   else if(strcasecmp(argv[1], "umfpack-block") == 0) {
 #ifdef WITH_UMFPACK
-    UMFPackMatrix<complex > mat;
-    UMFPackVector<complex > rhs;
+    CSCMatrix<complex > mat;
+    SimpleVector<complex > rhs;
     build_matrix_block(n, ar_mat, ar_rhs, &mat, &rhs);
 
     UMFPackLinearMatrixSolver<complex > solver(&mat, &rhs);
