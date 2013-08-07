@@ -36,20 +36,20 @@ bool export_and_test_matrix(Matrix<complex>* mat, int argc, char *argv[])
 
     if(i == 0)
     {
-      sprintf(s, "Complex-Matrix-%s-plain.mat", argv[1]);
+      sprintf(s, "Complex_Matrix_%s_plain.mat", argv[1]);
       success = mat->export_to_file(s, "A", EXPORT_FORMAT_PLAIN_ASCII) && success;
     }
 
     if(i == 1)
     {
-      sprintf(s, "Complex-Matrix-%s-market.mat", argv[1]);
+      sprintf(s, "Complex_Matrix_%s_market.mat", argv[1]);
       success = mat->export_to_file(s, "A", EXPORT_FORMAT_MATRIX_MARKET) && success;
     }
 
     if(i == 2)
     {
 #ifdef WITH_MATIO
-      sprintf(s, "Complex-Matrix-%s-matio.mat", argv[1]);
+      sprintf(s, "Complex_Matrix_%s_matio.mat", argv[1]);
       success = mat->export_to_file(s, "A", EXPORT_FORMAT_MATLAB_MATIO) && success;
 #else
       break;
@@ -60,9 +60,9 @@ bool export_and_test_matrix(Matrix<complex>* mat, int argc, char *argv[])
     {
       char* test_s = new char[1000];
 #ifdef WIN32
-      sprintf(test_s, "win\\%s-stored", s);
+      sprintf(test_s, "win\\%s_stored", s);
 #else
-      sprintf(test_s, "linux/%s-stored", s);
+      sprintf(test_s, "linux/%s_stored", s);
 #endif
       success = Testing::compare_files(s, test_s) && success;
     } 
@@ -80,20 +80,20 @@ bool export_and_test_vector(Vector<complex>* vec, int argc, char *argv[])
 
     if(i == 0)
     {
-      sprintf(s, "Complex-Vector-%s-plain.vec", argv[1]);
+      sprintf(s, "Complex_Vector_%s_plain.vec", argv[1]);
       success = vec->export_to_file(s, "b", EXPORT_FORMAT_PLAIN_ASCII) && success;
     }
 
     if(i == 1)
     {
-      sprintf(s, "Complex-Vector-%s-market.vec", argv[1]);
+      sprintf(s, "Complex_Vector_%s_market.vec", argv[1]);
       success = vec->export_to_file(s, "b", EXPORT_FORMAT_MATRIX_MARKET) && success;
     }
 
     if(i == 2)
     {
 #ifdef WITH_MATIO
-      sprintf(s, "Complex-Vector-%s-matio.vec", argv[1]);
+      sprintf(s, "Complex_Vector_%s_matio.vec", argv[1]);
       success = vec->export_to_file(s, "b", EXPORT_FORMAT_MATLAB_MATIO) && success;
 #else
       break;
@@ -104,9 +104,9 @@ bool export_and_test_vector(Vector<complex>* vec, int argc, char *argv[])
     {
       char* test_s = new char[1000];
 #ifdef WIN32
-      sprintf(test_s, "win\\%s-stored", s);
+      sprintf(test_s, "win\\%s_stored", s);
 #else
-      sprintf(test_s, "linux/%s-stored", s);
+      sprintf(test_s, "linux/%s_stored", s);
 #endif
       success = Testing::compare_files(s, test_s) && success;
     } 

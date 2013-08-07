@@ -196,19 +196,19 @@ bool export_and_test_matrix(Matrix<double>* mat, int argc, char *argv[])
 
     if(i == 0)
     {
-      sprintf(s, "Real-Matrix-%s-%s-plain.mat", argv[1], argv[2]);
+      sprintf(s, "Real_Matrix_%s_%s_plain.mat", argv[1], argv[2]);
       success = mat->export_to_file(s, "A", EXPORT_FORMAT_PLAIN_ASCII) && success;
     }
     if(i == 1)
     {
-      sprintf(s, "Real-Matrix-%s-%s-market.mat", argv[1], argv[2]);
+      sprintf(s, "Real_Matrix_%s_%s_market.mat", argv[1], argv[2]);
       success = mat->export_to_file(s, "A", EXPORT_FORMAT_MATRIX_MARKET) && success;
     }
 
     if(i == 2)
     {
 #ifdef WITH_MATIO
-      sprintf(s, "Real-Matrix-%s-%s-matio.mat", argv[1], argv[2]);
+      sprintf(s, "Real_Matrix_%s_%s_matio.mat", argv[1], argv[2]);
       success = mat->export_to_file(s, "A", EXPORT_FORMAT_MATLAB_MATIO) && success;
 #else
       break;
@@ -219,9 +219,9 @@ bool export_and_test_matrix(Matrix<double>* mat, int argc, char *argv[])
     {
       char* test_s = new char[1000];
 #ifdef WIN32
-      sprintf(test_s, "win\\%s-stored", s);
+      sprintf(test_s, "win\\%s_stored", s);
 #else
-      sprintf(test_s, "linux/%s-stored", s);
+      sprintf(test_s, "linux/%s_stored", s);
 #endif
       success = Testing::compare_files(s, test_s) && success;
     } 
@@ -239,20 +239,20 @@ bool export_and_test_vector(Vector<double>* vec, int argc, char *argv[])
 
     if(i == 0)
     {
-      sprintf(s, "Real-Vector-%s-%s-plain.vec", argv[1], argv[2]);
+      sprintf(s, "Real_Vector_%s_%s_plain.vec", argv[1], argv[2]);
       success = vec->export_to_file(s, "b", EXPORT_FORMAT_PLAIN_ASCII) && success;
     }
 
     if(i == 1)
     {
-      sprintf(s, "Real-Vector-%s-%s-market.vec", argv[1], argv[2]);
+      sprintf(s, "Real_Vector_%s_%s_market.vec", argv[1], argv[2]);
       success = vec->export_to_file(s, "b", EXPORT_FORMAT_MATRIX_MARKET) && success;
     }
 
     if(i == 2)
     {
 #ifdef WITH_MATIO
-      sprintf(s, "Real-Vector-%s-%s-matio.vec", argv[1], argv[2]);
+      sprintf(s, "Real_Vector_%s_%s_matio.vec", argv[1], argv[2]);
       success = vec->export_to_file(s, "b", EXPORT_FORMAT_MATLAB_MATIO) && success;
 #else
       break;
@@ -263,9 +263,9 @@ bool export_and_test_vector(Vector<double>* vec, int argc, char *argv[])
     {
       char* test_s = new char[1000];
 #ifdef WIN32
-      sprintf(test_s, "win\\%s-stored", s);
+      sprintf(test_s, "win\\%s_stored", s);
 #else
-      sprintf(test_s, "linux/%s-stored", s);
+      sprintf(test_s, "linux/%s_stored", s);
 #endif
       success = Testing::compare_files(s, test_s) && success;
     } 
