@@ -301,7 +301,7 @@ int main(int argc, char *argv[])
     build_matrix(n, ar_mat, ar_rhs, mat, rhs);
 #endif
   }
-  else if(strcasecmp(argv[1], "petsc-block") == 0) {
+  else if(strcasecmp(argv[1], "petsc_block") == 0) {
 #ifdef WITH_PETSC
     mat = new PetscMatrix<complex>;
     rhs = new PetscVector<complex>;
@@ -315,7 +315,7 @@ int main(int argc, char *argv[])
     build_matrix(n, ar_mat, ar_rhs, mat, rhs);
 #endif
   }
-  else if(strcasecmp(argv[1], "umfpack-block") == 0) {
+  else if(strcasecmp(argv[1], "umfpack_block") == 0) {
 #ifdef WITH_UMFPACK
     mat = new CSCMatrix<complex>;
     rhs = new SimpleVector<complex>;
@@ -329,7 +329,7 @@ int main(int argc, char *argv[])
     build_matrix(n, ar_mat, ar_rhs, mat, rhs);
 #endif
   }
-  else if(strcasecmp(argv[1], "aztecoo-block") == 0) {
+  else if(strcasecmp(argv[1], "aztecoo_block") == 0) {
 #ifdef WITH_TRILINOS
     mat = new EpetraMatrix<complex>;
     rhs = new EpetraVector<complex>;
@@ -343,7 +343,7 @@ int main(int argc, char *argv[])
     build_matrix(n, ar_mat, ar_rhs, mat, rhs);
 #endif
   }
-  else if(strcasecmp(argv[1], "amesos-block") == 0) {
+  else if(strcasecmp(argv[1], "amesos_block") == 0) {
 #ifdef WITH_TRILINOS
     mat = new EpetraMatrix<complex>;
     rhs = new EpetraVector<complex>;
@@ -357,7 +357,7 @@ int main(int argc, char *argv[])
     build_matrix(n, ar_mat, ar_rhs, mat, rhs);
 #endif
   }
-  else if(strcasecmp(argv[1], "mumps-block") == 0) {
+  else if(strcasecmp(argv[1], "mumps_block") == 0) {
 #ifdef WITH_MUMPS
     mat = new MumpsMatrix<complex>;
     rhs = new SimpleVector<complex>;
