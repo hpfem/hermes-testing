@@ -272,7 +272,7 @@ int main(int argc, char *argv[]) {
     Hermes::Solvers::IterativeParalutionLinearMatrixSolver<double> solver(&mat, &rhs);
     if(atoi(argv[2]) != 1)
       solver.set_solver_type(IterativeParalutionLinearMatrixSolver<double>::BiCGStab);
-    solver.set_precond(new ParalutionPrecond<double>(ParalutionPrecond<double>::ParalutionPreconditionerType::ILU));
+    solver.set_precond(new ParalutionPrecond<double>(ParalutionPrecond<double>::ILU));
     // Tested as of 13th August 2013.
     solver.set_max_iters(atoi(argv[2]) == 1 ? 1 : atoi(argv[2]) == 2 ? 2 : 5);
     solve(solver, n);
@@ -286,7 +286,7 @@ int main(int argc, char *argv[]) {
     build_matrix_block(n, ar_mat, ar_rhs, &mat, &rhs);
 
     Hermes::Solvers::IterativeParalutionLinearMatrixSolver<double> solver(&mat, &rhs);
-    solver.set_precond(new ParalutionPrecond<double>(ParalutionPrecond<double>::ParalutionPreconditionerType::ILU));
+    solver.set_precond(new ParalutionPrecond<double>(ParalutionPrecond<double>::ILU));
     solver.set_max_iters(10000);
     solve(solver, n);
     sln = solver.get_sln_vector();
