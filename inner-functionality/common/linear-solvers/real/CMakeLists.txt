@@ -6,6 +6,22 @@ set_common_target_properties(${PROJECT_NAME} "HERMES2D")
 
 set(BIN ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME})
 
+add_test(test-superlu-solver-1 ${BIN} superlu 1)
+add_test(test-superlu-solver-2 ${BIN} superlu 2)
+add_test(test-superlu-solver-3 ${BIN} superlu 3)
+
+add_test(test-superlu-solver-block-1 ${BIN} superlu-block 1)
+add_test(test-superlu-solver-block-2 ${BIN} superlu-block 2)
+add_test(test-superlu-solver-block-3 ${BIN} superlu-block 3)
+
+add_test(test-paralution-solver-1 ${BIN} paralution 1)
+add_test(test-paralution-solver-2 ${BIN} paralution 2)
+add_test(test-paralution-solver-3 ${BIN} paralution 3)
+
+add_test(test-paralution-solver-block-1 ${BIN} paralution-block 1)
+add_test(test-paralution-solver-block-2 ${BIN} paralution-block 2)
+add_test(test-paralution-solver-block-3 ${BIN} paralution-block 3)
+
 add_test(test-umfpack-solver-1 ${BIN} umfpack 1)
 add_test(test-umfpack-solver-2 ${BIN} umfpack 2)
 add_test(test-umfpack-solver-3 ${BIN} umfpack 3)

@@ -1,4 +1,5 @@
 #include "hermes_common.h"
+#include "../../../../testing-core/testing-core.h"
 #include <iostream>
 
 using namespace Hermes::Algebra::DenseMatrixOperations;
@@ -262,6 +263,57 @@ int main(int argc, char *argv[]) {
     sln = solver.get_sln_vector();
 #endif
   }
+  else if(strcasecmp(argv[1], "paralution") == 0) {
+#ifdef WITH_PARALUTION
+    ParalutionMatrix<double> mat;
+    ParalutionVector<double> rhs;
+    build_matrix(n, ar_mat, ar_rhs, &mat, &rhs);
+
+    Hermes::Solvers::IterativeParalutionLinearMatrixSolver<double> solver(&mat, &rhs);
+    if(atoi(argv[2]) != 1)
+      solver.set_solver_type(IterativeParalutionLinearMatrixSolver<double>::BiCGStab);
+    solver.set_precond(new ParalutionPrecond<double>(ParalutionPrecond<double>::ParalutionPreconditionerType::ILU));
+    // Tested as of 13th August 2013.
+    solver.set_max_iters(atoi(argv[2]) == 1 ? 1 : atoi(argv[2]) == 2 ? 2 : 5);
+    solve(solver, n);
+    sln = solver.get_sln_vector();
+#endif
+  }
+  else if(strcasecmp(argv[1], "paralution-block") == 0) {
+#ifdef WITH_PARALUTION
+    ParalutionMatrix<double> mat;
+    ParalutionVector<double> rhs;
+    build_matrix_block(n, ar_mat, ar_rhs, &mat, &rhs);
+
+    Hermes::Solvers::IterativeParalutionLinearMatrixSolver<double> solver(&mat, &rhs);
+    solver.set_precond(new ParalutionPrecond<double>(ParalutionPrecond<double>::ParalutionPreconditionerType::ILU));
+    solver.set_max_iters(10000);
+    solve(solver, n);
+    sln = solver.get_sln_vector();
+#endif
+  }
+  else if(strcasecmp(argv[1], "superlu") == 0) {
+#ifdef WITH_SUPERLU
+    CSCMatrix<double> mat;
+    SimpleVector<double> rhs;
+    build_matrix(n, ar_mat, ar_rhs, &mat, &rhs);
+
+    Hermes::Solvers::SuperLUSolver<double> solver(&mat, &rhs);
+    solve(solver, n);
+    sln = solver.get_sln_vector();
+#endif
+  }
+  else if(strcasecmp(argv[1], "superlu-block") == 0) {
+#ifdef WITH_SUPERLU
+    CSCMatrix<double> mat;
+    SimpleVector<double> rhs;
+    build_matrix_block(n, ar_mat, ar_rhs, &mat, &rhs);
+
+    Hermes::Solvers::SuperLUSolver<double> solver(&mat, &rhs);
+    solve(solver, n);
+    sln = solver.get_sln_vector();
+#endif
+  }
   else if(strcasecmp(argv[1], "aztecoo") == 0) {
 #ifdef WITH_TRILINOS
     EpetraMatrix<double> mat;
@@ -332,38 +384,44 @@ int main(int argc, char *argv[]) {
     sln = solver.get_sln_vector();
 #endif
   }
-  else
-    ret = -1;
 
+  bool success = true;
   if(sln)
   {
     switch(atoi(argv[2]))
     {
     case 1:
-      if(std::abs(sln[0] - 4) > 1E-6 || std::abs(sln[1] - 2) > 1E-6 || std::abs(sln[2] - 3) > 1E-6)
-        ret = -1;
-      else
-        ret = 0;
+      success = Testing::test_value(sln[0], 4, "sln[0]", 1E-6) && success;
+      success = Testing::test_value(sln[1], 2, "sln[1]", 1E-6) && success;
+      success = Testing::test_value(sln[2], 3, "sln[2]", 1E-6) && success;
       break;
     case 2:
-      if(std::abs(sln[0] - 2) > 1E-6 || std::abs(sln[1] - 3) > 1E-6 || std::abs(sln[2] - 1) > 1E-6 || std::abs(sln[3] + 3) > 1E-6 || std::abs(sln[4] + 1) > 1E-6)
-        ret = -1;
-      else
-        ret = 0;
+      success = Testing::test_value(sln[0], 2, "sln[0]", 1E-6) && success;
+      success = Testing::test_value(sln[1], 3, "sln[1]", 1E-6) && success;
+      success = Testing::test_value(sln[2], 1, "sln[2]", 1E-6) && success;
+      success = Testing::test_value(sln[3], -3, "sln[3]", 1E-6) && success;
+      success = Testing::test_value(sln[4], -1, "sln[4]", 1E-6) && success;
       break;
     case 3:
-      if(std::abs(sln[0] - 1) > 1E-6 || std::abs(sln[1] - 2) > 1E-6 || std::abs(sln[2] - 3) > 1E-6 || std::abs(sln[3] - 4) > 1E-6 || std::abs(sln[4] - 5) > 1E-6)
-        ret = -1;
-      else
-        ret = 0;
+      success = Testing::test_value(sln[0], 1, "sln[0]", 1E-6) && success;
+      success = Testing::test_value(sln[1], 2, "sln[1]", 1E-6) && success;
+      success = Testing::test_value(sln[2], 3, "sln[2]", 1E-6) && success;
+      success = Testing::test_value(sln[3], 4, "sln[3]", 1E-6) && success;
+      success = Testing::test_value(sln[4], 5, "sln[4]", 1E-6) && success;
       break;
     }
 
-    // Test
-    if(ret == -1)
-      printf("Failure!\n");
-    else
+    if(success)
+    {
+
       printf("Success!\n");
+      return 0;
+    }
+    else
+    {
+      printf("Failure!\n");
+      return -1;
+    } 
   }
   else
     return 0;
