@@ -227,7 +227,7 @@ int main(int argc, char *argv[]) {
 
     PetscLinearMatrixSolver<double> solver(&mat, &rhs);
     solve(solver, n);
-    sln = solver.get_sln_vector();
+    sln = new double[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(double));
 #endif
   }
   else if(strcasecmp(argv[1], "petsc-block") == 0) {
@@ -238,7 +238,7 @@ int main(int argc, char *argv[]) {
 
     PetscLinearMatrixSolver<double> solver(&mat, &rhs);
     solve(solver, n);
-    sln = solver.get_sln_vector();
+    sln = new double[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(double));
 #endif
   }
   else if(strcasecmp(argv[1], "umfpack") == 0) {
@@ -249,7 +249,7 @@ int main(int argc, char *argv[]) {
 
     UMFPackLinearMatrixSolver<double> solver(&mat, &rhs);
     solve(solver, n);
-    sln = solver.get_sln_vector();
+    sln = new double[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(double));
 #endif
   }
   else if(strcasecmp(argv[1], "umfpack-block") == 0) {
@@ -260,7 +260,7 @@ int main(int argc, char *argv[]) {
 
     UMFPackLinearMatrixSolver<double> solver(&mat, &rhs);
     solve(solver, n);
-    sln = solver.get_sln_vector();
+    sln = new double[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(double));
 #endif
   }
   else if(strcasecmp(argv[1], "paralution") == 0) {
@@ -276,7 +276,7 @@ int main(int argc, char *argv[]) {
     // Tested as of 13th August 2013.
     solver.set_max_iters(atoi(argv[2]) == 1 ? 1 : atoi(argv[2]) == 2 ? 2 : 5);
     solve(solver, n);
-    sln = solver.get_sln_vector();
+    sln = new double[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(double));
 #endif
   }
   else if(strcasecmp(argv[1], "paralution-block") == 0) {
@@ -289,7 +289,7 @@ int main(int argc, char *argv[]) {
     solver.set_precond(new ParalutionPrecond<double>(ParalutionPrecond<double>::ILU));
     solver.set_max_iters(10000);
     solve(solver, n);
-    sln = solver.get_sln_vector();
+    sln = new double[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(double));
 #endif
   }
   else if(strcasecmp(argv[1], "superlu") == 0) {
@@ -300,7 +300,7 @@ int main(int argc, char *argv[]) {
 
     Hermes::Solvers::SuperLUSolver<double> solver(&mat, &rhs);
     solve(solver, n);
-    sln = solver.get_sln_vector();
+    sln = new double[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(double));
 #endif
   }
   else if(strcasecmp(argv[1], "superlu-block") == 0) {
@@ -311,7 +311,7 @@ int main(int argc, char *argv[]) {
 
     Hermes::Solvers::SuperLUSolver<double> solver(&mat, &rhs);
     solve(solver, n);
-    sln = solver.get_sln_vector();
+    sln = new double[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(double));
 #endif
   }
   else if(strcasecmp(argv[1], "aztecoo") == 0) {
@@ -322,7 +322,7 @@ int main(int argc, char *argv[]) {
 
     AztecOOSolver<double> solver(&mat, &rhs);
     solve(solver, n);
-    sln = solver.get_sln_vector();
+    sln = new double[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(double));
 #endif
   }
   else if(strcasecmp(argv[1], "aztecoo-block") == 0) {
@@ -333,7 +333,7 @@ int main(int argc, char *argv[]) {
 
     AztecOOSolver<double> solver(&mat, &rhs);
     solve(solver, n);
-    sln = solver.get_sln_vector();
+    sln = new double[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(double));
 #endif
   }
   else if(strcasecmp(argv[1], "amesos") == 0) {
@@ -345,7 +345,7 @@ int main(int argc, char *argv[]) {
     if(AmesosSolver<double>::is_available("Klu")) {
       AmesosSolver<double> solver("Klu", &mat, &rhs);
       solve(solver, n);
-      sln = solver.get_sln_vector();
+      sln = new double[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(double));
     }
 #endif
   }
@@ -358,7 +358,7 @@ int main(int argc, char *argv[]) {
     if(AmesosSolver<double>::is_available("Klu")) {
       AmesosSolver<double> solver("Klu", &mat, &rhs);
       solve(solver, n);
-      sln = solver.get_sln_vector();
+      sln = new double[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(double));
     }
 #endif
   }
@@ -370,7 +370,7 @@ int main(int argc, char *argv[]) {
 
     MumpsSolver<double> solver(&mat, &rhs);
     solve(solver, n);
-    sln = solver.get_sln_vector();
+    sln = new double[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(double));
 #endif
   }
   else if(strcasecmp(argv[1], "mumps-block") == 0) {
@@ -381,7 +381,7 @@ int main(int argc, char *argv[]) {
 
     MumpsSolver<double> solver(&mat, &rhs);
     solve(solver, n);
-    sln = solver.get_sln_vector();
+    sln = new double[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(double));
 #endif
   }
 

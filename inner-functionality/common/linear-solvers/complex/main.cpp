@@ -224,7 +224,7 @@ int main(int argc, char *argv[]) {
 
     PetscLinearMatrixSolver<complex > solver(&mat, &rhs);
     solve(solver, n);
-    sln = solver.get_sln_vector();
+    sln = new complex[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(complex));
 #endif
   }
   else if(strcasecmp(argv[1], "petsc-block") == 0) {
@@ -235,7 +235,7 @@ int main(int argc, char *argv[]) {
 
     PetscLinearMatrixSolver<complex > solver(&mat, &rhs);
     solve(solver, n);
-    sln = solver.get_sln_vector();
+    sln = new complex[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(complex));
 #endif
   }
   else if(strcasecmp(argv[1], "umfpack") == 0) {
@@ -246,7 +246,7 @@ int main(int argc, char *argv[]) {
 
     UMFPackLinearMatrixSolver<complex > solver(&mat, &rhs);
     solve(solver, n);
-    sln = solver.get_sln_vector();
+    sln = new complex[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(complex));
 #endif
   }
   else if(strcasecmp(argv[1], "umfpack-block") == 0) {
@@ -257,7 +257,7 @@ int main(int argc, char *argv[]) {
 
     UMFPackLinearMatrixSolver<complex > solver(&mat, &rhs);
     solve(solver, n);
-    sln = solver.get_sln_vector();
+    sln = new complex[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(complex));
 #endif
   }
   else if(strcasecmp(argv[1], "aztecoo") == 0) {
@@ -268,7 +268,7 @@ int main(int argc, char *argv[]) {
 
     AztecOOSolver<complex > solver(&mat, &rhs);
     solve(solver, n);
-    sln = solver.get_sln_vector();
+    sln = new complex[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(complex));
 #endif
   }
   else if(strcasecmp(argv[1], "aztecoo-block") == 0) {
@@ -279,7 +279,7 @@ int main(int argc, char *argv[]) {
 
     AztecOOSolver<complex > solver(&mat, &rhs);
     solve(solver, n);
-    sln = solver.get_sln_vector();
+    sln = new complex[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(complex));
 #endif
   }
   else if(strcasecmp(argv[1], "amesos") == 0) {
@@ -291,7 +291,7 @@ int main(int argc, char *argv[]) {
     if(AmesosSolver<complex >::is_available("Klu")) {
       AmesosSolver<complex > solver("Klu", &mat, &rhs);
       solve(solver, n);
-      sln = solver.get_sln_vector();
+      sln = new complex[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(complex));
     }
 #endif
   }
@@ -304,7 +304,7 @@ int main(int argc, char *argv[]) {
     if(AmesosSolver<complex >::is_available("Klu")) {
       AmesosSolver<complex > solver("Klu", &mat, &rhs);
       solve(solver, n);
-      sln = solver.get_sln_vector();
+      sln = new complex[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(complex));
     }
 #endif
   }
@@ -316,7 +316,7 @@ int main(int argc, char *argv[]) {
 
     MumpsSolver<complex > solver(&mat, &rhs);
     solve(solver, n);
-    sln = solver.get_sln_vector();
+    sln = new complex[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(complex));
 #endif
   }
   else if(strcasecmp(argv[1], "mumps-block") == 0) {
@@ -327,7 +327,7 @@ int main(int argc, char *argv[]) {
 
     MumpsSolver<complex > solver(&mat, &rhs);
     solve(solver, n);
-    sln = solver.get_sln_vector();
+    sln = new complex[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(complex));
 #endif
   }
   else
