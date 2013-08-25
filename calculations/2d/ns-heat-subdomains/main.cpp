@@ -181,6 +181,7 @@ int main(int argc, char* argv[])
   newton.set_max_steps_with_reused_jacobian(0);
   newton.set_tolerance(1e-6, ResidualNormAbsolute);
 
+#ifdef SHOW_OUTPUT
   // Initialize views.
   Views::VectorView vview("velocity [m/s]", new Views::WinGeom(0, 0, 700, 360));
   Views::ScalarView pview("pressure [Pa]", new Views::WinGeom(0, 415, 700, 350));
@@ -192,6 +193,7 @@ int main(int argc, char* argv[])
   pview.show_mesh(false);
   tempview.fix_scale_width(80);
   tempview.show_mesh(false);
+#endif
 
   // Time-stepping loop:
   char title[100];

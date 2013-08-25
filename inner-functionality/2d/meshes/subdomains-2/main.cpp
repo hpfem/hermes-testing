@@ -44,9 +44,6 @@ int main(int argc, char* argv[])
 
   wf.set_ext(slnTemp);
 
-  ScalarView sTemp("Temperature");
-  ScalarView sAdv("Advection");
-
   Hermes::vector<SpaceSharedPtr<double> > spaces(spaceTemperature, spaceAdvectionDiffusion);
   LinearSolver<double> solver(&wf, spaces);
   for(int step = 0; step <= 1; step++)

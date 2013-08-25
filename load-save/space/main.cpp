@@ -235,7 +235,7 @@ typedef std::complex<double> complex;
       ogProjection.project_global(space_test2, ref_sln, sln);
 #else
       space->save("space-complex-coarse.xml2");
-      SpaceSharedPtr<complex> space_test2 = Space<complex>::load("space-complex-coarse.xml2", mesh, &bcs);
+      SpaceSharedPtr<complex> space_test2 = Space<complex>::load("space-complex-coarse.xml2", mesh, false, &bcs);
       ogProjection.project_global(space_test2, ref_sln, sln);
 #endif
       // View the coarse mesh solution and polynomial orders.
