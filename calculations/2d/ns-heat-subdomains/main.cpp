@@ -226,10 +226,6 @@ int main(int argc, char* argv[])
       Solution<double>::vector_to_solutions(newton.get_sln_vector(), all_spaces, all_solutions);
     }
     
-    // Show the solution at the end of time step.
-    vview.get_vectorizer()->process_solution(xvel_prev_time, yvel_prev_time, H2D_FN_VAL_0, H2D_FN_DX_0);
-    pview.get_linearizer()->save_solution_vtk(p_prev_time, "pressure.vtk", "pressure");
-
 #ifdef SHOW_OUTPUT
     sprintf(title, "Velocity [m/s], time %g s", current_time);
     vview.set_title(title);
