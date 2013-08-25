@@ -12,6 +12,8 @@ else(${CMAKE_CL_64})
 endif(${CMAKE_CL_64})
 
 # This has to be the same as in the library's CMake.
+set(H2D_WITH_GLUT YES)
+
 set(WITH_TC_MALLOC YES)
 set(WITH_MATIO NO)
 set(WITH_BSON NO)
@@ -95,7 +97,9 @@ enable_testing()
 
 set(TESTING_CORE_LIBRARY "testing-core")
 add_subdirectory(testing-core)
-add_subdirectory(visualization)
+if(H2D_WITH_GLUT)
+  add_subdirectory(visualization)
+endif()
 add_subdirectory(load-save)
 add_subdirectory(inner-functionality)
 add_subdirectory(calculations)
