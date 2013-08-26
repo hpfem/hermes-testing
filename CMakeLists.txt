@@ -14,7 +14,7 @@ endif(${CMAKE_CL_64})
 # This has to be the same as in the library's CMake.
 set(H2D_WITH_GLUT YES)
 
-set(WITH_TC_MALLOC YES)
+set(WITH_TC_MALLOC NO)
 set(WITH_MATIO NO)
 set(WITH_BSON NO)
 set(WITH_PARALUTION YES)
