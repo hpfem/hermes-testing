@@ -1,5 +1,6 @@
 #define HERMES_REPORT_INFO
 #include "definitions.h"
+#include "../../../../testing-core/testing-core.h"
 
 using namespace Hermes;
 using namespace Hermes::Hermes2D;
@@ -93,24 +94,18 @@ int main(int argc, char* argv[])
   double test_point_7 = slnAdv->get_pt_value(1.47, 1.8)->val[0];
   double test_point_8 = slnAdv->get_pt_value(1.81, 1.67)->dx[0] + slnAdv->get_pt_value(1.81, 1.67)->dy[0];
 
-  if(std::abs(test_point_1 - testValues[0]) > 1e-6)
-    return -1;
-  if(std::abs(test_point_2 - testValues[1]) > 1e-6)
-    return -1;
-  if(std::abs(test_point_3 - testValues[2]) > 1e-6)
-    return -1;
-  if(std::abs(test_point_4 - testValues[3]) > 1e-6)
-    return -1;
-  if(std::abs(test_point_5 - testValues[4]) > 1e-6)
-    return -1;
-  if(std::abs(test_point_6 - testValues[5]) > 1e-6)
-    return -1;
-  if(std::abs(test_point_7 - testValues[6]) > 1e-6)
-    return -1;
-  if(std::abs(test_point_8 - testValues[7]) > 1e-6)
-    return -1;
-
   bool success = true;
+
+  success = Testing::test_value(test_point_1, testValues[0], "test_point_1") && success;
+  success = Testing::test_value(test_point_2, testValues[1], "test_point_2") && success;
+  success = Testing::test_value(test_point_3, testValues[2], "test_point_3") && success;
+
+  success = Testing::test_value(test_point_4, testValues[3], "test_point_4") && success;
+  success = Testing::test_value(test_point_5, testValues[4], "test_point_5") && success;
+  success = Testing::test_value(test_point_6, testValues[5], "test_point_6") && success;
+  success = Testing::test_value(test_point_7, testValues[6], "test_point_7") && success;
+  success = Testing::test_value(test_point_8, testValues[7], "test_point_8") && success;
+
 #ifdef WITH_BSON
   int first_mesh_elem_count = meshes[0]->get_num_active_elements();
   int second_mesh_elem_count = meshes[1]->get_num_active_elements();
