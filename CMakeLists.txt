@@ -118,3 +118,36 @@ endif()
 add_subdirectory(load-save)
 add_subdirectory(inner-functionality)
 add_subdirectory(calculations)
+
+#------------------------------------------------------------------------------
+# Report.
+#~~~~~~~~
+message("\nHermes-testing Configuration results")
+message("---------------------")
+if(WIN32)
+  message("Build for Win64: ${WIN64}")
+endif(WIN32)
+
+message("\n-------Features-------")
+message("Build with OpenMP: ${WITH_OPENMP}")
+message("Build with TCMalloc: ${WITH_TC_MALLOC}")
+message("Build with BSON: ${WITH_BSON}")
+message("Build with MATIO: ${WITH_MATIO}")
+if(${WITH_MATIO})
+  message(" MATIO with HDF5: ${MATIO_WITH_HDF5}")
+endif()
+if(${WITH_MPI})
+  message("Build with MPI: ${WITH_MPI}")
+endif()
+message("Build with EXODUSII: ${WITH_EXODUSII}")
+
+message("\n-------Solvers-------")
+message("Build with UMFPACK: ${WITH_UMFPACK}")
+message("Build with PARALUTION: ${WITH_PARALUTION}")
+message("Build with PETSC: ${WITH_PETSC}")
+message("Build with MUMPS: ${WITH_MUMPS}")
+message("Build with SUPERLU${MT}: ${WITH_SUPERLU}")
+message("Build with TRILINOS: ${WITH_TRILINOS}")
+
+message("---------------------")
+message("\n")
