@@ -30,7 +30,7 @@ void TestExactSolution1::derivatives(double x, double y, double& dx, double& dy)
   dy = 0.0;
 }
 
-Ord TestExactSolution1::ord(Ord x, Ord y) const 
+Ord TestExactSolution1::ord(double x, double y) const 
 {
   return Ord(10);
 }
@@ -60,7 +60,7 @@ void TestExactSolution2::derivatives(double x, double y, double& dx, double& dy)
   dx = 0.0;
 }
 
-Ord TestExactSolution2::ord(Ord x, Ord y) const 
+Ord TestExactSolution2::ord(double x, double y) const 
 {
   return Ord(10);
 }

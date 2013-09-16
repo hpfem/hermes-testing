@@ -95,7 +95,7 @@ public:
     return;
   };
 
-  virtual Hermes::Ord ord(Hermes::Ord x, Hermes::Ord y) const 
+  virtual Hermes::Ord ord(double x, double y) const 
   {
     return Hermes::Ord(10);
   }

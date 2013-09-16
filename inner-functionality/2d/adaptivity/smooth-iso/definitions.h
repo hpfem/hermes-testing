@@ -22,7 +22,7 @@ public:
 
   virtual double value(double x, double y) const;
 
-  virtual Ord ord(Ord x, Ord y) const;
+  virtual Ord ord(double x, double y) const;
 
   virtual MeshFunction<double>* clone() const { return new CustomExactSolution(this->mesh); }
 

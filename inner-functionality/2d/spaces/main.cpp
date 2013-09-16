@@ -14,7 +14,7 @@ public:
 
   void derivatives (double x, double y, double& dx, double& dy) const {};
 
-  Hermes::Ord ord(Hermes::Ord x, Hermes::Ord y) const { return Hermes::Ord(1); }
+  Hermes::Ord ord(double x, double y) const { return Hermes::Ord(1); }
 };
 
 class BCNonConst : public DefaultEssentialBCNonConst<double>
