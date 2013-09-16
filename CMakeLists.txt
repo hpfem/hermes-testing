@@ -12,14 +12,18 @@ else(${CMAKE_CL_64})
 endif(${CMAKE_CL_64})
 
 # This has to be the same as in the library's CMake.
+# Default "yes"
 set(H2D_WITH_GLUT YES)
-
-set(WITH_TC_MALLOC NO)
+set(WITH_TC_MALLOC YES)
+set(WITH_PARALUTION YES)
+set(WITH_UMFPACK YES)
+set(WITH_OPENMP YES)
+# Default "no"
+set(WITH_EXODUSII NO)
+set(WITH_MUMPS NO)
 set(WITH_MATIO NO)
 set(WITH_BSON NO)
-set(WITH_PARALUTION YES)
 set(WITH_SUPERLU NO)
-set(WITH_OPENMP YES)
 
 # Where to look for the static libraries.
 set(HERMES_DIRECTORY /usr/local/lib)
@@ -67,8 +71,10 @@ endif(MSVC)
 
 include_directories("${PTHREAD_ROOT}/include")
 
-find_package(UMFPACK REQUIRED)
-include_directories(${UMFPACK_INCLUDE_DIRS})
+if(${WITH_UMFPACK})
+  find_package(UMFPACK REQUIRED)
+  include_directories(${UMFPACK_INCLUDE_DIRS})
+endif()
 
 find_package(PTHREAD REQUIRED)
 
@@ -86,6 +92,38 @@ if(${WITH_MATIO})
   find_package(MATIO REQUIRED)
   include_directories(${MATIO_INCLUDE_DIR})
 endif()
+
+if(MSVC)
+  if(WITH_PETSC OR WITH_TRILINOS OR WITH_SUPERLU)
+      find_package(CLAPACK REQUIRED)
+      include_directories(${CLAPACK_INCLUDE_DIRS})
+  endif(WITH_PETSC OR WITH_TRILINOS OR WITH_SUPERLU)
+  if(WITH_MUMPS)
+    find_package(WINBLAS REQUIRED)
+  endif(WITH_MUMPS)
+else(MSVC)
+  if(WITH_UMFPACK OR WITH_PETSC OR WITH_MUMPS OR WITH_TRILINOS OR WITH_SUPERLU)
+    if (NOT LAPACK_FOUND)
+        enable_language(Fortran)
+        find_package(LAPACK REQUIRED)
+        set(LAPACK_LIBRARIES  ${LAPACK_LIBRARIES}
+                CACHE STRING  "Path to LAPACK/BLAS libraries.")
+        set(LAPACK_FOUND      YES
+                CACHE STRING  "Have LAPACK/BLAS libraries been found?")
+    endif (NOT LAPACK_FOUND)
+    add_definitions(-DWITH_BLAS)  
+  endif(WITH_UMFPACK OR WITH_PETSC OR WITH_MUMPS OR WITH_TRILINOS OR WITH_SUPERLU)
+endif(MSVC)
+
+if(WITH_MUMPS)
+  find_package(MUMPS REQUIRED)
+  if(WITH_MPI)
+    find_package(SCALAPACK REQUIRED) # parallel version of MUMPS needs ScaLapack+BLACS
+  endif(WITH_MPI)
+  include_directories(${MUMPS_INCLUDE_DIR})
+  set(MUMPS_LIBRARIES ${MUMPS_CPLX_LIBRARIES})
+  LIST(APPEND MUMPS_LIBRARIES ${MUMPS_REAL_LIBRARIES})
+endif(WITH_MUMPS)
 
 if(${WITH_BSON})
   find_package(BSON REQUIRED)
@@ -144,10 +182,10 @@ message("Build with EXODUSII: ${WITH_EXODUSII}")
 message("\n-------Solvers-------")
 message("Build with UMFPACK: ${WITH_UMFPACK}")
 message("Build with PARALUTION: ${WITH_PARALUTION}")
-message("Build with PETSC: ${WITH_PETSC}")
+message("Build with PETSC: !TO_DO!")
 message("Build with MUMPS: ${WITH_MUMPS}")
 message("Build with SUPERLU${MT}: ${WITH_SUPERLU}")
-message("Build with TRILINOS: ${WITH_TRILINOS}")
+message("Build with TRILINOS: !TO_DO!")
 
 message("---------------------")
 message("\n")
