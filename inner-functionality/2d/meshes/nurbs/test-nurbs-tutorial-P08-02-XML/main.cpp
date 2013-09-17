@@ -2,6 +2,8 @@
 #include "hermes2d.h"
 
 using namespace Hermes;
+using namespace Hermes::Solvers;
+using namespace Hermes::Algebra;
 using namespace Hermes::Hermes2D;
 
 // This test makes sure that NURBS work correctly.
