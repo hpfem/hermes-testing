@@ -1,7 +1,5 @@
 #include "hermes2d.h"
 
-#define complex std::complex<double>
-
 using namespace Hermes;
 using namespace Hermes::Hermes2D;
 using namespace Hermes::Hermes2D::Views;

@@ -1,9 +1,6 @@
 #include "definitions.h"
 #include "../../../testing-core/testing-core.h"
 
-using namespace RefinementSelectors;
-using namespace Views;
-
 // Number of initial uniform mesh refinements.
 const int INIT_REF_NUM = 3;                       
 // Initial polynomial degree of all mesh elements.
@@ -15,7 +12,7 @@ const double T_FINAL = 0.3;
 
 // Error calculation & adaptivity.
 // Every UNREF_FREQth time step the mesh is derefined.
-const int UNREF_FREQ = 2;                         
+const int UNREF_FREQ = 2;
 // 1... mesh reset to basemesh and poly degrees to P_INIT.   
 // 2... one ref. layer shaved off, poly degrees reset to P_INIT.
 // 3... one ref. layer shaved off, poly degrees decreased by one. 

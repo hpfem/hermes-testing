@@ -1,8 +1,5 @@
 #include "definitions.h"
-
-using namespace Hermes::Hermes2D::RefinementSelectors;
-
-typedef std::complex<double> complex;
+#include "../../../testing-core/testing-core.h"
 
 //  The following parameters can be changed:
 const int INIT_REF_NUM = 0;                       // Number of initial uniform mesh refinements.

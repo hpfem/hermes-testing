@@ -4,6 +4,8 @@ namespace Hermes
 {
   namespace Testing
   {
+    Hermes::Mixins::Loggable logger(true);
+
 #ifdef _WINDOWS
     long get_current_virtual_memory()
     {

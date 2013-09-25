@@ -1,8 +1,6 @@
 #include "definitions.h"
 #include "../../testing-core/testing-core.h"
 
-//#define SHOW_OUTPUT
-
 int main(int argc, char* argv[])
 {
   bool success = true;

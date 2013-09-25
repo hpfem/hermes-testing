@@ -1,6 +1,5 @@
 #include "definitions.h"
-
-using namespace RefinementSelectors;
+#include "../../../testing-core/testing-core.h"
 
 // Initial polynomial degree.
 const int P_INIT = 2;                             
@@ -54,6 +53,9 @@ int main(int argc, char* argv[])
 
   // Initialize Newton solver.
   NewtonSolver<double> newton(&dp);
+  newton.set_weak_formulation(dp.get_weak_formulation());
+  newton.set_space(dp.get_space(0));
+  newton.output_matrix();
   newton.set_tolerance(NEWTON_TOL, ResidualNormAbsolute);
   newton.set_max_allowed_residual_norm(1e99);
   newton.set_max_allowed_iterations(NEWTON_MAX_ITER);

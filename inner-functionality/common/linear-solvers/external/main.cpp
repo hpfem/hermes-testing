@@ -1,8 +1,6 @@
 #include "definitions.h"
 #include "../../../../testing-core/testing-core.h"
 
-using namespace Hermes;
-using namespace Hermes::Hermes2D;
 using namespace Hermes::Algebra::DenseMatrixOperations;
 using namespace Hermes::Solvers;
 

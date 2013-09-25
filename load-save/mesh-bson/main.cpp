@@ -1,11 +1,6 @@
 #include "definitions.h"
 #include "../../testing-core/testing-core.h"
 
-//#define SHOW_OUTPUT
-
-using namespace Hermes;
-using namespace Hermes::Hermes2D;
-
 int main(int argc, char* argv[])
 {
 #ifdef WITH_BSON

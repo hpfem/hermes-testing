@@ -1,6 +1,5 @@
 #include "definitions.h"
-
-//#define SHOW_OUTPUT
+#include "../../testing-core/testing-core.h"
 
 namespace L2_real
 {

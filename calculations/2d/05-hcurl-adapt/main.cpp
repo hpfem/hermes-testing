@@ -1,11 +1,4 @@
-#include "hermes2d.h"
 #include "../../../testing-core/testing-core.h"
-
-using namespace Hermes;
-using namespace Hermes::Hermes2D;
-using namespace Hermes::Hermes2D::RefinementSelectors;
-
-typedef std::complex<double> complex;
 
 // Initial polynomial degree. NOTE: The meaning is different from
 // standard continuous elements in the space H1. Here, P_INIT refers

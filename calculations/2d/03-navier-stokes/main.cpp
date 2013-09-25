@@ -1,9 +1,6 @@
 #include "hermes2d.h"
 #include "../../../testing-core/testing-core.h"
 
-using namespace Hermes;
-using namespace Hermes::Hermes2D;
-
 const bool STOKES = false;                        // For application of Stokes flow (creeping flow).
 
 #define PRESSURE_IN_L2

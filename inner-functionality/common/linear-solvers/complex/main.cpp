@@ -1,7 +1,4 @@
-#include "hermes_common.h"
-#include <iostream>
-
-typedef std::complex<double> complex;
+#include "../../../../testing-core/testing-core.h"
 
 using namespace Hermes::Algebra::DenseMatrixOperations;
 using namespace Hermes::Solvers;

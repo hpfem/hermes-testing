@@ -11,12 +11,19 @@
 
 using namespace Hermes;
 using namespace Hermes::Hermes2D;
+using namespace Hermes::Hermes2D::Views;
+using namespace Hermes::Hermes2D::RefinementSelectors;
 
+typedef ::std::complex<double> complex;
+
+// #define SHOW_OUTPUT
 
 namespace Hermes
 {
   namespace Testing
   {
+    extern Hermes::Mixins::Loggable logger;
+
     long get_current_virtual_memory();
 
 #ifdef _WINDOWS
@@ -30,3 +37,5 @@ namespace Hermes
     bool compare_files(const char* filename_1, const char* filename_2);
   }
 }
+
+using namespace Hermes::Testing;

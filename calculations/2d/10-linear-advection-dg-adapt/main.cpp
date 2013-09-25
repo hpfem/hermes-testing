@@ -1,4 +1,5 @@
 #include "definitions.h"
+#include "../../../testing-core/testing-core.h"
 
 //  This example solves a linear advection equation using Dicontinuous Galerkin (DG) method.
 //  It is intended to show how evalutation of surface matrix forms that take basis functions defined
@@ -74,6 +75,8 @@ int main(int argc, char* args[])
     try
     {
       linear_solver.solve();
+      linear_solver.get_jacobian()->export_to_file("Matrix", "A", MatrixExportFormat::EXPORT_FORMAT_MATRIX_MARKET);
+      linear_solver.get_residual()->export_to_file("Vector", "b", MatrixExportFormat::EXPORT_FORMAT_PLAIN_ASCII);
       Solution<double>::vector_to_solution(linear_solver.get_sln_vector(), ref_space, ref_sln);
     }
     catch(std::exception& e)

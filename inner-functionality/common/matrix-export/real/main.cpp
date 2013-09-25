@@ -1,6 +1,4 @@
-#include "hermes_common.h"
 #include "../../../../testing-core/testing-core.h"
-#include <iostream>
 
 using namespace Hermes::Algebra::DenseMatrixOperations;
 using namespace Hermes::Solvers;

@@ -1,10 +1,7 @@
-#define HERMES_REPORT_INFO
-#include "hermes2d.h"
+#include "../../../../../testing-core/testing-core.h"
 
-using namespace Hermes;
 using namespace Hermes::Solvers;
 using namespace Hermes::Algebra;
-using namespace Hermes::Hermes2D;
 
 // This test makes sure that NURBS work correctly.
 

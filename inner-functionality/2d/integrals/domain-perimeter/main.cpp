@@ -1,13 +1,6 @@
-#define HERMES_REPORT_WARN
-#define HERMES_REPORT_INFO
-#define HERMES_REPORT_FILE "application.log"
+#include "../../../../testing-core/testing-core.h"
 #define PI 4.0*atan(1.0)
-#include "hermes2d.h"
 
-#include <iostream>
-
-using namespace Hermes;
-using namespace Hermes::Hermes2D;;
 using std::cout;
 using std::endl;
 

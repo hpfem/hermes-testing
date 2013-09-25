@@ -1,9 +1,5 @@
-#define HERMES_REPORT_ALL
-#define HERMES_REPORT_FILE "application.log"
-#include "hermes2d.h"
+#include "../../../../testing-core/testing-core.h"
 
-using namespace Hermes;
-using namespace Hermes::Hermes2D;;
 // This example makes sure that normal and tangential vectors to circular
 // arcs nurbs are calculated correctly.
 //

@@ -1,7 +1,5 @@
 #include "definitions.h"
-
-using namespace Hermes;
-using namespace Hermes::Hermes2D;
+#include "../../testing-core/testing-core.h"
 
 int main(int argc, char* argv[])
 {

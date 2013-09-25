@@ -1,10 +1,5 @@
-#define HERMES_REPORT_INFO
 #include "definitions.h"
 #include "../../../../testing-core/testing-core.h"
-
-using namespace Hermes;
-using namespace Hermes::Hermes2D;
-using namespace Hermes::Hermes2D::Views;
 
 // This test makes sure that subdomains work correctly.
 

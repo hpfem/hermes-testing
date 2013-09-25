@@ -1,6 +1,5 @@
 #include "definitions.h"
-
-using namespace RefinementSelectors;
+#include "../../../testing-core/testing-core.h"
 
 const int P_INIT = 2;                             // Polynomial degree of all mesh elements.
 const int INIT_REF_NUM = 1;                       // Number of initial uniform mesh refinements.
@@ -56,7 +55,6 @@ int main(int argc, char* argv[])
 
   // Initialize Runge-Kutta time stepping.
   RungeKutta<double> runge_kutta(&wf, space, &bt);
-
   runge_kutta.set_verbose_output(true);
 
   // Iteration number.

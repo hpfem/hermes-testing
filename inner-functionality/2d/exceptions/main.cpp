@@ -1,9 +1,7 @@
-#include "hermes2d.h"
+#include "../../../testing-core/testing-core.h"
 
-using namespace Hermes;
 using namespace Hermes::Solvers;
 using namespace Hermes::Algebra;
-using namespace Hermes::Hermes2D;
 
 // This is a test of excptions.
 

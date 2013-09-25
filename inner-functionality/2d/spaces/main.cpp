@@ -1,7 +1,4 @@
-
-#include "hermes2d.h"
-
-using namespace Hermes::Hermes2D;;
+#include "../../../testing-core/testing-core.h"
 
 // This is a test of spaces in Hermes2D.
 

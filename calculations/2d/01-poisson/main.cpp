@@ -1,5 +1,5 @@
-
 #include "definitions.h"
+#include "../../../testing-core/testing-core.h"
 
 const int P_INIT = 2;                             // Uniform polynomial degree of mesh elements.
 const int INIT_REF_NUM = 3;                       // Number of initial uniform mesh refinements.

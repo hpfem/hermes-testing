@@ -1,8 +1,5 @@
 #include "definitions.h"
-
-using namespace Hermes;
-using namespace Hermes::Hermes2D;
-using namespace Hermes::Hermes2D::RefinementSelectors;
+#include "../../../../testing-core/testing-core.h"
 
 //  This is a test of adaptivity.
 //
