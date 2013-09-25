@@ -19,3 +19,5 @@ add_subdirectory("10-linear-advection-dg-adapt")
 add_subdirectory("11-transient-adapt")
 
 add_subdirectory("ns-heat-subdomains")
+
+add_subdirectory("12-picard")
