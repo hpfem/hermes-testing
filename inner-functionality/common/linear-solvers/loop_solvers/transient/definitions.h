@@ -12,7 +12,7 @@ class CustomWeakFormHeatRK1 : public WeakForm<double>
 public:
   CustomWeakFormHeatRK1(std::string bdy_air, double alpha, double lambda, double heatcap, double rho,
                         double time_step, double* current_time_ptr, double temp_init, double t_final,
-                        Solution<double>* prev_time_sln);
+                        MeshFunctionSharedPtr<double> prev_time_sln);
 
 private:
   // This form is custom since it contains previous time-level solution.
@@ -22,13 +22,13 @@ private:
     CustomVectorFormVol(int i, double time_step)
           : VectorFormVol<double>(i), time_step(time_step) {};
 
-    virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
+    virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, Geom<double> *e, Func<double>**ext) const;
 
-    virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, Geom<Ord> *e, ExtData<Ord> *ext) const;
+    virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, Geom<Ord> *e, Func<Ord>** ext) const;
 
     double time_step;
 
-    VectorFormVol<double>* clone();
+    VectorFormVol<double>* clone() const;
   };
 
   // This form is custom since it contains time-dependent exterior temperature.
@@ -37,12 +37,15 @@ private:
   public:
     CustomVectorFormSurf(int i, std::string area, double alpha, double rho, double heatcap,
                          double time_step, double* current_time_ptr, double temp_init, double t_final)
-          : VectorFormSurf<double>(i, area), alpha(alpha), rho(rho), heatcap(heatcap), time_step(time_step), current_time_ptr(current_time_ptr),
-                                     temp_init(temp_init), t_final(t_final) {};
+          : VectorFormSurf<double>(i), alpha(alpha), rho(rho), heatcap(heatcap), time_step(time_step), current_time_ptr(current_time_ptr),
+                                     temp_init(temp_init), t_final(t_final) 
+    {
+      this->set_area(area);
+    };
 
-    virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, Geom<double> *e, ExtData<double> *ext) const;
+    virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, Geom<double> *e, Func<double>**ext) const;
 
-    virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, Geom<Ord> *e, ExtData<Ord> *ext) const;
+    virtual Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, Geom<Ord> *e, Func<Ord>**ext) const;
 
     // Time-dependent exterior temperature.
     template<typename Real>
@@ -50,6 +53,6 @@ private:
 
     double alpha, rho, heatcap, time_step, *current_time_ptr, temp_init, t_final;
     
-    VectorFormSurf<double>* clone();
+    VectorFormSurf<double>* clone() const;
   };
 };

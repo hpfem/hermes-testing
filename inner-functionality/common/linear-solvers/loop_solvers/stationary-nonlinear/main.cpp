@@ -40,9 +40,9 @@ int main(int argc, char* argv[])
   CustomNonlinearity lambda(alpha);
   Hermes2DFunction<double> src(-heat_src);
   DefaultWeakFormPoisson<double> wf(HERMES_ANY, &lambda, &src);
-  #ifdef SHOW_OUTPUT
-        ScalarView s_view("Solution");
-      #endif
+#ifdef SHOW_OUTPUT
+  ScalarView s_view("Solution");
+#endif
 
   double* coeff_vec = new double[ndof];
   MeshFunctionSharedPtr<double> init_sln(new CustomInitialCondition(mesh));
@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
   // Testing is happening here.
   Hermes::vector<int> numbers_of_nonlinear_iterations;
   Hermes::vector<int> numbers_of_linear_iterations_in_last_nonlinear_step;
-  // Iterative - zero initial guess.
+  // Iterative - original initial guess.
   HermesCommonApi.set_integral_param_value(matrixSolverType, SOLVER_PARALUTION_ITERATIVE);
   {
     // Initialize Newton solver.
@@ -60,90 +60,56 @@ int main(int argc, char* argv[])
     newton.set_tolerance(NEWTON_TOL, ResidualNormAbsolute);
     newton.set_max_steps_with_reused_jacobian(0);
 
-    IterativeParalutionLinearMatrixSolver<double>* lsolver = dynamic_cast<IterativeParalutionLinearMatrixSolver<double>*>(newton.get_linear_solver());
-    lsolver->set_solver_type(GMRES);
-    //lsolver->set_precond(new ParalutionPrecond<double>(Preconditioners::PreconditionerType::MultiColoredSGS));
-    lsolver->set_tolerance(1e-5);
+    newton.get_linear_solver()->as_IterSolver()->set_solver_type(GMRES);
+    newton.get_linear_solver()->as_IterSolver()->set_tolerance(1e-5);
 
     // Perform Newton's iteration.
     newton.solve(coeff_vec);
     numbers_of_nonlinear_iterations.push_back(newton.get_num_iters());
-    numbers_of_linear_iterations_in_last_nonlinear_step.push_back(lsolver->get_num_iters());
-      
+    numbers_of_linear_iterations_in_last_nonlinear_step.push_back(newton.get_linear_solver()->as_IterSolver()->get_num_iters());
+
     // Translate the resulting coefficient vector into a Solution.
     Solution<double>::vector_to_solution(newton.get_sln_vector(), space, sln);
-    #ifdef SHOW_OUTPUT
-      s_view.show(sln);
-    #endif
+#ifdef SHOW_OUTPUT
+    s_view.show(sln);
+#endif
   }
 
-  // Iterative - nonzero initial guess.
+  // Iterative - "exact" initial guess.
   {
     // Initialize Newton solver.
     NewtonSolver<double> newton(&wf, space);
     newton.set_tolerance(NEWTON_TOL, ResidualNormAbsolute);
 
-    IterativeParalutionLinearMatrixSolver<double>* lsolver = dynamic_cast<IterativeParalutionLinearMatrixSolver<double>*>(newton.get_linear_solver());
-    lsolver->set_solver_type(GMRES);
+    newton.get_linear_solver()->as_IterSolver()->set_solver_type(GMRES);
 
     // Perform Newton's iteration.
     newton.solve(sln);
     numbers_of_nonlinear_iterations.push_back(newton.get_num_iters());
-    numbers_of_linear_iterations_in_last_nonlinear_step.push_back(lsolver->get_num_iters());
-      
+    numbers_of_linear_iterations_in_last_nonlinear_step.push_back(newton.get_linear_solver()->as_IterSolver()->get_num_iters());
+
     // Translate the resulting coefficient vector into a Solution.
     Solution<double>::vector_to_solution(newton.get_sln_vector(), space, sln);
-    #ifdef SHOW_OUTPUT
-      s_view.show(sln);
-    #endif
+#ifdef SHOW_OUTPUT
+    s_view.show(sln);
+#endif
   }
-  // AMG - nonzero initial guess.
-  HermesCommonApi.set_integral_param_value(matrixSolverType, SOLVER_PARALUTION_AMG);
+
+  bool success = true;
+  
+  success = Hermes::Testing::test_value(numbers_of_nonlinear_iterations[0], 11, "Nonlinear iterations[0]", 1) && success;
+  success = Hermes::Testing::test_value(numbers_of_nonlinear_iterations[1], 2, "Nonlinear iterations[1]", 1) && success;
+  success = Hermes::Testing::test_value(numbers_of_linear_iterations_in_last_nonlinear_step[0], 14, "Linear iterations[0]", 1) && success;
+  success = Hermes::Testing::test_value(numbers_of_linear_iterations_in_last_nonlinear_step[1], 17, "Linear iterations[1]", 1) && success;
+  if(success == true)
   {
-    // Initialize Newton solver.
-    NewtonSolver<double> newton(&wf, space);
-    newton.set_tolerance(NEWTON_TOL, ResidualNormAbsolute);
-
-    AMGParalutionLinearMatrixSolver<double>* lsolver = dynamic_cast<AMGParalutionLinearMatrixSolver<double>*>(newton.get_linear_solver());
-    lsolver->set_smoother(GMRES, Preconditioners::ILU);
-
-    // Perform Newton's iteration.
-    newton.solve(coeff_vec);
-    numbers_of_nonlinear_iterations.push_back(newton.get_num_iters());
-    numbers_of_linear_iterations_in_last_nonlinear_step.push_back(lsolver->get_num_iters());
-      
-    // Translate the resulting coefficient vector into a Solution.
-    Solution<double>::vector_to_solution(newton.get_sln_vector(), space, sln);
-    #ifdef SHOW_OUTPUT
-      s_view.show(sln);
-    #endif
+    printf("Success!\n");
+    return 0;
   }
-
-  // Iterative - nonzero initial guess.
+  else
   {
-      // Initialize Newton solver.
-      NewtonSolver<double> newton(&wf, space);
-      newton.set_tolerance(NEWTON_TOL, ResidualNormAbsolute);
-
-      AMGParalutionLinearMatrixSolver<double>* lsolver = dynamic_cast<AMGParalutionLinearMatrixSolver<double>*>(newton.get_linear_solver());
-      lsolver->set_smoother(GMRES, Preconditioners::ILU);
-
-      // Perform Newton's iteration.
-      newton.solve(sln);
-      numbers_of_nonlinear_iterations.push_back(newton.get_num_iters());
-      numbers_of_linear_iterations_in_last_nonlinear_step.push_back(lsolver->get_num_iters());
-      
-      // Translate the resulting coefficient vector into a Solution.
-      Solution<double>::vector_to_solution(newton.get_sln_vector(), space, sln);
-      #ifdef SHOW_OUTPUT
-        s_view.show(sln);
-      #endif
+    printf("Failure!\n");
+    return -1;
   }
-
-  // Clean up.
-  delete [] coeff_vec;
-
-  printf("Success!\n");
-  return 0;
 }
 

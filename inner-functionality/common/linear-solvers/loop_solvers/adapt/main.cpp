@@ -1,7 +1,5 @@
-#define HERMES_REPORT_ALL
 #include "definitions.h"
-
-using namespace RefinementSelectors;
+#include "../../../../../testing-core/testing-core.h"
 
 // This example shows how to run adaptive hp-FEM, h-FEM and p-FEM with
 // basic control parameters. The underlying problem is a planar model
@@ -83,6 +81,7 @@ const double EPS_AIR = 1.0 * EPS0;
 
 int main(int argc, char* argv[])
 {
+  /*
   // Load the mesh.
   Mesh mesh;
   MeshReaderH2D mloader;
@@ -192,6 +191,7 @@ int main(int argc, char* argv[])
     Hermes::Mixins::Loggable::Static::info("Calculating error estimate.");
     Adapt<double> adaptivity(&space);
     bool solutions_for_adapt = true;
+
     // In the following function, the Boolean parameter "solutions_for_adapt" determines whether
     // the calculated errors are intended for use with adaptivity (this may not be the case, for example,
     // when error wrt. an exact solution is calculated). The default value is solutions_for_adapt = true,
@@ -208,11 +208,6 @@ int main(int argc, char* argv[])
 
     // Add entry to DOF and CPU convergence graphs.
     cpu_time.tick();    
-    graph_cpu.add_values(cpu_time.accumulated(), err_est_rel);
-    graph_cpu.save("conv_cpu_est.dat");
-    graph_dof.add_values(space.get_num_dofs(), err_est_rel);
-    graph_dof.save("conv_dof_est.dat");
-    
     // Skip the time spent to save the convergence graphs.
     cpu_time.tick();
 
@@ -240,6 +235,7 @@ int main(int argc, char* argv[])
 
   Hermes::Mixins::Loggable::Static::info("Total running time: %g s", cpu_time.accumulated());
 
+#ifdef SHOW_OUTPUT
   // Show the fine mesh solution - final result.
   sview.set_title("Fine mesh solution");
   sview.show_mesh(false);
@@ -247,7 +243,8 @@ int main(int argc, char* argv[])
 
   // Wait for all views to be closed.
   Views::View::wait();
-
-  return 0;
+#endif
+*/
+  return -1;
 }
 

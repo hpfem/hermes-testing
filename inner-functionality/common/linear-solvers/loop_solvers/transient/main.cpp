@@ -1,8 +1,5 @@
-#define HERMES_REPORT_ALL
-#define HERMES_REPORT_FILE "application.log"
 #include "definitions.h"
-
-using namespace RefinementSelectors;
+#include "../../../../../testing-core/testing-core.h"
 
 //  This example shows the simplest way to solve a linear time-dependent
 //  PDE in Hermes using the implicit Euler method in time. The model describes 
@@ -47,47 +44,56 @@ const double HEATCAP = 1e2;
 // Material density.
 const double RHO = 3000;           
 // Length of time interval (24 hours) in seconds.
-const double T_FINAL = 86400;      
+const double T_FINAL = 100 * time_step;      
 
 int main(int argc, char* argv[])
 {
+  HermesCommonApi.set_integral_param_value(matrixSolverType, SOLVER_PARALUTION_AMG);
+
   // Load the mesh.
-  Mesh mesh;
+  MeshSharedPtr mesh(new Mesh);
   MeshReaderH2D mloader;
-  mloader.load("domain.mesh", &mesh);
+  mloader.load("domain.mesh", mesh);
 
   // Perform initial mesh refinements.
-  for(int i = 0; i < INIT_REF_NUM; i++) mesh.refine_all_elements();
-  mesh.refine_towards_boundary("Boundary air", INIT_REF_NUM_BDY);
-  mesh.refine_towards_boundary("Boundary ground", INIT_REF_NUM_BDY);
+  for(int i = 0; i < INIT_REF_NUM; i++) mesh->refine_all_elements();
+  mesh->refine_towards_boundary("Boundary air", INIT_REF_NUM_BDY);
+  mesh->refine_towards_boundary("Boundary ground", INIT_REF_NUM_BDY);
 
   // Previous time level solution (initialized by the external temperature).
-  ConstantSolution<double> tsln(&mesh, TEMP_INIT);
+  MeshFunctionSharedPtr<double> tsln(new ConstantSolution<double> (mesh, TEMP_INIT));
 
   // Initialize the weak formulation.
   double current_time = 0;
   CustomWeakFormHeatRK1 wf("Boundary air", ALPHA, LAMBDA, HEATCAP, RHO, time_step, 
-                           &current_time, TEMP_INIT, T_FINAL, &tsln);
+                           &current_time, TEMP_INIT, T_FINAL, tsln);
   
   // Initialize boundary conditions.
   DefaultEssentialBCConst<double> bc_essential("Boundary ground", TEMP_INIT);
   EssentialBCs<double> bcs(&bc_essential);
 
   // Create an H1 space with default shapeset.
-  H1Space<double> space(&mesh, &bcs, P_INIT);
-  int ndof = space.get_num_dofs();
+  SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
+  int ndof = space->get_num_dofs();
   Hermes::Mixins::Loggable::Static::info("ndof = %d", ndof);
  
-  // Initialize the FE problem.
-  DiscreteProblem<double> dp(&wf, &space);
-
   // Initialize Newton solver.
-  NewtonSolver<double> newton(&dp);
+  NewtonSolver<double> newton(&wf, space);
+#ifdef SHOW_OUTPUT
+  newton.set_verbose_output(true);
+#else
+  newton.set_verbose_output(false);
+#endif
+  newton.set_jacobian_constant();
+  newton.get_linear_solver()->as_AMGSolver()->set_smoother(GMRES, ILU);
+  newton.get_linear_solver()->as_LoopSolver()->set_tolerance(1e-5);
 
+#ifdef SHOW_OUTPUT
   // Initialize views.
   ScalarView Tview("Temperature", new WinGeom(0, 0, 450, 600));
   Tview.set_min_max_range(0,20);
   Tview.fix_scale_width(30);
+#endif
 
   // Time stepping:
   int ts = 1;
@@ -95,25 +101,18 @@ int main(int argc, char* argv[])
   {
     Hermes::Mixins::Loggable::Static::info("---- Time step %d, time %3.5f s", ts, current_time);
 
-    // Perform Newton's iteration.
-    try
-    {
-      newton.solve_keep_jacobian();
-    }
-    catch(std::exception& e)
-    {
-      std::cout << e.what();
-      
-    }
+    newton.solve();
 
     // Translate the resulting coefficient vector into the Solution sln.
-    Solution<double>::vector_to_solution(newton.get_sln_vector(), &space, &tsln);
+    Solution<double>::vector_to_solution(newton.get_sln_vector(), space, tsln);
 
+#ifdef SHOW_OUTPUT
     // Visualize the solution.
     char title[100];
     sprintf(title, "Time %3.2f s", current_time);
     Tview.set_title(title);
-    Tview.show(&tsln);
+    Tview.show(tsln);
+#endif
 
     // Increase current time and time step counter.
     current_time += time_step;
@@ -122,6 +121,8 @@ int main(int argc, char* argv[])
   while (current_time < T_FINAL);
 
   // Wait for the view to be closed.
+#ifdef SHOW_OUTPUT
   View::wait();
+#endif
   return 0;
 }
