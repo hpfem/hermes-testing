@@ -48,6 +48,7 @@ const double T_FINAL = 100 * time_step;
 
 int main(int argc, char* argv[])
 {
+#ifdef WITH_PARALUTION
   HermesCommonApi.set_integral_param_value(matrixSolverType, SOLVER_PARALUTION_AMG);
 
   // Load the mesh.
@@ -123,6 +124,8 @@ int main(int argc, char* argv[])
   // Wait for the view to be closed.
 #ifdef SHOW_OUTPUT
   View::wait();
+#endif
+  return 0;
 #endif
   return 0;
 }

@@ -18,6 +18,7 @@ double alpha = 7.0;
 
 int main(int argc, char* argv[])
 {
+#ifdef WITH_PARALUTION
   HermesCommonApi.set_integral_param_value(matrixSolverType, SOLVER_PARALUTION_ITERATIVE);
   // Load the mesh.
   MeshSharedPtr mesh(new Mesh);
@@ -111,5 +112,6 @@ int main(int argc, char* argv[])
     printf("Failure!\n");
     return -1;
   }
+#endif
+  return 0;
 }
-
