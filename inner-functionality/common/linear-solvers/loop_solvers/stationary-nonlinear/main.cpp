@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
     newton.set_tolerance(NEWTON_TOL, ResidualNormAbsolute);
     newton.set_max_steps_with_reused_jacobian(0);
 
-    newton.get_linear_solver()->as_IterSolver()->set_solver_type(GMRES);
+    newton.get_linear_solver()->as_IterSolver()->set_solver_type(Solvers::GMRES);
     newton.get_linear_solver()->as_IterSolver()->set_tolerance(1e-5);
 
     // Perform Newton's iteration.
@@ -81,7 +81,7 @@ int main(int argc, char* argv[])
     NewtonSolver<double> newton(&wf, space);
     newton.set_tolerance(NEWTON_TOL, ResidualNormAbsolute);
 
-    newton.get_linear_solver()->as_IterSolver()->set_solver_type(GMRES);
+    newton.get_linear_solver()->as_IterSolver()->set_solver_type(Solvers::GMRES);
 
     // Perform Newton's iteration.
     newton.solve(sln);

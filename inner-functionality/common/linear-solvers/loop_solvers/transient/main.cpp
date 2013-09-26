@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
   newton.set_verbose_output(false);
 #endif
   newton.set_jacobian_constant();
-  newton.get_linear_solver()->as_AMGSolver()->set_smoother(GMRES, ILU);
+  newton.get_linear_solver()->as_AMGSolver()->set_smoother(Solvers::GMRES, Preconditioners::ILU);
   newton.get_linear_solver()->as_LoopSolver()->set_tolerance(1e-5);
 
 #ifdef SHOW_OUTPUT
