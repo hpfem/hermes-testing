@@ -249,7 +249,7 @@ typedef std::complex<double> complex;
       errorCalculator.calculate_errors(sln, ref_sln);
 
 #ifdef SHOW_OUTPUT
-      std::cout << (std::string)"Relative error: " << errorCalculator.get_total_error_squared() * 100. << '%' << std::endl;
+      std::cout << "Relative error: " << errorCalculator.get_total_error_squared() * 100. << '%' << std::endl;
 #endif
 
       // Add entry to DOF and CPU convergence graphs.
@@ -262,7 +262,7 @@ typedef std::complex<double> complex;
         done = true;
       else
       {
-        std::cout << (std::string)"Adapting..." << std::endl << std::endl;
+        std::cout << "Adapting..." << std::endl << std::endl;
         adaptivity.adapt(&selector);
       }
 
