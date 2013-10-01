@@ -61,13 +61,13 @@ int main(int argc, char* argv[])
     newton.set_tolerance(NEWTON_TOL, ResidualNormAbsolute);
     newton.set_max_steps_with_reused_jacobian(0);
 
-    newton.get_linear_solver()->as_IterSolver()->set_solver_type(Solvers::GMRES);
-    newton.get_linear_solver()->as_IterSolver()->set_tolerance(1e-5);
+    newton.get_linear_matrix_solver()->as_IterSolver()->set_solver_type(Solvers::GMRES);
+    newton.get_linear_matrix_solver()->as_IterSolver()->set_tolerance(1e-5);
 
     // Perform Newton's iteration.
     newton.solve(coeff_vec);
     numbers_of_nonlinear_iterations.push_back(newton.get_num_iters());
-    numbers_of_linear_iterations_in_last_nonlinear_step.push_back(newton.get_linear_solver()->as_IterSolver()->get_num_iters());
+    numbers_of_linear_iterations_in_last_nonlinear_step.push_back(newton.get_linear_matrix_solver()->as_IterSolver()->get_num_iters());
 
     // Translate the resulting coefficient vector into a Solution.
     Solution<double>::vector_to_solution(newton.get_sln_vector(), space, sln);
@@ -82,12 +82,12 @@ int main(int argc, char* argv[])
     NewtonSolver<double> newton(&wf, space);
     newton.set_tolerance(NEWTON_TOL, ResidualNormAbsolute);
 
-    newton.get_linear_solver()->as_IterSolver()->set_solver_type(Solvers::GMRES);
+    newton.get_linear_matrix_solver()->as_IterSolver()->set_solver_type(Solvers::GMRES);
 
     // Perform Newton's iteration.
     newton.solve(sln);
     numbers_of_nonlinear_iterations.push_back(newton.get_num_iters());
-    numbers_of_linear_iterations_in_last_nonlinear_step.push_back(newton.get_linear_solver()->as_IterSolver()->get_num_iters());
+    numbers_of_linear_iterations_in_last_nonlinear_step.push_back(newton.get_linear_matrix_solver()->as_IterSolver()->get_num_iters());
 
     // Translate the resulting coefficient vector into a Solution.
     Solution<double>::vector_to_solution(newton.get_sln_vector(), space, sln);

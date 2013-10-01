@@ -45,7 +45,7 @@ const double THRESHOLD = 0.8;
 // H2D_HP_ANISO_P, H2D_HP_ANISO.
 const CandList CAND_LIST = H2D_HP_ANISO_H;        
 // Stopping criterion for adaptivity.
-const double ERR_STOP = 3.0;
+const double ERR_STOP = 6.0;
 // Error calculation & adaptivity.
 DefaultErrorCalculator<double, HERMES_H1_NORM> errorCalculator(RelativeErrorToGlobalNorm, 1);
 // Stopping criterion for an adaptivity step.
@@ -88,10 +88,12 @@ int main(int argc, char* argv[])
   H1ProjBasedSelector<double> selector(CAND_LIST);
 
   // Initialize views.
+#ifdef SHOW_OUTPUT
   Views::ScalarView sview("Solution", new Views::WinGeom(0, 0, 410, 600));
   sview.fix_scale_width(50);
   sview.show_mesh(false);
   Views::OrderView  oview("Polynomial orders", new Views::WinGeom(420, 0, 400, 600));
+#endif
 
   // DOF and CPU convergence graphs initialization.
   SimpleGraph graph_dof, graph_cpu;
@@ -101,7 +103,7 @@ int main(int argc, char* argv[])
 
   // solver
   LinearSolver<double> solver(&wf, space);
-  solver.get_linear_solver()->as_AMGSolver()->set_tolerance(1e-1, RelativeTolerance);
+  solver.get_linear_matrix_solver()->as_AMGSolver()->set_tolerance(1e-1, RelativeTolerance);
 
   // Test values.
   int linear_iterations = 0;
@@ -139,7 +141,7 @@ int main(int argc, char* argv[])
     {
       solver.set_space(ref_space);
       solver.solve(coeff_vec);
-      linear_iterations += solver.get_linear_solver()->as_AMGSolver()->get_num_iters();
+      linear_iterations += solver.get_linear_matrix_solver()->as_AMGSolver()->get_num_iters();
     }
     catch(std::exception& e)
     {
@@ -159,6 +161,7 @@ int main(int argc, char* argv[])
     // Time measurement.
     cpu_time.tick();
 
+#ifdef SHOW_OUTPUT
     // VTK output.
     if (VTK_VISUALIZATION) 
     {
@@ -182,6 +185,7 @@ int main(int argc, char* argv[])
       sview.show(sln);
       oview.show(space);
     }
+#endif
 
     // Skip visualization time.
     cpu_time.tick();
