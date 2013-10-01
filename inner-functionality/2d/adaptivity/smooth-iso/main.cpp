@@ -121,11 +121,16 @@ int main(int argc, char* argv[])
   }
   while (done == false);
 
-  if(space->get_num_dofs() == 225)
+  bool success = Hermes::Testing::test_value(space->get_num_dofs(), 225, "DOFs", 1);
+
+  if(success == true)
   {
+    printf("Success!\n");
     return 0;
   }
-  else {
+  else
+  {
+    printf("Failure!\n");
     return -1;
   }
 }
