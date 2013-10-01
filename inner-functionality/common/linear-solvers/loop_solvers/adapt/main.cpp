@@ -45,7 +45,7 @@ const double THRESHOLD = 0.8;
 // H2D_HP_ANISO_P, H2D_HP_ANISO.
 const CandList CAND_LIST = H2D_HP_ANISO_H;        
 // Stopping criterion for adaptivity.
-const double ERR_STOP = 6.0;
+const double ERR_STOP = 10.0;
 // Error calculation & adaptivity.
 DefaultErrorCalculator<double, HERMES_H1_NORM> errorCalculator(RelativeErrorToGlobalNorm, 1);
 // Stopping criterion for an adaptivity step.
@@ -218,8 +218,8 @@ int main(int argc, char* argv[])
   Hermes::Mixins::Loggable::Static::info("Number of linear iterations: %d.", linear_iterations);
 
   bool success = true;
-  success = Hermes::Testing::test_value(as, 11, "Adaptivity steps", 1) && success;
-  success = Hermes::Testing::test_value(linear_iterations, 83, "Linear iterations", 1) && success;
+  success = Hermes::Testing::test_value(as, 7, "Adaptivity steps", 1) && success;
+  success = Hermes::Testing::test_value(linear_iterations, 45, "Linear iterations", 1) && success;
 
   if(success == true)
   {
