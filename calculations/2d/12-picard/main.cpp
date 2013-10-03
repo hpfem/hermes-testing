@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
   logger.info("Adjusted tolerance without Anderson");
   // Perform the Picard's iteration (Anderson acceleration on by default).
   picard.clear_tolerances();
-  picard.set_tolerance(PICARD_TOL, SolutionChangeAbsolute);
+  picard.set_tolerance(PICARD_TOL, Hermes::Solvers::SolutionChangeAbsolute);
   try
   {
     picard.solve(init_condition);

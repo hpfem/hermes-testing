@@ -179,7 +179,7 @@ int main(int argc, char* argv[])
   // Initialize the Newton solver.
   NewtonSolver<double> newton(&dp);
   newton.set_max_steps_with_reused_jacobian(0);
-  newton.set_tolerance(1e-6, ResidualNormAbsolute);
+  newton.set_tolerance(1e-6, Hermes::Solvers::ResidualNormAbsolute);
 
 #ifdef SHOW_OUTPUT
   // Initialize views.
