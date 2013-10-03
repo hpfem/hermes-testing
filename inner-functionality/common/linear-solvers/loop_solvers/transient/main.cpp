@@ -44,7 +44,7 @@ const double HEATCAP = 1e2;
 // Material density.
 const double RHO = 3000;           
 // Length of time interval (24 hours) in seconds.
-const double T_FINAL = 100 * time_step;      
+const double T_FINAL = 15 * time_step;      
 
 int main(int argc, char* argv[])
 {
@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
 #endif
   newton.set_jacobian_constant();
   newton.get_linear_matrix_solver()->as_AMGSolver()->set_smoother(Solvers::GMRES, Preconditioners::ILU);
-  newton.get_linear_matrix_solver()->as_LoopSolver()->set_tolerance(1e-5);
+  newton.get_linear_matrix_solver()->as_LoopSolver()->set_tolerance(1e-1, RelativeTolerance);
 
 #ifdef SHOW_OUTPUT
   // Initialize views.

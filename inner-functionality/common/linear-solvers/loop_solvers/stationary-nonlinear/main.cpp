@@ -98,10 +98,10 @@ int main(int argc, char* argv[])
 
   bool success = true;
   
-  success = Hermes::Testing::test_value(numbers_of_nonlinear_iterations[0], 11, "Nonlinear iterations[0]", 1) && success;
-  success = Hermes::Testing::test_value(numbers_of_nonlinear_iterations[1], 2, "Nonlinear iterations[1]", 1) && success;
-  success = Hermes::Testing::test_value(numbers_of_linear_iterations_in_last_nonlinear_step[0], 14, "Linear iterations[0]", 1) && success;
-  success = Hermes::Testing::test_value(numbers_of_linear_iterations_in_last_nonlinear_step[1], 17, "Linear iterations[1]", 1) && success;
+  success = Hermes::Testing::test_value(numbers_of_nonlinear_iterations[0], 10, "Nonlinear iterations[0]", 1) && success;
+  success = Hermes::Testing::test_value(numbers_of_nonlinear_iterations[1], 1, "Nonlinear iterations[1]", 1) && success;
+  success = Hermes::Testing::test_value(numbers_of_linear_iterations_in_last_nonlinear_step[0], 5, "Linear iterations[0]", 1) && success;
+  success = Hermes::Testing::test_value(numbers_of_linear_iterations_in_last_nonlinear_step[1], 7, "Linear iterations[1]", 1) && success;
   if(success == true)
   {
     printf("Success!\n");
