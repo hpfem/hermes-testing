@@ -117,12 +117,12 @@ public:
 
     // Jacobian.
     add_matrix_form(new WeakFormsHcurl::DefaultJacobianCurlCurl<std::complex<double> >(0, 0, HERMES_ANY, 1.0/mu_r));
-    add_matrix_form(new WeakFormsHcurl::DefaultMatrixFormVol<std::complex<double> >(0, 0, HERMES_ANY, -sqr(kappa)));
+    add_matrix_form(new WeakFormsHcurl::DefaultMatrixFormVol<std::complex<double> >(0, 0, HERMES_ANY, -kappa*kappa));
     add_matrix_form_surf(new WeakFormsHcurl::DefaultMatrixFormSurf<std::complex<double> >(0, 0, HERMES_ANY, -kappa*ii));
 
     // Residual.
     add_vector_form(new WeakFormsHcurl::DefaultResidualCurlCurl<std::complex<double> >(0, HERMES_ANY, 1.0/mu_r));
-    add_vector_form(new WeakFormsHcurl::DefaultResidualVol<std::complex<double> >(0, HERMES_ANY, -sqr(kappa)));
+    add_vector_form(new WeakFormsHcurl::DefaultResidualVol<std::complex<double> >(0, HERMES_ANY, -kappa*kappa));
     add_vector_form_surf(new WeakFormsHcurl::DefaultResidualSurf<std::complex<double> >(0, HERMES_ANY, -kappa*ii));
     add_vector_form_surf(new CustomVectorFormSurf());
   };
