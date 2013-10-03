@@ -143,9 +143,9 @@ int main(int argc, char* argv[])
 #endif
 
   bool success = Testing::test_value(iter_1, 53, "# of iterations 1", 1); // Tested value as of September 2013.
-  success = Testing::test_value(iter_2, 41, "# of iterations 1", 1) & success; // Tested value as of September 2013.
-  success = Testing::test_value(iter_3, 12, "# of iterations 1", 1) & success; // Tested value as of September 2013.
-  success = Testing::test_value(iter_4, 4, "# of iterations 1", 1) & success; // Tested value as of September 2013.
+  success = Testing::test_value(iter_2, 41, "# of iterations 2", 1) & success; // Tested value as of September 2013.
+  success = Testing::test_value(iter_3, 12, "# of iterations 3", 1) & success; // Tested value as of September 2013.
+  success = Testing::test_value(iter_4, 5, "# of iterations 4", 1) & success; // Tested value as of September 2013.
 
   if(success)
   {
