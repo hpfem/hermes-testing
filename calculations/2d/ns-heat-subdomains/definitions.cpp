@@ -7,7 +7,7 @@ CustomInitialConditionTemperature::CustomInitialConditionTemperature(MeshSharedP
 
 double CustomInitialConditionTemperature::value(double x, double y) const 
 {
-  bool in_graphite = (std::sqrt(sqr(mid_x - x) + sqr(mid_y - y)) < radius);
+  bool in_graphite = (std::sqrt((mid_x - x)*(mid_x - x) + (mid_y - y)*(mid_y - y)) < radius);
   double temp = temp_fluid;
   if (in_graphite) temp = temp_graphite;
   return temp;
@@ -109,7 +109,7 @@ CustomWeakFormHeatAndFlow::CustomWeakFormHeatAndFlow(bool Stokes, double Reynold
 
 bool point_in_graphite(double x, double y)
 {
-  double dist_from_center = std::sqrt(sqr(x - HOLE_MID_X) + sqr(y - HOLE_MID_Y));
+  double dist_from_center = std::sqrt((x - HOLE_MID_X)*(x - HOLE_MID_X) + (y - HOLE_MID_Y)*(y - HOLE_MID_Y));
   if (dist_from_center < 0.5 * OBSTACLE_DIAMETER) return true;
   else return false;
 }

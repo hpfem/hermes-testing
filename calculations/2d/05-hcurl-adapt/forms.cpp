@@ -73,7 +73,7 @@ template<typename Real, typename Scalar>
 Scalar bilinear_form(int n, double *wt, Func<Scalar> *u_ext[], Func<Real> *u, Func<Real> *v, Geom<Real> *e, ExtData<Scalar> *ext)
 {
   return 1.0/mu_r * int_curl_e_curl_f<Real, Scalar>(n, wt, u, v) -
-         sqr(kappa) * int_e_f<Real, Scalar>(n, wt, u, v);
+         kappa * kappa * int_e_f<Real, Scalar>(n, wt, u, v);
 }
 
 template<typename Real, typename Scalar>
