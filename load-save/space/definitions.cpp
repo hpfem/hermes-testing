@@ -174,7 +174,7 @@ namespace L2_real
 
   double CustomWeakForm::calculate_a_dot_v(double x, double y, double vx, double vy) const
   {
-    double norm = std::max<double>(1e-12, std::sqrt(sqr(x) + sqr(y)));
+    double norm = std::max<double>(1e-12, std::sqrt(x*x + y*y));
     return -y/norm*vx + x/norm*vy;
   }
 
