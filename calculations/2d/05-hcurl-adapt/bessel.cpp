@@ -2351,10 +2351,7 @@ extern double fabs ( double );
 extern double sqrt ( double );
 double cbrt(double x)
 {
-  if(!_isnan(x))
-    return std::pow(x, 1.0 / 3.0);
-  else
-    return x;
+  return std::pow(x, 1.0 / 3.0);
 }
 
 extern double exp ( double );
