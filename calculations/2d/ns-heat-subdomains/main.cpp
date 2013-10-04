@@ -1,8 +1,6 @@
 #include "definitions.h"
 #include "../../../testing-core/testing-core.h"
 
-//#define SHOW_OUTPUT
-
 // This example shows the use of subdomains. It models a round graphite object that is 
 // heated through internal heat sources and cooled with a fluid (air or water) flowing 
 // past it. This model is semi-realistic, double-check all parameter values and equations 
@@ -149,20 +147,10 @@ int main(int argc, char* argv[])
   Hermes::vector<MeshFunctionSharedPtr<double> > all_solutions = Hermes::vector<MeshFunctionSharedPtr<double> >(xvel_prev_time, 
       yvel_prev_time, p_prev_time, temperature_prev_time);
 
-  // Project all initial conditions on their FE spaces to obtain aninitial
-  // coefficient vector for the Newton's method. We use local projection
-  // to avoid oscillations in temperature on the graphite-fluid interface
-  // FIXME - currently the LocalProjection only does the lowest-order part (linear
-  // interpolation) at the moment. Higher-order part needs to be added.
-  double* coeff_vec = new double[ndof];
-  
   Hermes::Mixins::Loggable::Static::info("Projecting initial condition to obtain initial vector for the Newton's method.");
   OGProjection<double> ogProjection;
-  ogProjection.project_global(all_spaces, initial_solutions, coeff_vec, all_proj_norms);
+  ogProjection.project_global(all_spaces, initial_solutions, all_solutions, all_proj_norms);
 
-  // Translate the solution vector back to Solutions. This is needed to replace
-  // the discontinuous initial condition for temperature_prev_time with its projection.
-  Solution<double>::vector_to_solutions(coeff_vec, all_spaces, all_solutions);
 
   // Calculate Reynolds number.
   double reynolds_number = VEL_INLET * OBSTACLE_DIAMETER / KINEMATIC_VISCOSITY_FLUID;
@@ -218,7 +206,7 @@ int main(int argc, char* argv[])
     newton.set_verbose_output(verbose);
     try
     {
-      newton.solve(coeff_vec);
+      newton.solve(all_solutions);
     }
     catch(Hermes::Exceptions::Exception e)
     {
@@ -241,11 +229,9 @@ int main(int argc, char* argv[])
 #endif
   }
 
-  double norm = get_l2_norm(coeff_vec, Space<double>::get_num_dofs(all_spaces));
+  double norm = get_l2_norm(newton.get_sln_vector(), Space<double>::get_num_dofs(all_spaces));
 
   bool success = Testing::test_value(norm, 578.49360112096122, "sln-norm", 1e-1);
-
-  delete [] coeff_vec;
 
   // Wait for all views to be closed.
 #ifdef SHOW_OUTPUT

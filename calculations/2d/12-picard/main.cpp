@@ -105,6 +105,7 @@ int main(int argc, char* argv[])
   Solution<double>::vector_to_solution(picard.get_sln_vector(), space, sln);
   logger.info("Default tolerance without Anderson and good initial guess");
   PicardSolver<double> picard2(&wf, space);
+  picard2.set_tolerance(1e-3, Hermes::Solvers::SolutionChangeRelative);
   picard2.set_max_allowed_iterations(PICARD_MAX_ITER);
   try
   {
@@ -142,10 +143,10 @@ int main(int argc, char* argv[])
   View::wait();
 #endif
 
-  bool success = Testing::test_value(iter_1, 53, "# of iterations 1", 1); // Tested value as of September 2013.
-  success = Testing::test_value(iter_2, 41, "# of iterations 2", 1) & success; // Tested value as of September 2013.
-  success = Testing::test_value(iter_3, 12, "# of iterations 3", 1) & success; // Tested value as of September 2013.
-  success = Testing::test_value(iter_4, 5, "# of iterations 4", 1) & success; // Tested value as of September 2013.
+  bool success = Testing::test_value(iter_1, 14, "# of iterations 1", 1); // Tested value as of September 2013.
+  success = Testing::test_value(iter_2, 12, "# of iterations 2", 1) & success; // Tested value as of September 2013.
+  success = Testing::test_value(iter_3, 3, "# of iterations 3", 1) & success; // Tested value as of September 2013.
+  success = Testing::test_value(iter_4, 3, "# of iterations 4", 1) & success; // Tested value as of September 2013.
 
   if(success)
   {

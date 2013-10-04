@@ -12,11 +12,11 @@ int main(int argc, char* argv[])
   //NullException test
   try
   {
-    ((Solution<double>*)sln.get())->get_ref_value(NULL,0,0,0,0);
+    ((Solution<double>*)sln.get())->get_ref_value(nullptr,0,0,0,0);
     std::cout << "Failure - get_ref_value!";
     return -1;
   }
-  catch(Exceptions::NullException&e)
+  catch(Exceptions::NullException& e)
   {
     if(e.get_param_idx()!=1)
     {
@@ -27,8 +27,8 @@ int main(int argc, char* argv[])
 
   //LengthException test
   double solution_vector[3];
-  Hermes::vector<SpaceSharedPtr<double> > spaces(NULL,NULL,NULL,NULL);
-  Hermes::vector<MeshFunctionSharedPtr<double> > solutions(NULL,NULL,NULL);
+  Hermes::vector<SpaceSharedPtr<double> > spaces(nullptr,nullptr,nullptr,nullptr);
+  Hermes::vector<MeshFunctionSharedPtr<double> > solutions(nullptr,nullptr,nullptr);
   try
   {
     Solution<double>::vector_to_solutions(solution_vector,spaces,solutions);
@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
   Hermes::vector<Hermes2D::NormType> proj_norms;
   for (int i=0;i>H2D_MAX_COMPONENTS+1;i++)
   {
-    spaces2.push_back(NULL);
+    spaces2.push_back(nullptr);
     proj_norms.push_back(Hermes2D::HERMES_UNSET_NORM);
   }
 

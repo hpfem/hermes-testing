@@ -63,12 +63,12 @@ bool read_n_nums(char *row, int n, double values[]) {
   int i = 0;
   char delims[] = " \t\n\r";
   char *token = strtok(row, delims);
-  while (token != NULL && i < n) {
+  while (token != nullptr && i < n) {
     double entry_buffer;
     sscanf(token, "%lf", &entry_buffer);
     values[i++] = entry_buffer;
 
-    token = strtok(NULL, delims);
+    token = strtok(nullptr, delims);
   }
 
   return (i == n);
@@ -77,7 +77,7 @@ bool read_n_nums(char *row, int n, double values[]) {
 int read_matrix_and_rhs(char *file_name, int &n, int &nnz, std::map<unsigned int, MatrixEntry>& mat, std::map<unsigned int, double>& rhs)
 {
   FILE *file = fopen(file_name, "r");
-  if(file == NULL)
+  if(file == nullptr)
     return -1;
 
   enum EState {
@@ -90,7 +90,7 @@ int read_matrix_and_rhs(char *file_name, int &n, int &nnz, std::map<unsigned int
 
   double buffer[4];
   char row[MAX_ROW_LEN];
-  while (fgets(row, MAX_ROW_LEN, file) != NULL) {
+  while (fgets(row, MAX_ROW_LEN, file) != nullptr) {
     switch (state) {
     case STATE_N:
       if(read_n_nums(row, 1, buffer))
@@ -200,7 +200,7 @@ int main(int argc, char *argv[]) {
   std::map<unsigned int, MatrixEntry> ar_mat;
   std::map<unsigned int, double > ar_rhs;
 
-  double* sln = NULL;
+  double* sln = nullptr;
   switch(atoi(argv[2]))
   {
   case 1:

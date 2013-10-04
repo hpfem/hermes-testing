@@ -63,12 +63,12 @@ bool read_n_nums(char *row, int n, double values[]) {
   int i = 0;
   char delims[] = " \t\n\r";
   char *token = strtok(row, delims);
-  while (token != NULL && i < n) {
+  while (token != nullptr && i < n) {
     double entry_buffer;
     sscanf(token, "%lf", &entry_buffer);
     values[i++] = entry_buffer;
 
-    token = strtok(NULL, delims);
+    token = strtok(nullptr, delims);
   }
 
   return (i == n);
@@ -78,7 +78,7 @@ int read_matrix_and_rhs(char *file_name, int &n, int &nnz,
                         std::map<unsigned int, MatrixEntry>& mat, std::map<unsigned int, complex>& rhs)
 {
   FILE *file = fopen(file_name, "r");
-  if(file == NULL) return -1;
+  if(file == nullptr) return -1;
 
   enum EState {
     STATE_N,
@@ -90,7 +90,7 @@ int read_matrix_and_rhs(char *file_name, int &n, int &nnz,
 
   double buffer[4];
   char row[MAX_ROW_LEN];
-  while (fgets(row, MAX_ROW_LEN, file) != NULL) {
+  while (fgets(row, MAX_ROW_LEN, file) != nullptr) {
     switch (state) {
     case STATE_N:
       if(read_n_nums(row, 1, buffer)) {
@@ -208,7 +208,7 @@ int main(int argc, char *argv[]) {
   std::map<unsigned int, MatrixEntry> ar_mat;
   std::map<unsigned int, complex > ar_rhs;
 
-  complex* sln = NULL;
+  complex* sln = nullptr;
 
   if(read_matrix_and_rhs((char*)"in/linsys-cplx-4", n, nnz, ar_mat, ar_rhs) != 0)
     throw Hermes::Exceptions::Exception("Failed to read the matrix and rhs.");
