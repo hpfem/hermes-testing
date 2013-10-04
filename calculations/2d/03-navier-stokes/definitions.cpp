@@ -1,8 +1,38 @@
 #include "hermes2d.h"
 
 using namespace Hermes;
-using namespace Hermes::Hermes2D;;
+using namespace Hermes::Hermes2D;
 
+class CustomUExtFunction : public UExtFunction<double>
+{
+public:
+  /// \param[in] polynomialOrder The polynomial order used for the space where the solution of the
+  /// internal Laplace equation is sought.
+  CustomUExtFunction(MeshSharedPtr mesh, int index) : UExtFunction<double>(mesh), index(index)
+  {
+  }
+  
+  virtual void value (double* values, double* dx, double* dy, double result[3], Geom<double>* geometry) const
+  {
+    result[0] = values[index];
+    result[1] = dx[index];
+    result[2] = dy[index];
+  };
+
+  virtual void ord(Hermes::Ord* values, Hermes::Ord* dx, Hermes::Ord* dy, Hermes::Ord result[3], Geom<Hermes::Ord>* geometry) const
+  {
+    result[0] = values[index];
+    result[1] = dx[index];
+		result[2] = dy[index];
+  };
+  
+  MeshFunction<double>* clone() const
+  {
+    return new CustomUExtFunction(this->mesh, this->index);
+  };
+
+  int index;
+};
 
 class WeakFormNSSimpleLinearization : public WeakForm<double>
 {
@@ -222,8 +252,8 @@ public:
 
     VectorFormNS_0* F_0 = new VectorFormNS_0(0, Stokes, Reynolds, time_step);
     
-    //F_0->set_ext(Hermes::vector<MeshFunction<double>*>(xvel_prev_time, yvel_prev_time));
-    F_0->set_ext(xvel_prev_time);
+    //F_0->set_ext(Hermes::vector<MeshFunctionSharedPtr<double> >(xvel_prev_time, yvel_prev_time));
+    this->set_ext(xvel_prev_time);
 
     add_vector_form(F_0);
     VectorFormNS_1* F_1 = new VectorFormNS_1(1, Stokes, Reynolds, time_step);
@@ -277,8 +307,8 @@ public:
     double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, Func<double> *v, Geom<double> *e, Func<double> **ext) const{
       double result = 0;
       if(!Stokes) {
-        Func<double>* xvel_prev_newton = u_ext[0];
-        Func<double>* yvel_prev_newton = u_ext[1];
+        Func<double>* xvel_prev_newton = ext[2];
+        Func<double>* yvel_prev_newton = ext[3];
         for (int i = 0; i < n; i++)
           result += wt[i] * ((xvel_prev_newton->val[i] * u->dx[i] + yvel_prev_newton->val[i]
         * u->dy[i]) * v->val[i] + u->val[i] * v->val[i] * xvel_prev_newton->dx[i]);
@@ -289,8 +319,8 @@ public:
     Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, Geom<Ord> *e, Func<Ord> **ext) const{
       Ord result = Ord(0);
       if(!Stokes) {
-        Func<Ord>* xvel_prev_newton = u_ext[0];
-        Func<Ord>* yvel_prev_newton = u_ext[1];
+        Func<Ord>* xvel_prev_newton = ext[2];
+        Func<Ord>* yvel_prev_newton = ext[3];
         for (int i = 0; i < n; i++)
           result += wt[i] * ((xvel_prev_newton->val[i] * u->dx[i] + yvel_prev_newton->val[i]
         * u->dy[i]) * v->val[i] + u->val[i] * v->val[i] * xvel_prev_newton->dx[i]);
@@ -318,7 +348,7 @@ public:
     double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, Func<double> *v, Geom<double> *e, Func<double> **ext) const{
       double result = 0;
       if(!Stokes) {
-        Func<double>* xvel_prev_newton = u_ext[0];
+        Func<double>* xvel_prev_newton = ext[2];
         for (int i = 0; i < n; i++)
           result += wt[i] * (u->val[i] * v->val[i] * xvel_prev_newton->dy[i]);
       }
@@ -328,7 +358,7 @@ public:
     Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, Geom<Ord> *e, Func<Ord> **ext) const {
       Ord result = Ord(0);
       if(!Stokes) {
-        Func<Ord>* xvel_prev_newton = u_ext[0];
+        Func<Ord>* xvel_prev_newton = ext[2];
         for (int i = 0; i < n; i++)
           result += wt[i] * (u->val[i] * v->val[i] * xvel_prev_newton->dy[i]);
       }
@@ -355,7 +385,7 @@ public:
     double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, Func<double> *v, Geom<double> *e, Func<double> **ext) const{
       double result = 0;
       if(!Stokes) {
-        Func<double>* yvel_prev_newton = u_ext[1];
+        Func<double>* yvel_prev_newton = ext[3];
         for (int i = 0; i < n; i++)
           result += wt[i] * (u->val[i] * v->val[i] * yvel_prev_newton->dx[i]);
       }
@@ -365,7 +395,7 @@ public:
     Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, Geom<Ord> *e, Func<Ord> **ext) const{
       Ord result = Ord(0);
       if(!Stokes) {
-        Func<Ord>* yvel_prev_newton = u_ext[1];
+        Func<Ord>* yvel_prev_newton = ext[3];
         for (int i = 0; i < n; i++)
           result += wt[i] * (u->val[i] * v->val[i] * yvel_prev_newton->dx[i]);
       }
@@ -392,8 +422,8 @@ public:
     double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, Func<double> *v, Geom<double> *e, Func<double> **ext) const{
       double result = 0;
       if(!Stokes) {
-        Func<double>* xvel_prev_newton = u_ext[0];
-        Func<double>* yvel_prev_newton = u_ext[1];
+        Func<double>* xvel_prev_newton = ext[2];
+        Func<double>* yvel_prev_newton = ext[3];
         for (int i = 0; i < n; i++)
           result += wt[i] * ((xvel_prev_newton->val[i] * u->dx[i] + yvel_prev_newton->val[i] * u->dy[i]) * v->val[i] + u->val[i]
         * v->val[i] * yvel_prev_newton->dy[i]);
@@ -404,8 +434,8 @@ public:
     Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v, Geom<Ord> *e, Func<Ord> **ext) const {
       Ord result = Ord(0);
       if(!Stokes) {
-        Func<Ord>* xvel_prev_newton = u_ext[0];
-        Func<Ord>* yvel_prev_newton = u_ext[1];
+        Func<Ord>* xvel_prev_newton = ext[2];
+        Func<Ord>* yvel_prev_newton = ext[3];
         for (int i = 0; i < n; i++)
           result += wt[i] * ((xvel_prev_newton->val[i] * u->dx[i] + yvel_prev_newton->val[i] * u->dy[i]) * v->val[i] + u->val[i]
         * v->val[i] * yvel_prev_newton->dy[i]);
@@ -477,8 +507,8 @@ public:
       double result = 0;
       Func<double>* xvel_prev_time = ext[0];  
       Func<double>* yvel_prev_time = ext[1];
-      Func<double>* xvel_prev_newton = u_ext[0];  
-      Func<double>* yvel_prev_newton = u_ext[1];  
+      Func<double>* xvel_prev_newton = ext[2];  
+      Func<double>* yvel_prev_newton = ext[3];  
       Func<double>* p_prev_newton = u_ext[2];
       for (int i = 0; i < n; i++)
         result += wt[i] * ((xvel_prev_newton->dx[i] * v->dx[i] + xvel_prev_newton->dy[i] * v->dy[i]) / Reynolds - (p_prev_newton->val[i] * v->dx[i]));
@@ -493,8 +523,8 @@ public:
       Ord result = Ord(0);
       Func<Ord>* xvel_prev_time = ext[0];  
       Func<Ord>* yvel_prev_time = ext[1];
-      Func<Ord>* xvel_prev_newton = u_ext[0];  
-      Func<Ord>* yvel_prev_newton = u_ext[1];  
+      Func<Ord>* xvel_prev_newton = ext[2];  
+      Func<Ord>* yvel_prev_newton = ext[3];  
       Func<Ord>* p_prev_newton = u_ext[2];
       for (int i = 0; i < n; i++)
         result += wt[i] * ((xvel_prev_newton->dx[i] * v->dx[i] + xvel_prev_newton->dy[i] * v->dy[i]) / Reynolds - (p_prev_newton->val[i] * v->dx[i]));
@@ -526,8 +556,8 @@ public:
       double result = 0;
       Func<double>* xvel_prev_time = ext[0];  
       Func<double>* yvel_prev_time = ext[1];
-      Func<double>* xvel_prev_newton = u_ext[0];  
-      Func<double>* yvel_prev_newton = u_ext[1];  
+      Func<double>* xvel_prev_newton = ext[2];  
+      Func<double>* yvel_prev_newton = ext[3];  
       Func<double>* p_prev_newton = u_ext[2];
       for (int i = 0; i < n; i++)
         result += wt[i] * ((yvel_prev_newton->dx[i] * v->dx[i] + yvel_prev_newton->dy[i] * v->dy[i]) / Reynolds - (p_prev_newton->val[i] * v->dy[i]));
@@ -542,8 +572,8 @@ public:
       Ord result = Ord(0);
       Func<Ord>* xvel_prev_time = ext[0];  
       Func<Ord>* yvel_prev_time = ext[1];
-      Func<Ord>* xvel_prev_newton = u_ext[0];  
-      Func<Ord>* yvel_prev_newton = u_ext[1];  
+      Func<Ord>* xvel_prev_newton = ext[2];  
+      Func<Ord>* yvel_prev_newton = ext[3];  
       Func<Ord>* p_prev_newton = u_ext[2];
       for (int i = 0; i < n; i++)
         result += wt[i] * ((xvel_prev_newton->dx[i] * v->dx[i] + xvel_prev_newton->dy[i] * v->dy[i]) / Reynolds - (p_prev_newton->val[i] * v->dx[i]));
@@ -573,8 +603,8 @@ public:
 
     double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, Geom<double> *e, Func<double> **ext) const{
       double result = 0;
-      Func<double>* xvel_prev_newton = u_ext[0];  
-      Func<double>* yvel_prev_newton = u_ext[1];  
+      Func<double>* xvel_prev_newton = ext[2];  
+      Func<double>* yvel_prev_newton = ext[3];  
 
       for (int i = 0; i < n; i++)
         result += wt[i] * (xvel_prev_newton->dx[i] * v->val[i] + yvel_prev_newton->dy[i] * v->val[i]);
@@ -583,8 +613,8 @@ public:
 
     Ord ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, Geom<Ord> *e, Func<Ord> **ext) const {
       Ord result = Ord(0);
-      Func<Ord>* xvel_prev_newton = u_ext[0];  
-      Func<Ord>* yvel_prev_newton = u_ext[1];  
+      Func<Ord>* xvel_prev_newton = ext[2];  
+      Func<Ord>* yvel_prev_newton = ext[3];  
 
       for (int i = 0; i < n; i++)
         result += wt[i] * (xvel_prev_newton->dx[i] * v->val[i] + yvel_prev_newton->dy[i] * v->val[i]);
@@ -601,6 +631,8 @@ protected:
   // Members.
   bool Stokes;
   double Reynolds;
+  MeshFunctionSharedPtr<double> x_vel_previous_time;
+  MeshFunctionSharedPtr<double> y_vel_previous_time;
 };
 
 class EssentialBCNonConst : public EssentialBoundaryCondition<double>
