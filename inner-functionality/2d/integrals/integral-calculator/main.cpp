@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
   double volume = volume_integral.calculate("Copper")[0];
   double surface = surface_integral.calculate("Outer")[0];
 
-  bool success = Testing::test_value(volume, 1.01039, "volumetric", 1e-3) && Testing::test_value(surface, -2, "surface", 1e-3);
+  bool success = Testing::test_value(volume, 1.01039, "volumetric", 1e-3) && Testing::test_value(surface, -2., "surface", 1e-3);
 
   if (success)
   {
