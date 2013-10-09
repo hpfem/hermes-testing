@@ -23,6 +23,7 @@ class CustomVolumeIntegralCalculator : public Hermes2D::PostProcessing::Volumetr
 {
 public:
   CustomVolumeIntegralCalculator(MeshFunctionSharedPtr<double> source_function, int number_of_integrals) : Hermes2D::PostProcessing::VolumetricIntegralCalculator<double>(source_function, number_of_integrals) {} ;
+  CustomVolumeIntegralCalculator(Hermes::vector<MeshFunctionSharedPtr<double> > source_functions, int number_of_integrals) : Hermes2D::PostProcessing::VolumetricIntegralCalculator<double>(source_functions, number_of_integrals) {} ;
   
   /// The integral description.
   /// \param[in] n - number of integration points.
@@ -30,13 +31,19 @@ public:
   virtual void integral(int n, double* wt, Func<double> **fns, Geom<double> *e, double* result)
   {
     for (int i = 0; i < n; i++)
+    {
       result[0] = wt[i] * fns[0]->val[i];
+      result[1] = wt[i] * fns[0]->val[i];
+      result[2] = wt[i] * fns[0]->val[i];
+    }
   };
 
   /// The integration order calculation.
   virtual void order(Func<Hermes::Ord> **fns, Hermes::Ord* result)
   {
     result[0] = fns[0]->val[0];
+    result[1] = fns[0]->val[0];
+    result[2] = fns[0]->val[0];
   }
 };
 
@@ -44,6 +51,7 @@ class CustomSurfaceIntegralCalculator : public Hermes2D::PostProcessing::Surface
 {
 public:
   CustomSurfaceIntegralCalculator(MeshFunctionSharedPtr<double> source_function, int number_of_integrals) : Hermes2D::PostProcessing::SurfaceIntegralCalculator<double>(source_function, number_of_integrals) {} ;
+  CustomSurfaceIntegralCalculator(Hermes::vector<MeshFunctionSharedPtr<double> > source_functions, int number_of_integrals) : Hermes2D::PostProcessing::SurfaceIntegralCalculator<double>(source_functions, number_of_integrals) {} ;
 
   /// The integral description.
   /// \param[in] n - number of integration points.
