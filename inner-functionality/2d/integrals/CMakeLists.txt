@@ -1,1 +1,2 @@
 add_subdirectory(domain-perimeter)
+add_subdirectory(integral-calculator)
