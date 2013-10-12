@@ -1,5 +1,6 @@
 #include "definitions.h"
 #include "../../../../testing-core/testing-core.h"
+#include <algorithm>
 
 //  This is a test of integral calculator.
 int main(int argc, char* argv[])
