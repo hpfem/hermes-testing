@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
   View::wait();
 #endif
 
-  int random_number = std::max(2, std::rand());
+  int random_number = std::max<int>(2, std::rand());
 
   CustomVolumeIntegralCalculator volume_integral(Hermes::vector<MeshFunctionSharedPtr<double> >(exact_sln, exact_sln), random_number);
   CustomSurfaceIntegralCalculator surface_integral(Hermes::vector<MeshFunctionSharedPtr<double> >(exact_sln, exact_sln), random_number);
