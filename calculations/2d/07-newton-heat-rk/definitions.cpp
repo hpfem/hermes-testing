@@ -1,7 +1,7 @@
 #include "definitions.h"
 
 CustomWeakFormHeatRK::CustomWeakFormHeatRK(std::string bdy_air, double alpha, double lambda, double heatcap, double rho,
-                                           double* current_time_ptr, double temp_init, double t_final) : Hermes::Hermes2D::WeakForm<double>(1)
+                                           double* current_time_ptr, double temp_init, double t_final) : Hermes::Hermes2D::WeakForm<double>(2)
 {
   for(int i = 0; i < this->neq; i++)
   {
@@ -38,7 +38,15 @@ Scalar CustomWeakFormHeatRK::CustomFormResidualSurf::vector_form_surf(int n, dou
 double CustomWeakFormHeatRK::CustomFormResidualSurf::value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, Geom<double> *e,
                                                            Func<double> **ext) const
 {
-  return vector_form_surf<double, double>(n, wt, u_ext, v, e, ext);
+  double T_ext = temp_ext(get_current_stage_time());
+  double result = 0.;
+
+  for (int pt_i = 0; pt_i < n; pt_i++)
+  {
+    result += wt[pt_i] * (T_ext - u_ext[this->i % this->original_neq]->val[pt_i]) * v->val[pt_i];
+  }
+
+  return alpha / (rho * heatcap) * result;
 }
 
 Ord CustomWeakFormHeatRK::CustomFormResidualSurf::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, Geom<Ord> *e, Func<Ord> **ext) const
