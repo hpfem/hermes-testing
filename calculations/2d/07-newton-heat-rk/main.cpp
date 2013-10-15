@@ -21,78 +21,101 @@ const double T_FINAL = 5*time_step;
 int main(int argc, char* argv[])
 {
   // Choose a Butcher's table or define your own.
-  ButcherTable bt(butcher_table_type);
+	ButcherTable bt(butcher_table_type);
 
-  // Load the mesh.
-  MeshSharedPtr mesh(new Mesh);
-  MeshReaderH2D mloader;
-  mloader.load("cathedral.mesh", mesh);
-
-  // Perform initial mesh refinements.
-  for(int i = 0; i < INIT_REF_NUM; i++)
-    mesh->refine_all_elements();
-  mesh->refine_towards_boundary("Boundary_air", INIT_REF_NUM_BDY);
-  mesh->refine_towards_boundary("Boundary_ground", INIT_REF_NUM_BDY);
-
-  // Previous and next time level solutions.
-  MeshFunctionSharedPtr<double> sln_time_prev(new ConstantSolution<double>(mesh, TEMP_INIT));
-  MeshFunctionSharedPtr<double> sln_time_new(new Solution<double>(mesh));
-
-  // Initialize the weak formulation.
+	// Initialize the time.
 	double current_time = 0;
 
+	// mesh->
+	MeshSharedPtr mesh(new Mesh);
+
+	// Init mesh->
+	MeshReaderH2D mloader;
+	mloader.load("cathedral.mesh", mesh);
+
+	// Perform initial mesh refinements.
+	for(int i = 0; i < INIT_REF_NUM; i++)
+		mesh->refine_all_elements();
+	mesh->refine_towards_boundary("Boundary_air", INIT_REF_NUM_BDY);
+	mesh->refine_towards_boundary("Boundary_ground", INIT_REF_NUM_BDY);
+
+	// Initialize boundary conditions.
+	Hermes::Hermes2D::DefaultEssentialBCConst<double> bc_essential("Boundary_ground", TEMP_INIT);
+	Hermes::Hermes2D::EssentialBCs<double> bcs(&bc_essential);
+
+	// space->
+	SpaceSharedPtr<double> space1(new H1Space<double>(mesh, &bcs, P_INIT));
+	SpaceSharedPtr<double> space2(new H1Space<double>(mesh, &bcs, P_INIT + 1));
+  Hermes::vector<SpaceSharedPtr<double> > spaces(space1, space2);
+
+	// Solution pointer.
+	MeshFunctionSharedPtr<double> sln_time_prev1(new ConstantSolution<double>(mesh, TEMP_INIT));
+	MeshFunctionSharedPtr<double> sln_time_prev2(new ConstantSolution<double>(mesh, TEMP_INIT));
+  Hermes::vector<MeshFunctionSharedPtr<double> > sln_time_prev(sln_time_prev1, sln_time_prev2);
+
+	MeshFunctionSharedPtr<double> sln_time_new1(new Solution<double>(mesh));
+	MeshFunctionSharedPtr<double> sln_time_new2(new Solution<double>(mesh));
+  Hermes::vector<MeshFunctionSharedPtr<double> > sln_time_new(sln_time_new1, sln_time_new2);
+
   CustomWeakFormHeatRK wf("Boundary_air", ALPHA, LAMBDA, HEATCAP, RHO,
-                          &current_time, TEMP_INIT, T_FINAL);
-  wf.set_global_integration_order(10);
+		&current_time, TEMP_INIT, T_FINAL);
 
-  // Initialize boundary conditions.
-  DefaultEssentialBCConst<double> bc_essential("Boundary_ground", TEMP_INIT);
-  EssentialBCs<double>bcs(&bc_essential);
+	// Initialize views.
+	Hermes::Hermes2D::Views::ScalarView Tview("Temperature", new Hermes::Hermes2D::Views::WinGeom(0, 0, 450, 600));
+	Tview.set_min_max_range(0, 20);
+	Tview.fix_scale_width(30);
 
-  // Create an H1 space with default shapeset.
-  SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));
-  int ndof = space->get_num_dofs();
+	// Initialize Runge-Kutta time stepping.
+	RungeKutta<double> runge_kutta(&wf, spaces, &bt);
+  runge_kutta.set_tolerance(NEWTON_TOL);
+	runge_kutta.set_verbose_output(true);
+	runge_kutta.output_matrix(1);
+	runge_kutta.set_matrix_number_format("%a");
+	runge_kutta.output_rhs(2);
+	runge_kutta.set_time_step(time_step);
 
-  // Initialize Runge-Kutta time stepping.
-  RungeKutta<double> runge_kutta(&wf, space, &bt);
-  runge_kutta.set_verbose_output(true);
+	// Iteration number.
+	int iteration = 0;
 
-  // Iteration number.
-  int iteration = 0;
-    
-  // Time stepping loop:
-  do
-  {
-    // Perform one Runge-Kutta time step according to the selected Butcher's table.
-    try
-    {
-      runge_kutta.set_space(space);
-      runge_kutta.set_time(current_time);
-      runge_kutta.set_time_step(time_step);
-      runge_kutta.rk_time_step_newton(sln_time_prev, sln_time_new);
-    }
-    catch(Exceptions::Exception& e)
-    {
-      e.print_msg();
-    }
+	// Time stepping loop:
+	do
+	{
+		// Perform one Runge-Kutta time step according to the selected Butcher's table.
+		try
+		{
+			runge_kutta.set_time(current_time);
+			runge_kutta.rk_time_step_newton(sln_time_prev, sln_time_new);
+		}
+		catch(Exceptions::Exception& e)
+		{
+			e.print_msg();
+		}
 
-    // Copy solution for the new time step.
-    sln_time_prev->copy(sln_time_new);
+		// Show the new time level solution.
+		char title[100];
+		sprintf(title, "Time %3.2f s", current_time);
+		Tview.set_title(title);
+		Tview.show(sln_time_new1);
 
-    // Increase current time and time step counter.
-    current_time += time_step;
-  }
-  while (current_time < T_FINAL);
+		// Copy solution for the new time step.
+		sln_time_prev1->copy(sln_time_new1);
+		sln_time_prev2->copy(sln_time_new2);
+
+		// Increase current time and time step counter.
+		current_time += time_step;
+		iteration++;
+	}
+	while (current_time < T_FINAL);
 
   /* Begin test */
 
   bool success = true;
 
-  if(fabs(sln_time_new->get_pt_value(-3.5, 17.0)->val[0] - 10.00271206) > 1E-6) success = false;
-  if(fabs(sln_time_new->get_pt_value(-1.0, 2.0)->val[0] - 10.0) > 1E-6) success = false;
-  if(fabs(sln_time_new->get_pt_value(0.0, 9.5)->val[0] - 10.00005812) > 1E-6) success = false;
-  if(fabs(sln_time_new->get_pt_value( 1.0, 2.0)->val[0] - 10.0) > 1E-6) success = false;
-  if(fabs(sln_time_new->get_pt_value(3.5, 17.0)->val[0] - 10.00271206) > 1E-6) success = false;
+  success = Testing::test_value(sln_time_new1->get_pt_value(-3.5, 17.0)->val[0], 10.00271206, "sln_time_new1->get_pt_value(-3.5, 17.0)->val[0]", 1e-6) && success;
+  success = Testing::test_value(sln_time_new2->get_pt_value(-1.0, 2.0)->val[0], 10.0, "sln_time_new1->get_pt_value(-3.5, 17.0)->val[0]", 1e-6) && success;
+  success = Testing::test_value(sln_time_new2->get_pt_value(0.0, 9.5)->val[0], 10.00005812, "sln_time_new1->get_pt_value(-3.5, 17.0)->val[0]", 1e-6) && success;
+  success = Testing::test_value(sln_time_new1->get_pt_value( 1.0, 2.0)->val[0], 10.0, "sln_time_new1->get_pt_value(-3.5, 17.0)->val[0]", 1e-6) && success;
+  success = Testing::test_value(sln_time_new1->get_pt_value(3.5, 17.0)->val[0], 10.00271206, "sln_time_new1->get_pt_value(-3.5, 17.0)->val[0]", 1e-6) && success;
 
   if(success)
   {
