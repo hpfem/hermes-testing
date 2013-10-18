@@ -85,7 +85,9 @@ void handle_success(bool success)
     printf("Failure!\n");
 }
 
+#ifdef _SHOW_OUTPUT
 Views::MeshView m;
+#endif
 Hermes::vector<int> measured_elems;
 Hermes::vector<int> elems;
 Hermes::vector<double> measured_integrals;
