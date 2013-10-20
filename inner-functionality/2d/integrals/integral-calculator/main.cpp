@@ -86,7 +86,11 @@ int main(int argc, char* argv[])
     Hermes::vector<std::string> markers;
     char t[2];
     for(int i = 0; i < 29; i++)
-      markers.push_back(itoa(i, t, 10));
+    {
+      std::stringstream ss;
+      ss << i;
+      markers.push_back(ss.str());
+    }
     surface_int.push_back(surface_integral2.calculate(markers)[random_number / 2]);
   }
   catch(Hermes::Exceptions::Exception& e)
