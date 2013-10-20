@@ -183,10 +183,11 @@ void part2FillData()
 
 int main(int argc, char* argv[])
 {
+  Mesh::egg_shell_verbose = false;
+
   // Part1: eggShellCreation + Integral (both Vol. + Surf.) comparison to calculation with for_all_active_elements.
   try
   {
-    Mesh::egg_shell_verbose = false;
 
     // Load the mesh.
     MeshSharedPtr mesh(new Mesh);
@@ -288,5 +289,46 @@ int main(int argc, char* argv[])
     return (!success);
   }
 
-  return -1;
+  // Part 3.
+  {
+#ifdef _SHOW_OUTPUT
+    MeshView m;
+    ScalarView s;
+#endif
+    // Load the mesh.
+    MeshSharedPtr mesh(new Mesh);
+    Hermes::Hermes2D::MeshReaderH2DXML mloader;
+    mloader.load("pokus.xml", mesh);
+
+    for(int k = 0; k < 5; k++)
+    {
+      std::cout << "k == " << k << std::endl;
+
+      mesh->refine_towards_boundary("3");
+
+      for(int i = 3; i < 5; i++)
+      {
+        std::cout << "i == " << i << std::endl;
+        Hermes::Hermes2D::MeshSharedPtr egg_shell_mesh = Hermes::Hermes2D::Mesh::get_egg_shell(mesh, "4", i);
+
+#ifdef _SHOW_OUTPUT
+        m.show(egg_shell_mesh);
+#endif
+
+        for(int j = 2; j < 4; j++)
+        {
+          std::cout << "j == " << j << std::endl;
+          Hermes::Hermes2D::MeshFunctionSharedPtr<double> eggShell(new Hermes::Hermes2D::ExactSolutionEggShell(egg_shell_mesh, j));
+
+#ifdef _SHOW_OUTPUT
+          s.show(eggShell);
+          View::wait(HERMES_WAIT_KEYPRESS);
+#endif
+        }
+      }
+    }
+  }
+
+  handle_success(true);
+  return 0;
 }
