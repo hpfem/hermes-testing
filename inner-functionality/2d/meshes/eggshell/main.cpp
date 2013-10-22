@@ -187,13 +187,12 @@ int main(int argc, char* argv[])
   // Part1: eggShellCreation + Integral (both Vol. + Surf.) comparison to calculation with for_all_active_elements.
   try
   {
-
     // Load the mesh.
     MeshSharedPtr mesh(new Mesh);
     Hermes::Hermes2D::MeshReaderH2DXML mloader;
     mloader.load("mesh_marker3.xml", mesh);
 
-    Hermes::Hermes2D::MeshSharedPtr egg_shell_mesh = Hermes::Hermes2D::Mesh::get_egg_shell(mesh,"3", 2);
+    Hermes::Hermes2D::MeshSharedPtr egg_shell_mesh = Hermes::Hermes2D::EggShell::get_egg_shell(mesh,"3", 2);
 
 #ifdef SHOW_OUTPUT
     Views::MeshView m;
@@ -207,12 +206,12 @@ int main(int argc, char* argv[])
     double* area_int = volume_integrator.calculate(HERMES_ANY);
 
     MySurfaceIntegralCalculator surface_integrator(eggShell, 34);
-    double* surface_1_int = surface_integrator.calculate(Mesh::eggShell1Marker);
+    double* surface_1_int = surface_integrator.calculate(EggShell::eggShell1Marker);
 
     Element* e;
     double area = 0;
     double surface_1 = 0;
-    Hermes::Hermes2D::Mesh::MarkersConversion::IntValid internalMarker = egg_shell_mesh->get_boundary_markers_conversion().get_internal_marker(Mesh::eggShell1Marker);
+    Hermes::Hermes2D::Mesh::MarkersConversion::IntValid internalMarker = egg_shell_mesh->get_boundary_markers_conversion().get_internal_marker(EggShell::eggShell1Marker);
     if(!internalMarker.valid)
     {
       handle_success(false);
@@ -257,7 +256,7 @@ int main(int argc, char* argv[])
   {
     bool success = true;
 
-    Mesh::egg_shell_verbose = false;
+    EggShell::egg_shell_verbose = false;
 
     // Load the mesh.
     MeshSharedPtr mesh(new Mesh);
