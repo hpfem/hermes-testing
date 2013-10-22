@@ -98,7 +98,7 @@ bool part2OneCase(int i, MeshSharedPtr mesh, Hermes::vector<std::string> markers
   bool success = true;
   try
   {
-    Hermes::Hermes2D::MeshSharedPtr egg_shell_mesh = Hermes::Hermes2D::Mesh::get_egg_shell(mesh, markers, layers);
+    Hermes::Hermes2D::MeshSharedPtr egg_shell_mesh = Hermes::Hermes2D::EggShell::get_egg_shell(mesh, markers, layers);
     elems.push_back(egg_shell_mesh->get_num_active_elements());
     success = Hermes::Testing::test_value(egg_shell_mesh->get_num_active_elements(), measured_elems[i], "Num elems", 1) && success;
 
@@ -183,8 +183,7 @@ void part2FillData()
 
 int main(int argc, char* argv[])
 {
-  Mesh::egg_shell_verbose = false;
-
+  Hermes::Hermes2D::EggShell::egg_shell_verbose = false;
   // Part1: eggShellCreation + Integral (both Vol. + Surf.) comparison to calculation with for_all_active_elements.
   try
   {
@@ -285,10 +284,12 @@ int main(int argc, char* argv[])
 
     success = part2OneCase(9, mesh, Hermes::vector<std::string>("3", "4"), 4, 1) && success;
 
-    handle_success(success);
-    return (!success);
+    if(!success)
+    {
+      handle_success(success);
+      return (!success);
+    }
   }
-
   // Part 3.
   {
 #ifdef _SHOW_OUTPUT
@@ -306,13 +307,14 @@ int main(int argc, char* argv[])
 
       mesh->refine_towards_boundary("3");
 
-      for(int i = 3; i < 5; i++)
+      for(int i = 2; i < 5; i++)
       {
         std::cout << "i == " << i << std::endl;
-        Hermes::Hermes2D::MeshSharedPtr egg_shell_mesh = Hermes::Hermes2D::Mesh::get_egg_shell(mesh, "4", i);
+        Hermes::Hermes2D::MeshSharedPtr egg_shell_mesh = Hermes::Hermes2D::EggShell::get_egg_shell(mesh, "4", i);
 
 #ifdef _SHOW_OUTPUT
         m.show(egg_shell_mesh);
+          View::wait(HERMES_WAIT_KEYPRESS);
 #endif
 
         for(int j = 2; j < 4; j++)
