@@ -263,15 +263,11 @@ int main(int argc, char* argv[])
     Hermes::Hermes2D::MeshReaderH2DXML mloader;
     mloader.load("pokus.xml", mesh);
 
-    success = part2OneCase(0, mesh, "1", 1, 2) && success;
-
     success = part2OneCase(1, mesh, "2", 2, 3) && success;
 
     success = part2OneCase(2, mesh, "3", 3, 4) && success;
 
     success = part2OneCase(3, mesh, "4", 2, 5) && success;
-
-    success = part2OneCase(4, mesh, "5", 1, 3) && success;
 
     success = part2OneCase(5, mesh, Hermes::vector<std::string>("2", "4"), 5, 6) && success;
 
