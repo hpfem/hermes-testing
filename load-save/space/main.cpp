@@ -88,9 +88,9 @@ namespace L2_real
       OGProjection<double> ogProjection;
       ogProjection.project_global(space, ref_sln, sln, HERMES_L2_NORM);
 
+#ifdef SHOW_OUTPUT
       MeshFunctionSharedPtr<double> val_filter(new ValFilter(ref_sln, 0.0, 1.0));
 
-#ifdef SHOW_OUTPUT
       // View the coarse mesh solution.
       view1.show(val_filter);
       oview.show(space);
