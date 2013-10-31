@@ -139,6 +139,7 @@ project(hermes_testing)
   add_subdirectory(load-save)
   add_subdirectory(inner-functionality)
   add_subdirectory(calculations)
+  add_subdirectory(memory-leaks)
 
   #------------------------------------------------------------------------------
   # Report.
