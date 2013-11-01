@@ -1,8 +1,8 @@
 #include "definitions.h"
 
-const int P_INIT_U = 3;
-const int P_INIT_V = 5;
-const int INIT_REF_BDY = 5;
+const int P_INIT_U = 2;
+const int P_INIT_V = 4;
+const int INIT_REF_BDY = 4;
 
 // Problem parameters.
 const double D_u = 1;

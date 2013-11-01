@@ -141,7 +141,6 @@ int main(int argc, char* argv[])
 
     }
     delete [] coeff_vec;
-    delete newton.get_sln_vector();
 
     int success = 1;
     double eps = 1e-5;
