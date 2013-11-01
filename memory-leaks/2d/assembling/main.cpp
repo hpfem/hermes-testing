@@ -1,7 +1,7 @@
 #include "definitions.h"
 
 const int P_INIT_U = 2;
-const int P_INIT_V = 4;
+const int P_INIT_V = 3;
 const int INIT_REF_BDY = 4;
 
 // Problem parameters.
