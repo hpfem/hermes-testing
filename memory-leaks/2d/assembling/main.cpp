@@ -24,11 +24,11 @@ int main(int argc, char* argv[])
   v_mesh->refine_towards_boundary("Bdy", INIT_REF_BDY);
 
   // Define right-hand sides.
-  CustomRightHandSide1 g1(K, D_u, SIGMA);
-  CustomRightHandSide2 g2(K, D_v);
+  CustomRightHandSide1* g1 = new CustomRightHandSide1(K, D_u, SIGMA);
+  CustomRightHandSide2* g2 = new CustomRightHandSide2(K, D_v);
 
   // Initialize the weak formulation.
-  CustomWeakForm wf(&g1, &g2);
+  CustomWeakForm wf(g1, g2);
 
   // Initialize boundary conditions
   DefaultEssentialBCConst<double> bc_u("Bdy", 0.0);

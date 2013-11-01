@@ -115,6 +115,8 @@ public:
   CustomResidual1(double d_u, double sigma, CustomRightHandSide1* g1)
     : VectorFormVol<double>(0), d_u(d_u), sigma(sigma), g1(g1) {};
 
+  ~CustomResidual1() { delete this->g1;  }
+
   virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v,
                        Geom<double> *e, Func<double> **ext) const;
 
@@ -135,6 +137,8 @@ public:
   CustomResidual2(double d_v, CustomRightHandSide2* g2)
     : VectorFormVol<double>(1), d_v(d_v), g2(g2) {};
 
+  ~CustomResidual2() { delete this->g2; }
+
   virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *v,
                        Geom<double> *e, Func<double> **ext) const;
   
@@ -152,4 +156,7 @@ class CustomWeakForm : public WeakForm<double>
 {
 public:
   CustomWeakForm(CustomRightHandSide1* g1, CustomRightHandSide2* g2);
+  ~CustomWeakForm();
+  Hermes::vector<Hermes1DFunction<double>*> fns_1d;
+  Hermes::vector<Hermes2DFunction<double>*> fns_2d;
 };

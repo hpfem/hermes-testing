@@ -209,14 +209,29 @@ VectorFormVol<double>* CustomResidual2::clone() const
 CustomWeakForm::CustomWeakForm(CustomRightHandSide1* g1, CustomRightHandSide2* g2) : WeakForm<double>(2) 
 {
   // Jacobian.
-  add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion<double>(0, 0, HERMES_ANY, new Hermes1DFunction<double>(g1->d_u * g1->d_u)));
-  add_matrix_form(new WeakFormsH1::DefaultMatrixFormVol<double>(0, 0, HERMES_ANY, new Hermes2DFunction<double>(-1.0)));
-  add_matrix_form(new WeakFormsH1::DefaultMatrixFormVol<double>(0, 1, HERMES_ANY, new Hermes2DFunction<double>(g1->sigma), HERMES_NONSYM));
-  add_matrix_form(new WeakFormsH1::DefaultMatrixFormVol<double>(1, 0, HERMES_ANY, new Hermes2DFunction<double>(-1.0), HERMES_NONSYM));
-  add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion<double>(1, 1, HERMES_ANY, new Hermes1DFunction<double>(g2->d_v * g2->d_v)));
-  add_matrix_form(new WeakFormsH1::DefaultMatrixFormVol<double>(1, 1, HERMES_ANY, new Hermes2DFunction<double>(1.0)));
+  this->fns_1d.push_back(new Hermes1DFunction<double>(g1->d_u * g1->d_u));
+  add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion<double>(0, 0, HERMES_ANY, this->fns_1d.back()));
+  this->fns_2d.push_back(new Hermes2DFunction<double>(-1.0));
+  add_matrix_form(new WeakFormsH1::DefaultMatrixFormVol<double>(0, 0, HERMES_ANY, fns_2d.back()));
+  this->fns_2d.push_back(new Hermes2DFunction<double>(g1->sigma));
+  add_matrix_form(new WeakFormsH1::DefaultMatrixFormVol<double>(0, 1, HERMES_ANY, fns_2d.back(), HERMES_NONSYM));
+  this->fns_2d.push_back(new Hermes2DFunction<double>(-1.0));
+  add_matrix_form(new WeakFormsH1::DefaultMatrixFormVol<double>(1, 0, HERMES_ANY, fns_2d.back(), HERMES_NONSYM));
+  this->fns_1d.push_back(new Hermes1DFunction<double>(g2->d_v * g2->d_v));
+  add_matrix_form(new WeakFormsH1::DefaultJacobianDiffusion<double>(1, 1, HERMES_ANY, this->fns_1d.back()));
+  this->fns_2d.push_back(new Hermes2DFunction<double>(1.0));
+  add_matrix_form(new WeakFormsH1::DefaultMatrixFormVol<double>(1, 1, HERMES_ANY, fns_2d.back()));
 
   // Residual.
   add_vector_form(new CustomResidual1(g1->d_u, g1->sigma, g1));
   add_vector_form(new CustomResidual2(g2->d_v, g2));
+}
+
+CustomWeakForm::~CustomWeakForm()
+{
+  for (int i = 0; i < this->fns_1d.size(); i++)
+    delete this->fns_1d[i];
+
+  for (int i = 0; i < this->fns_2d.size(); i++)
+    delete this->fns_2d[i];
 }
