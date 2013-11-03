@@ -16,4 +16,9 @@ class CustomWeakFormAcoustics : public WeakForm<complex>
 public:
   CustomWeakFormAcoustics(std::string bdy_newton, double rho,
                           double sound_speed, double omega);
+
+  ~CustomWeakFormAcoustics();
+
+  Hermes::vector<Hermes1DFunction<complex>*> fns_1d;
+  Hermes::vector<Hermes2DFunction<complex>*> fns_2d;
 };
