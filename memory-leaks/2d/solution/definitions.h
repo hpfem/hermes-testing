@@ -155,7 +155,7 @@ private:
 class CustomWeakForm : public WeakForm<double>
 {
 public:
-  CustomWeakForm(CustomRightHandSide1* g1, CustomRightHandSide2* g2, bool linear = false);
+  CustomWeakForm(CustomRightHandSide1* g1, CustomRightHandSide2* g2);
   ~CustomWeakForm();
   Hermes::vector<Hermes1DFunction<double>*> fns_1d;
   Hermes::vector<Hermes2DFunction<double>*> fns_2d;

@@ -29,7 +29,6 @@ int main(int argc, char* argv[])
 
   // Initialize the weak formulation.
   CustomWeakForm wf(g1, g2);
-  CustomWeakForm wf_linear(g1, g2, true);
 
   // Initialize boundary conditions
   DefaultEssentialBCConst<double> bc_u("Bdy", 0.0);
@@ -42,21 +41,36 @@ int main(int argc, char* argv[])
   SpaceSharedPtr<double> v_space(new H1Space<double>(v_mesh, &bcs_v, P_INIT_V));
   Hermes::vector<SpaceSharedPtr<double> > spaces(u_space, v_space);
   NewtonSolver<double> newton(&wf, spaces);
-  LinearSolver<double> linear(&wf_linear, spaces);
 
-  try
-  {
-    newton.solve();
-    linear.solve();
-  }
-  catch(Hermes::Exceptions::Exception& e)
-  {
-    std::cout << e.what();
-  }
-  catch(std::exception& e)
-  {
-    std::cout << e.what();
-  }
+  MeshFunctionSharedPtr<double> u_sln(new Solution<double>());
+  MeshFunctionSharedPtr<double> u_sln1(new Solution<double>());
+  MeshFunctionSharedPtr<double> v_sln(new Solution<double>());
+  MeshFunctionSharedPtr<double> v_sln1(new Solution<double>());
+  Hermes::vector<MeshFunctionSharedPtr<double> > slns(u_sln, v_sln);
+  Hermes::vector<MeshFunctionSharedPtr<double> > slns1(u_sln1, v_sln1);
+
+  newton.solve();
+  Solution<double>::vector_to_solutions(newton.get_sln_vector(), spaces, slns);
+  
+  u_sln1->copy(u_sln);
+  v_sln1->copy(v_sln);
+  
+  u_sln->free();
+  v_sln->free();
+  
+  u_sln->copy(u_sln1);
+  v_sln->copy(v_sln1);
+
+  newton.solve(slns);
+  Solution<double>::vector_to_solutions(newton.get_sln_vector(), spaces, slns1);
+
+  Linearizer lin;
+  lin.process_solution(u_sln);
+  lin.process_solution(u_sln1);
+  lin.process_solution(v_sln1);
+  lin.process_solution(u_sln1);
+  lin.process_solution(u_sln1);
+  lin.process_solution(v_sln1);
 
   return 0;
 }

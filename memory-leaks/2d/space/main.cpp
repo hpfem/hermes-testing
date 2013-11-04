@@ -32,14 +32,30 @@ namespace L2_real
         Space<double>::ReferenceSpaceCreator ref_space_creator(space, ref_mesh);
         SpaceSharedPtr<double> ref_space = ref_space_creator.create_ref_space();
 
-        ref_space->save("space-real.xml");
-        ref_space->free();
-        ref_space->load("space-real.xml");
+        if (as == 3)
+        {
+          space->copy(ref_space, ref_mesh);
+
+          space->save("space-real.xml");
+          space->free();
+          space->load("space-real.xml");
 #ifdef WITH_BSON
-        ref_space->save_bson("space-real.bson");
-        ref_space->free();
-        ref_space->load_bson("space-real.bson");
+          space->save_bson("space-real.bson");
+          space->free();
+          space->load_bson("space-real.bson");
 #endif
+        }
+        else
+        {
+          ref_space->save("space-real.xml");
+          ref_space->free();
+          ref_space->load("space-real.xml");
+#ifdef WITH_BSON
+          ref_space->save_bson("space-real.bson");
+          ref_space->free();
+          ref_space->load_bson("space-real.bson");
+#endif
+        }
       } while (as++ < 3);
     }
     return 0;
@@ -71,6 +87,7 @@ namespace H1_complex
     {
       // Create an H1 space with default shapeset.
       SpaceSharedPtr<complex> space(new H1Space<complex>(mesh, &bcs, orders[k]));
+      space->update_essential_bc_values();
       int ndof = space->get_num_dofs();
 
       // Adaptivity loop:
@@ -82,6 +99,7 @@ namespace H1_complex
         MeshSharedPtr ref_mesh = ref_mesh_creator.create_ref_mesh();
         Space<complex>::ReferenceSpaceCreator ref_space_creator(space, ref_mesh);
         SpaceSharedPtr<complex> ref_space = ref_space_creator.create_ref_space();
+        ref_space->update_essential_bc_values();
 
         ref_space->save("space-complex.xml");
         ref_space->free();
@@ -103,7 +121,6 @@ namespace H1_complex
 #else
         space->save("space-complex-coarse.xml2");
         SpaceSharedPtr<complex> space_test2 = Space<complex>::load("space-complex-coarse.xml2", mesh, false, &bcs);
-        ogProjection.project_global(space_test2, ref_sln, sln);
 #endif
       } while (as++ < 4);
     }
