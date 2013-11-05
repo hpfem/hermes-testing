@@ -184,6 +184,23 @@ int main(int argc, char* argv[])
     return -1;
   }
 
+  try
+  {
+    mloader.set_validation(false);
+    MeshSharedPtr mesh_agros1(new Mesh), mesh_agros2(new Mesh);
+    Hermes::vector<MeshSharedPtr> meshes_agros(mesh_agros1, mesh_agros2);
+    mloader.load("agros-test.msh", meshes_agros);
+    DefaultEssentialBCConst<double> bc(HERMES_ANY, 1.0);
+    EssentialBCs<double> bcs(&bc);
+    SpaceSharedPtr<double> space_1(new H1Space<double>(mesh_agros1, &bcs, 1));
+    SpaceSharedPtr<double> space_2(new H1Space<double>(mesh_agros2, &bcs, 1));
+  }
+  catch (std::exception& e)
+  {
+    std::cout << e.what();
+    return -1;
+  }
+
   time.tick();
 
   std::cout << "Time taken: " << time.last() << std::endl;
