@@ -14,6 +14,10 @@ const double K = 100.;
 
 int main(int argc, char* argv[])
 {
+#ifdef THREAD_TESTING
+  HermesCommonApi.set_integral_param_value(numThreads, 8);
+#endif
+
   // Load the mesh.
   MeshSharedPtr u_mesh(new Mesh), v_mesh(new Mesh);
   MeshReaderH2DXML mloader;

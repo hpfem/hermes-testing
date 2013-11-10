@@ -27,6 +27,9 @@ const std::complex<double>  P_SOURCE(1.0, 0.0);
 
 int main(int argc, char* argv[])
 {
+#ifdef THREAD_TESTING
+  HermesCommonApi.set_integral_param_value(numThreads, 8);
+#endif
   // Load the mesh.
   MeshSharedPtr mesh(new Mesh);
   Hermes::vector<MeshSharedPtr> meshes;
