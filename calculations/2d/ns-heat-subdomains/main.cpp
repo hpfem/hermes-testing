@@ -231,7 +231,7 @@ int main(int argc, char* argv[])
 
   double norm = get_l2_norm(newton.get_sln_vector(), Space<double>::get_num_dofs(all_spaces));
 
-  bool success = Testing::test_value(norm, 567.51077541501434, "sln-norm", 1e-4);
+  bool success = Testing::test_value(norm, 567.39403731821096, "sln-norm", 1e-4);
 
   // Wait for all views to be closed.
 #ifdef SHOW_OUTPUT
