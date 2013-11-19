@@ -29,8 +29,8 @@ int main(int argc, char* argv[])
   SpaceSharedPtr<complex> space_c( new Hermes::Hermes2D::H1Space<complex>(mesh, &bcs_c, 2));
 
   // Initialize the weak formulation.
-  WeakFormsH1::DefaultWeakFormPoissonLinear<double> wf_r(HERMES_ANY, HERMES_ONE);
-  WeakFormsH1::DefaultWeakFormPoissonLinear<complex> wf_c(HERMES_ANY, HERMES_ONE);
+  WeakFormsH1::DefaultWeakFormPoissonLinear<double> wf_r(HERMES_ANY, nullptr);
+  WeakFormsH1::DefaultWeakFormPoissonLinear<complex> wf_c(HERMES_ANY, nullptr);
 
   // Initialize the solution.
   MeshFunctionSharedPtr<double> sln_r(new Solution<double>);
