@@ -61,3 +61,33 @@ add_test(test-mumps-solver-3 ${BIN} mumps 3)
 add_test(test-mumps-solver-block-1 ${BIN} mumps-block 1)
 add_test(test-mumps-solver-block-2 ${BIN} mumps-block 2)
 add_test(test-mumps-solver-block-3 ${BIN} mumps-block 3)
+
+IF(NOT MSVC)
+  add_test(memory-leaks-solver-mumps-1 "sudo" "valgrind" "--leak-check=full" "--track-origins=yes" "--log-file=/var/www/valgrind-logfiles/${PROJECT_NAME}-logfile" ${BIN} mumps 1)
+  add_test(memory-leaks-solver-mumps-2 "sudo" "valgrind" "--leak-check=full" "--track-origins=yes" "--log-file=/var/www/valgrind-logfiles/${PROJECT_NAME}-logfile" ${BIN} mumps 2)
+  add_test(memory-leaks-solver-mumps-3 "sudo" "valgrind" "--leak-check=full" "--track-origins=yes" "--log-file=/var/www/valgrind-logfiles/${PROJECT_NAME}-logfile" ${BIN} mumps 3)
+  
+  add_test(memory-leaks-solver-umfpack-1 "sudo" "valgrind" "--leak-check=full" "--track-origins=yes" "--log-file=/var/www/valgrind-logfiles/${PROJECT_NAME}-logfile" ${BIN} umfpack 1)
+  add_test(memory-leaks-solver-umfpack-2 "sudo" "valgrind" "--leak-check=full" "--track-origins=yes" "--log-file=/var/www/valgrind-logfiles/${PROJECT_NAME}-logfile" ${BIN} umfpack 2)
+  add_test(memory-leaks-solver-umfpack-3 "sudo" "valgrind" "--leak-check=full" "--track-origins=yes" "--log-file=/var/www/valgrind-logfiles/${PROJECT_NAME}-logfile" ${BIN} umfpack 3)
+  
+  add_test(memory-leaks-solver-paralution-1 "sudo" "valgrind" "--leak-check=full" "--track-origins=yes" "--log-file=/var/www/valgrind-logfiles/${PROJECT_NAME}-logfile" ${BIN} paralution 1)
+  add_test(memory-leaks-solver-paralution-2 "sudo" "valgrind" "--leak-check=full" "--track-origins=yes" "--log-file=/var/www/valgrind-logfiles/${PROJECT_NAME}-logfile" ${BIN} paralution 2)
+  add_test(memory-leaks-solver-paralution-3 "sudo" "valgrind" "--leak-check=full" "--track-origins=yes" "--log-file=/var/www/valgrind-logfiles/${PROJECT_NAME}-logfile" ${BIN} paralution 3)
+  
+  add_test(memory-leaks-solver-superlu-1 "sudo" "valgrind" "--leak-check=full" "--track-origins=yes" "--log-file=/var/www/valgrind-logfiles/${PROJECT_NAME}-logfile" ${BIN} superlu 1)
+  add_test(memory-leaks-solver-superlu-2 "sudo" "valgrind" "--leak-check=full" "--track-origins=yes" "--log-file=/var/www/valgrind-logfiles/${PROJECT_NAME}-logfile" ${BIN} superlu 2)
+  add_test(memory-leaks-solver-superlu-3 "sudo" "valgrind" "--leak-check=full" "--track-origins=yes" "--log-file=/var/www/valgrind-logfiles/${PROJECT_NAME}-logfile" ${BIN} superlu 3)
+  
+  add_test(memory-leaks-solver-petsc-1 "sudo" "valgrind" "--leak-check=full" "--track-origins=yes" "--log-file=/var/www/valgrind-logfiles/${PROJECT_NAME}-logfile" ${BIN} petsc 1)
+  add_test(memory-leaks-solver-petsc-2 "sudo" "valgrind" "--leak-check=full" "--track-origins=yes" "--log-file=/var/www/valgrind-logfiles/${PROJECT_NAME}-logfile" ${BIN} petsc 2)
+  add_test(memory-leaks-solver-petsc-3 "sudo" "valgrind" "--leak-check=full" "--track-origins=yes" "--log-file=/var/www/valgrind-logfiles/${PROJECT_NAME}-logfile" ${BIN} petsc 3)
+  
+  add_test(memory-leaks-solver-amesos-1 "sudo" "valgrind" "--leak-check=full" "--track-origins=yes" "--log-file=/var/www/valgrind-logfiles/${PROJECT_NAME}-logfile" ${BIN} amesos 1)
+  add_test(memory-leaks-solver-amesos-2 "sudo" "valgrind" "--leak-check=full" "--track-origins=yes" "--log-file=/var/www/valgrind-logfiles/${PROJECT_NAME}-logfile" ${BIN} amesos 2)
+  add_test(memory-leaks-solver-amesos-3 "sudo" "valgrind" "--leak-check=full" "--track-origins=yes" "--log-file=/var/www/valgrind-logfiles/${PROJECT_NAME}-logfile" ${BIN} amesos 3)
+  
+  add_test(memory-leaks-solver-paralution-1 "sudo" "valgrind" "--leak-check=full" "--track-origins=yes" "--log-file=/var/www/valgrind-logfiles/${PROJECT_NAME}-logfile" ${BIN} aztecoo 1)
+  add_test(memory-leaks-solver-paralution-2 "sudo" "valgrind" "--leak-check=full" "--track-origins=yes" "--log-file=/var/www/valgrind-logfiles/${PROJECT_NAME}-logfile" ${BIN} aztecoo 2)
+  add_test(memory-leaks-solver-paralution-3 "sudo" "valgrind" "--leak-check=full" "--track-origins=yes" "--log-file=/var/www/valgrind-logfiles/${PROJECT_NAME}-logfile" ${BIN} aztecoo 3)
+ENDIF(NOT MSVC)
