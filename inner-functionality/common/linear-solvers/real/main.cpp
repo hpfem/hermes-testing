@@ -409,6 +409,8 @@ int main(int argc, char *argv[]) {
       break;
     }
 
+    delete[] sln;
+
     if(success)
     {
 
