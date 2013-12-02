@@ -159,7 +159,7 @@ void build_matrix_block(int n, std::map<unsigned int, MatrixEntry> &ar_mat, std:
                               matrix->pre_add_ij(i, j);
 
                           matrix->alloc();
-                          double  **mat = new_matrix<double>(n, n);
+                          double* mat = new double[n * n];
                           int *cols = new int[n];
                           int *rows = new int[n];
                           for (int i = 0; i < n; i++) {
@@ -168,9 +168,9 @@ void build_matrix_block(int n, std::map<unsigned int, MatrixEntry> &ar_mat, std:
                           }
                           for (std::map<unsigned int, MatrixEntry>::iterator it = ar_mat.begin(); it != ar_mat.end(); it++) {
                             MatrixEntry &me = it->second;
-                            mat[me.m][me.n] = me.value;
+                            mat[me.m * n + me.n] = me.value;
                           }
-                          matrix->add(n, n, mat, rows, cols);
+                          matrix->add(n, n, mat, rows, cols, n);
                           matrix->finish();
 
                           rhs->alloc(n);
@@ -280,7 +280,6 @@ int main(int argc, char *argv[])
   std::map<unsigned int, MatrixEntry> ar_mat;
   std::map<unsigned int, double > ar_rhs;
 
-  double* sln;
   switch(atoi(argv[2]))
   {
   case 1:
