@@ -1,5 +1,5 @@
-
 #include "definitions.h"
+#include "../../testing-core/testing-core.h"
 
 // This example shows how to solve a simple PDE that describes stationary
 // heat transfer in an object consisting of two materials (aluminum and
@@ -25,8 +25,6 @@
 //
 // The following parameters can be changed:
 
-const bool HERMES_VISUALIZATION = true;           // Set to "false" to suppress Hermes OpenGL visualization.
-const bool VTK_VISUALIZATION = false;              // Set to "true" to enable VTK output.
 const int P_INIT = 1;                             // Uniform polynomial degree of mesh elements.
 const int INIT_REF_NUM = 1;                       // Number of initial uniform mesh refinements.
 
@@ -93,19 +91,18 @@ int main(int argc, char* argv[])
     // Translate the solution vector into the previously initialized Solution.
     Solution<double>::vector_to_solution(sln_vector, space, sln);
 
-    // VTK output.
-    if(VTK_VISUALIZATION)
-    {
-      // Output solution in VTK format.
-      Views::Linearizer lin;
-      bool mode_3D = false;
-      lin.save_solution_vtk(sln, "sln.vtk", "Temperature", mode_3D, 1, Views::HERMES_EPS_LOW);
+    MeshFunctionSharedPtr<double> slnZero(new ZeroSolution<double>(mesh));
+    Mesh::ReferenceMeshCreator ref_mesh_creator(mesh);
+    MeshSharedPtr ref_mesh = ref_mesh_creator.create_ref_mesh();
+    Space<double>::ReferenceSpaceCreator ref_space_creator(space, ref_mesh);
+    SpaceSharedPtr<double> ref_space = ref_space_creator.create_ref_space();
+    MeshFunctionSharedPtr<double> slnZeroReference(new ZeroSolution<double>(ref_space->get_mesh()));
+    MeshFunctionSharedPtr<double> slnConstRefined(new ConstantSolution<double>(ref_space->get_mesh(), 1.234567));
+    MeshFunctionSharedPtr<double> c1s(new TestExactSolution1(ref_space->get_mesh()));
+    MeshFunctionSharedPtr<double> c2s(new TestExactSolution2(ref_space->get_mesh()));
 
-      // Output mesh and element orders in VTK format.
-      Views::Orderizer ord;
-      ord.save_mesh_vtk(space, "mesh->vtk");
-      ord.save_orders_vtk(space, "ord.vtk");
-    }
+    MeshFunctionSharedPtr<double> c1v(new TestExactSolution1(mesh));
+    MeshFunctionSharedPtr<double> c2v(new TestExactSolution2(mesh));
 
     // Visualize the solution.
     Views::ScalarView viewS("Solution", new Views::WinGeom(50, 50, 1000, 800));
@@ -113,8 +110,7 @@ int main(int argc, char* argv[])
     Views::VectorView viewV("Vectors", new Views::WinGeom(50, 50, 1000, 800));
     Views::MeshView viewM("Mesh", new Views::WinGeom(50, 50, 1000, 800));
 
-    if(HERMES_VISUALIZATION)
-    {
+#ifdef _SHOW_OUTPUT
       viewS.show(sln);
       viewS.save_screenshot("000-base.bmp");
       viewS.show_contours(1.0);
@@ -138,26 +134,14 @@ int main(int argc, char* argv[])
       viewS.set_scale_size(40, 1230, 14);
       viewS.save_screenshot("010-scaleSize.bmp");
 
-      MeshFunctionSharedPtr<double> slnZero(new ZeroSolution<double>(mesh));
-      //viewS.set_3d_mode(false);
       viewS.show_mesh(true);
       viewS.set_scale_size(30, 120, 14);
       viewS.show(slnZero);
       viewS.save_screenshot("011-zeroSolution.bmp");
-
-      Mesh::ReferenceMeshCreator ref_mesh_creator(mesh);
-      MeshSharedPtr ref_mesh = ref_mesh_creator.create_ref_mesh();
-      Space<double>::ReferenceSpaceCreator ref_space_creator(space, ref_mesh);
-      SpaceSharedPtr<double> ref_space = ref_space_creator.create_ref_space();
-      MeshFunctionSharedPtr<double> slnZeroReference(new ZeroSolution<double>(ref_space->get_mesh()));
       viewS.show(slnZeroReference);
       viewS.save_screenshot("012-zeroSolutionRef1.bmp");
-      MeshFunctionSharedPtr<double> slnConstRefined(new ConstantSolution<double>(ref_space->get_mesh(), 1.234567));
-      MeshFunctionSharedPtr<double> c1s(new TestExactSolution1(ref_space->get_mesh()));
-      MeshFunctionSharedPtr<double> c2s(new TestExactSolution2(ref_space->get_mesh()));
       
       viewS.show(slnConstRefined, Views::HERMES_EPS_NORMAL, 1, c1s, c2s, 0.4);
-      //viewS.set_3d_mode(true);
       viewS.save_screenshot("013-constSolutionRefWithDisplacement.bmp");
       viewO.show(space); 
       viewO.save_screenshot("100-space.bmp");
@@ -179,12 +163,30 @@ int main(int argc, char* argv[])
       viewV.show(sln, sln);
       viewV.save_screenshot("303-vectorizerArrowsMode.bmp");
       
-      MeshFunctionSharedPtr<double> c1v(new TestExactSolution1(mesh));
-      MeshFunctionSharedPtr<double> c2v(new TestExactSolution2(mesh));
-      
       viewV.show(sln, sln, Views::HERMES_EPS_NORMAL, 1, 1, c1v, c2v, 0.5);
       viewV.save_screenshot("303-vectorizerArrowsModeWithDisplacement.bmp");
-    }
+#endif
+
+      // Process solution by Vectorizer even without views.
+      viewV.get_vectorizer()->process_solution(sln, sln, 1, 1, Views::HERMES_EPS_NORMAL);
+      viewV.get_vectorizer()->set_displacement(c1v, c2v, 0.5);
+      viewV.get_vectorizer()->free();
+      viewV.get_vectorizer()->process_solution(sln, sln, 1, 1, Views::HERMES_EPS_NORMAL);
+
+      // Output solution in VTK format.
+      Views::Linearizer lin;
+      bool mode_3D = false;
+      lin.save_solution_vtk(sln, "sln.vtk", "Temperature", mode_3D, 1, Views::HERMES_EPS_LOW);
+      lin.save_solution_vtk(sln, "sln-normal.vtk", "Temperature", mode_3D, 1);
+      lin.save_solution_vtk(slnZeroReference, "sln-zero.vtk", "Temperature", mode_3D, 1);
+      lin.save_solution_vtk(slnConstRefined, "sln-const.vtk", "Temperature", mode_3D, 1);
+
+      // Output mesh and element orders in VTK format.
+      Views::Orderizer ord;
+      ord.save_mesh_vtk(space, "mesh.vtk");
+      ord.save_mesh_vtk(ref_space, "ref_mesh.vtk");
+      ord.save_orders_vtk(space, "ord.vtk");
+      ord.save_orders_vtk(ref_space, "ref_ord.vtk");
   }
   catch(std::exception& e)
   {
