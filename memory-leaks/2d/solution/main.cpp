@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
   newton.solve(slns);
   Solution<double>::vector_to_solutions(newton.get_sln_vector(), spaces, slns1);
 
-  Linearizer lin;
+  Linearizer lin(FileExport);
   lin.process_solution(u_sln);
   lin.process_solution(u_sln1);
   lin.process_solution(v_sln1);

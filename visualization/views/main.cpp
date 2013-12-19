@@ -166,17 +166,18 @@ int main(int argc, char* argv[])
       viewV.show(sln, sln, Views::HERMES_EPS_NORMAL, 1, 1, c1v, c2v, 0.5);
       viewV.save_screenshot("303-vectorizerArrowsModeWithDisplacement.bmp");
 #endif
-
+      MeshFunctionSharedPtr<double> slns[2] = { sln, sln };
+      int items[2] = { 1, 1 };
       // Process solution by Vectorizer even without views.
-      viewV.get_vectorizer()->process_solution(sln, sln, 1, 1, Views::HERMES_EPS_NORMAL);
+      viewV.get_vectorizer()->process_solution(slns, items);
       viewV.get_vectorizer()->set_displacement(c1v, c2v, 0.5);
       viewV.get_vectorizer()->free();
-      viewV.get_vectorizer()->process_solution(sln, sln, 1, 1, Views::HERMES_EPS_NORMAL);
+      viewV.get_vectorizer()->process_solution(slns, items);
 
       // Output solution in VTK format.
-      Views::Linearizer lin;
+      Views::Linearizer lin(FileExport);
       bool mode_3D = false;
-      lin.save_solution_vtk(sln, "sln.vtk", "Temperature", mode_3D, 1, Views::HERMES_EPS_LOW);
+      lin.save_solution_vtk(sln, "sln.vtk", "Temperature", mode_3D, 1);
       lin.save_solution_vtk(sln, "sln-normal.vtk", "Temperature", mode_3D, 1);
       lin.save_solution_vtk(slnZeroReference, "sln-zero.vtk", "Temperature", mode_3D, 1);
       lin.save_solution_vtk(slnConstRefined, "sln-const.vtk", "Temperature", mode_3D, 1);
