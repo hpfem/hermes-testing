@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
   ss << "saved" << std::rand() << ".bson";
   ss1 << "saved" << (2 + std::rand()) << ".bson";
   ss2 << "saved" << (12 + std::rand()) << ".bson";
-  Views::Linearizer linearizer;
+  Views::Linearizer linearizer(FileExport);
 #pragma endregion
 #pragma region Single mesh
   mloader.load("initial.xml", meshes);
@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
   space->assign_dofs();
 
   MeshFunctionSharedPtr<double> fn(new ConstantSolution<double>(mesh1, 1.123124));
-  linearizer.save_solution_vtk(fn, "fn.vtk", "sln", true, 1, 1.0);
+  linearizer.save_solution_vtk(fn, "fn.vtk", "sln", true, 1);
 #pragma endregion
 
 #pragma region Multi-mesh 1
@@ -50,13 +50,13 @@ int main(int argc, char* argv[])
   SpaceSharedPtr<double> space22(new L2Space<double>(mesh4, 0));
 
   MeshFunctionSharedPtr<double> fn2(new ConstantSolution<double>(mesh2, 1.123124));
-  linearizer.save_solution_vtk(fn2, "fn2.vtk", "sln", true, 1, 1.0);
+  linearizer.save_solution_vtk(fn2, "fn2.vtk", "sln", true, 1);
 
   MeshFunctionSharedPtr<double> fn3(new ConstantSolution<double>(mesh3, 1.123124));
-  linearizer.save_solution_vtk(fn3, "fn3.vtk", "sln", true, 1, 1.0);
+  linearizer.save_solution_vtk(fn3, "fn3.vtk", "sln", true, 1);
 
   MeshFunctionSharedPtr<double> fn4(new ConstantSolution<double>(mesh4, 1.123124));
-  linearizer.save_solution_vtk(fn4, "fn4.vtk", "sln", true, 1, 1.0);
+  linearizer.save_solution_vtk(fn4, "fn4.vtk", "sln", true, 1);
 #pragma endregion
 
 #pragma region Multi-mesh 2
@@ -65,10 +65,10 @@ int main(int argc, char* argv[])
   mloaderb.load(ss2.str().c_str(), meshes2);
 
   MeshFunctionSharedPtr<double> fn33(new ConstantSolution<double>(mesh3, 1.123124));
-  linearizer.save_solution_vtk(fn33, "fn33.vtk", "sln", true, 1, 1.0);
+  linearizer.save_solution_vtk(fn33, "fn33.vtk", "sln", true, 1);
 
   MeshFunctionSharedPtr<double> fn44(new ConstantSolution<double>(mesh4, 1.123124));
-  linearizer.save_solution_vtk(fn44, "fn44.vtk", "sln", true, 1, 1.0);
+  linearizer.save_solution_vtk(fn44, "fn44.vtk", "sln", true, 1);
 
   // Initialize the weak formulation.
   CustomWeakForm wf;
