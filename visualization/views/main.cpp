@@ -110,7 +110,7 @@ int main(int argc, char* argv[])
     Views::VectorView viewV("Vectors", new Views::WinGeom(50, 50, 1000, 800));
     Views::MeshView viewM("Mesh", new Views::WinGeom(50, 50, 1000, 800));
 
-#ifdef _SHOW_OUTPUT
+#ifdef SHOW_OUTPUT
       viewS.show(sln);
       viewS.save_screenshot("000-base.bmp");
       viewS.show_contours(1.0);
@@ -141,7 +141,7 @@ int main(int argc, char* argv[])
       viewS.show(slnZeroReference);
       viewS.save_screenshot("012-zeroSolutionRef1.bmp");
       
-      viewS.show(slnConstRefined, Views::HERMES_EPS_NORMAL, 1, c1s, c2s, 0.4);
+      viewS.show(slnConstRefined, 1, c1s, c2s, 0.4);
       viewS.save_screenshot("013-constSolutionRefWithDisplacement.bmp");
       viewO.show(space); 
       viewO.save_screenshot("100-space.bmp");
@@ -153,8 +153,6 @@ int main(int argc, char* argv[])
       viewM.save_screenshot("201-meshBElemMrk.bmp");
       viewV.show(sln, sln);
       viewV.save_screenshot("300-vectorizer.bmp");
-      viewV.show(sln, sln, Views::HERMES_EPS_VERYHIGH);
-      viewV.save_screenshot("301-vectorizerFiner.bmp");
       viewV.get_vectorizer()->set_curvature_epsilon(1e-5);
       viewV.show(sln, sln);
       viewV.save_screenshot("302-vectorizerFinerWithFinerCurves.bmp");
@@ -163,8 +161,9 @@ int main(int argc, char* argv[])
       viewV.show(sln, sln);
       viewV.save_screenshot("303-vectorizerArrowsMode.bmp");
       
-      viewV.show(sln, sln, Views::HERMES_EPS_NORMAL, 1, 1, c1v, c2v, 0.5);
+      viewV.show(sln, sln, 1, 1, c1v, c2v, 0.5);
       viewV.save_screenshot("303-vectorizerArrowsModeWithDisplacement.bmp");
+      viewV.close();
 #endif
       MeshFunctionSharedPtr<double> slns[2] = { sln, sln };
       int items[2] = { 1, 1 };
