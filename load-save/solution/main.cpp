@@ -116,8 +116,8 @@ int main(int argc, char* argv[])
   catch(Hermes::Exceptions::Exception& e)
   {
     local_success = true;
-    std::string s = "Arbitrary exact solution can not be saved to disk. Only constant one can. Project to a space to get a saveable solution.\n";
-    std::string s1 = std::string(e.what());
+    std::string s = "Arbitrary exact solution can not be saved to disk. Only constant one can. Project to a space to get a saveable solution.";
+    std::string s1 = e.info();
     if(s.compare(s1))
       success = false;
   }
@@ -173,12 +173,12 @@ int main(int argc, char* argv[])
 */
   if(success)
   {
-    printf("Success!\n");
+    printf("Success!");
     return 0;
   }
   else
   {
-    printf("Failure!\n");
+    printf("Failure!");
     return -1;
   }
 }

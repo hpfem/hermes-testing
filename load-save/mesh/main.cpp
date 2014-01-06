@@ -23,8 +23,8 @@ int main(int argc, char* argv[])
   }
   catch(Hermes::Exceptions::MeshLoadFailureException& e)
   {
-    std::cout << e.what();
-    if(!strcmp(e.what(), "instance document parsing failed\n"))
+    std::cout << e.info();
+    if (!strcmp(e.info().c_str(), "Mesh loading failed: instance document parsing failed"))
       exceptionCaughtCorrectly = true;
   }
 
@@ -43,8 +43,8 @@ int main(int argc, char* argv[])
   }
   catch(Hermes::Exceptions::MeshLoadFailureException& e)
   {
-    std::cout << e.what();
-    if(!strcmp(e.what(), "Number of subdomains( = 2) does not equal the number of provided meshes in the vector( = 1).\n"))
+    std::cout << e.info();
+    if(!strcmp(e.info().c_str(), "Mesh loading failed: Number of subdomains( = 2) does not equal the number of provided meshes in the vector( = 1)."))
       exceptionCaughtCorrectly = true;
   }
   
@@ -61,8 +61,8 @@ int main(int argc, char* argv[])
   }
   catch(Hermes::Exceptions::MeshLoadFailureException& e)
   {
-    std::cout << e.what();
-    if(!strcmp(e.what(), "Some of the vertices of element #2 are identical which is not right.\n"))
+    std::cout << e.info();
+    if(!strcmp(e.info().c_str(), "Mesh loading failed: Some of the vertices of element #2 are identical which is not right."))
       exceptionCaughtCorrectly = true;
   }
 
@@ -78,8 +78,8 @@ int main(int argc, char* argv[])
   }
   catch(Hermes::Exceptions::MeshLoadFailureException& e)
   {
-    std::cout << e.what();
-    if(!strcmp(e.what(), "Some of the vertices of element #10 are identical which is not right.\n"))
+    std::cout << e.info();
+    if(!strcmp(e.info().c_str(), "Mesh loading failed: Some of the vertices of element #10 are identical which is not right."))
       exceptionCaughtCorrectly = true;
   }
 
@@ -96,8 +96,8 @@ int main(int argc, char* argv[])
   }
   catch(Hermes::Exceptions::MeshLoadFailureException& e)
   {
-    std::cout << e.what();
-    if(!strcmp(e.what(), "Boundary data #8: edge 156-5 does not exist.\n"))
+    std::cout << e.info();
+    if(!strcmp(e.info().c_str(), "Mesh loading failed: Boundary data #8: edge 156-5 does not exist."))
       exceptionCaughtCorrectly = true;
   }
 
@@ -114,8 +114,8 @@ int main(int argc, char* argv[])
   }
   catch(Hermes::Exceptions::MeshLoadFailureException& e)
   {
-    std::cout << e.what();
-    if(!strcmp(e.what(), "Curve #2: edge 111-6 does not exist.\n"))
+    std::cout << e.info();
+    if(!strcmp(e.info().c_str(), "Mesh loading failed: Curve #2: edge 111-6 does not exist."))
       exceptionCaughtCorrectly = true;
   }
 
@@ -131,8 +131,8 @@ int main(int argc, char* argv[])
   }
   catch(Hermes::Exceptions::MeshLoadFailureException& e)
   {
-    std::cout << e.what();
-    if(!strcmp(e.what(), "Wrong element number:123 in subdomain 0.\n"))
+    std::cout << e.info();
+    if(!strcmp(e.info().c_str(), "Mesh loading failed: Wrong element number:123 in subdomain 0."))
       exceptionCaughtCorrectly = true;
   }
 
@@ -149,8 +149,8 @@ int main(int argc, char* argv[])
   }
   catch(Hermes::Exceptions::MeshLoadFailureException& e)
   {
-    std::cout << e.what();
-    if(!strcmp(e.what(), "Boundary data error (edge 1 does not exist).\n"))
+    std::cout << e.info();
+    if(!strcmp(e.info().c_str(), "Mesh loading failed: Boundary data error (edge 1 does not exist)."))
       exceptionCaughtCorrectly = true;
   }
 
@@ -178,9 +178,9 @@ int main(int argc, char* argv[])
     if(mesh1->get_num_active_elements() != nelem)
       throw Hermes::Exceptions::Exception("fail");
   }
-  catch(std::exception& e)
+  catch(Hermes::Exceptions::Exception& e)
   {
-    std::cout << e.what();
+    std::cout << e.info();
     return -1;
   }
 
@@ -195,9 +195,9 @@ int main(int argc, char* argv[])
     SpaceSharedPtr<double> space_1(new H1Space<double>(mesh_agros1, &bcs, 1));
     SpaceSharedPtr<double> space_2(new H1Space<double>(mesh_agros2, &bcs, 1));
   }
-  catch (std::exception& e)
+  catch (Hermes::Exceptions::Exception& e)
   {
-    std::cout << e.what();
+    std::cout << e.info();
     return -1;
   }
 
