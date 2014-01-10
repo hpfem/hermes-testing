@@ -18,6 +18,8 @@ project(hermes_testing)
   set(WITH_PARALUTION YES)
   set(WITH_UMFPACK YES)
   set(WITH_OPENMP YES)
+  set(WITH_PJLIB               NO)
+    
   # Default "no"
   set(WITH_EXODUSII NO)
   set(WITH_MUMPS NO)
@@ -70,7 +72,12 @@ project(hermes_testing)
     find_package(MATIO REQUIRED)
     include_directories(${MATIO_INCLUDE_DIR})
   endif()
-
+  
+  if(WITH_PJLIB)
+    find_package(PJLIB REQUIRED)
+    include_directories(${PJLIB_INCLUDE_DIR})
+  endif(WITH_PJLIB)
+  
   if(MSVC)
     if(WITH_PETSC OR WITH_TRILINOS OR WITH_SUPERLU)
         find_package(CLAPACK REQUIRED)
