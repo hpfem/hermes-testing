@@ -297,7 +297,8 @@ int main(int argc, char* args[])
   total_check += L2_real::main(argc, args);
   total_check += H1_complex::main(argc, args);
 
-  if(total_check == 18)
+  bool success = Hermes::Testing::test_value(total_check, 18, "Adaptivity steps", 1);
+  if (total_check == 18)
   {
     printf("Success!\n");
     return 0;

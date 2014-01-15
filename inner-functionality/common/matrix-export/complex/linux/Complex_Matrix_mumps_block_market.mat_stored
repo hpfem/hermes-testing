@@ -1,4 +1,4 @@
-%%Matrix<Scalar>Market matrix coordinate real general
+%%MatrixMarket matrix coordinate real general
 3 3 9
 0 0 (1.000000, 2.000000)
 1 0 (0.000000, 0.000000)
