@@ -66,6 +66,7 @@ int main(int argc, char* argv[])
   int as = 1; bool done = false;
   do
   {
+    printf("Step: %i.\n", as);
     // Construct globally refined reference mesh and setup reference space->
     Mesh::ReferenceMeshCreator ref_mesh_creator(mesh);
     MeshSharedPtr ref_mesh = ref_mesh_creator.create_ref_mesh();
@@ -111,6 +112,8 @@ int main(int argc, char* argv[])
       done = true;
     else
       done = adaptivity.adapt(&selector);
+    
+    printf("Error: %f.\n", err_est_rel_total);
 
     // Increase the counter of adaptivity steps.
     if(done == false)
