@@ -71,6 +71,7 @@ namespace Hermes
         return true;
       else
       {
+        std::cout.precision(15);
         std::cout << "Failed test: " << identifier << std::endl;
         std::cout << "Difference: " << expected_value << " - " << obtained_value << " higher than the precision (" << absolute_precision << ")." << std::endl;
         return false;
