@@ -75,8 +75,6 @@ int main(int argc, char* args[])
     try
     {
       linear_solver.solve();
-      linear_solver.get_jacobian()->export_to_file("Matrix", "A", EXPORT_FORMAT_MATRIX_MARKET);
-      linear_solver.get_residual()->export_to_file("Vector", "b", EXPORT_FORMAT_PLAIN_ASCII);
       Solution<double>::vector_to_solution(linear_solver.get_sln_vector(), ref_space, ref_sln);
     }
     catch(std::exception& e)
