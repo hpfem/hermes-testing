@@ -48,11 +48,8 @@ int main(int argc, char* argv[])
   double sum = 0;
   for (int i = 0; i < space->get_num_dofs(); i++)
     sum += linear_solver.get_sln_vector()[i];
-  printf("coefficient sum = %f\n", sum);
 
-  bool success = true;
-  if(std::abs(sum - 3200.074172) > 1e-5)
-    success = false;
+  bool success = Testing::test_value(sum, 3200.164635, "sln-norm", 1e-4);
 
   if(success == true)
   {

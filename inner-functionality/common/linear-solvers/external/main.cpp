@@ -100,14 +100,10 @@ int main(int argc, char* argv[])
     std::cout << e.what();
   }
 
-  std::cout << sln->get_pt_value(.1,.1)->val[0] << std::endl;
-  std::cout << sln->get_pt_value(.2,.1)->val[0] << std::endl;
-  std::cout << sln->get_pt_value(.3,.1)->val[0] << std::endl;
-
   bool success = true;
-  success = Testing::test_value(sln->get_pt_value(.1,.1)->val[0], 434.315, "get_pt_value(.1,.1)", 1e-3) && success;
-  success = Testing::test_value(sln->get_pt_value(.2,.1)->val[0], 286.978, "get_pt_value(.2,.1)", 1e-3) && success;
-  success = Testing::test_value(sln->get_pt_value(.3,.1)->val[0], 101.786, "get_pt_value(.3,.1)", 1e-3) && success;
+  success = Testing::test_value(sln->get_pt_value(.1, .1)->val[0], 434.315, "get_pt_value(.1,.1)", 1e-3) && success;
+  success = Testing::test_value(sln->get_pt_value(.2, .1)->val[0], 274.314575050762, "get_pt_value(.2,.1)", 1e-3) && success;
+  success = Testing::test_value(sln->get_pt_value(.3, .1)->val[0], 97.2904323310241, "get_pt_value(.3,.1)", 1e-3) && success;
 
   if(success)
   {
