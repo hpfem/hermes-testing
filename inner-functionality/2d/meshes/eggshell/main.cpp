@@ -220,7 +220,8 @@ int main(int argc, char* argv[])
     int innerEggShell1Marker = internalMarker.marker;
     for_all_active_elements(e, egg_shell_mesh)
     {
-      area += e->get_area();
+      e->calc_area(true);
+      area += e->area;
       for(int i = 0; i < e->get_nvert(); i++)
       {
         if(e->en[i]->marker == innerEggShell1Marker)
