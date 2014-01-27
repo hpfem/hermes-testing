@@ -75,8 +75,6 @@ int main(int argc, char* args[])
     try
     {
       linear_solver.solve();
-      linear_solver.get_jacobian()->export_to_file("Matrix", "A", EXPORT_FORMAT_MATRIX_MARKET);
-      linear_solver.get_residual()->export_to_file("Vector", "b", EXPORT_FORMAT_PLAIN_ASCII);
       Solution<double>::vector_to_solution(linear_solver.get_sln_vector(), ref_space, ref_sln);
     }
     catch(std::exception& e)
@@ -109,11 +107,8 @@ int main(int argc, char* args[])
   double sum = 0;
   for (int i = 0; i < space->get_num_dofs(); i++)
     sum += linear_solver.get_sln_vector()[i];
-  printf("coefficient sum = %f\n", sum);
 
-  bool success = true;
-  if(std::abs(sum - 32.950958) > 1e-4)
-    success = false;
+  bool success = Testing::test_value(sum, 32.950958, "coefficient sum", 1e-4);
 
   if(success == true)
   {
