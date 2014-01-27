@@ -219,8 +219,8 @@ int main(int argc, char* argv[])
   Hermes::Mixins::Loggable::Static::info("Number of linear iterations: %d.", linear_iterations);
 
   bool success = true;
-  success = Hermes::Testing::test_value(as, 7, "Adaptivity steps", 1) && success;
-  success = Hermes::Testing::test_value(linear_iterations, 45, "Linear iterations", 1) && success;
+  success = Hermes::Testing::test_value(as, 6, "Adaptivity steps", 1) && success;
+  success = Hermes::Testing::test_value(linear_iterations, 22, "Linear iterations", 1) && success;
 
   if(success == true)
   {

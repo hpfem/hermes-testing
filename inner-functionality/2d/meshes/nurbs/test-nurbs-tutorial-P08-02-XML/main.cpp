@@ -14,7 +14,7 @@ const char* mesh_file_3 = "domain-3.xml";          // Three control points.
 const int P_INIT = 3;                             // Uniform polynomial degree of mesh elements.
 const int INIT_REF_NUM = 2;                       // Number of initial uniform mesh refinements.
 MatrixSolverType matrix_solver = SOLVER_UMFPACK;  // Possibilities: SOLVER_AMESOS, SOLVER_AZTECOO, SOLVER_MUMPS,
-                                                  // SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
+// SOLVER_PETSC, SOLVER_SUPERLU, SOLVER_UMFPACK.
 
 // Problem parameters.
 const double const_f = 1.0;
@@ -22,18 +22,18 @@ const double const_f = 1.0;
 int main(int argc, char* argv[])
 {
   // Check number of command-line parameters.
-  if(argc < 2)
+  if (argc < 2)
     throw Hermes::Exceptions::Exception("Not enough parameters.");
 
   // Load the mesh.
   MeshSharedPtr mesh(new Mesh);
   MeshReaderH2DXML mloader;
   mloader.set_validation(false);
-  if(strcasecmp(argv[1], "1") == 0)
+  if (strcasecmp(argv[1], "1") == 0)
     mloader.load(mesh_file_1, mesh);
-  if(strcasecmp(argv[1], "2") == 0)
+  if (strcasecmp(argv[1], "2") == 0)
     mloader.load(mesh_file_2, mesh);
-  if(strcasecmp(argv[1], "3") == 0)
+  if (strcasecmp(argv[1], "3") == 0)
     mloader.load(mesh_file_3, mesh);
 
   // Perform initial mesh refinements (optional).
@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
   try{
     newton.solve(coeff_vec);
   }
-  catch(Hermes::Exceptions::Exception& e)
+  catch (Hermes::Exceptions::Exception& e)
   {
     e.print_msg();
   }
@@ -79,11 +79,11 @@ int main(int argc, char* argv[])
   delete matrix;
   delete rhs;
 
-  double coor_x[4] = {0.3, 0.7, 1.3, 1.7};
+  double coor_x[4] = { 0.3, 0.7, 1.3, 1.7 };
   double coor_y = 0.5;
 
-  double value[4] = {0.102569, 0.167907, 0.174203, 0.109630};
-  if(strcasecmp(argv[1], "2") == 0)
+  double value[4] = { 0.102569, 0.167907, 0.174203, 0.109630 };
+  if (strcasecmp(argv[1], "2") == 0)
   {
     value[0] = 0.062896;
     value[1] = 0.096658;
@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
     value[3] = 0.081221;
   }
 
-  if(strcasecmp(argv[1], "3") == 0)
+  if (strcasecmp(argv[1], "3") == 0)
   {
     value[0] = 0.048752;
     value[1] = 0.028585;
@@ -101,11 +101,8 @@ int main(int argc, char* argv[])
 
   bool success = true;
   for (int i = 0; i < 4; i++)
-  {
-    if(Hermes::abs(value[i] - sln->get_pt_value(coor_x[i], coor_y)->val[0]) > 1E-6)
-      success = false;
-  }
-  if(success)
+    success = Testing::test_value(sln->get_pt_value(coor_x[i], coor_y)->val[0], value[i], "value") && success;
+  if (success)
   {
     printf("Success!\n");
     return 0;

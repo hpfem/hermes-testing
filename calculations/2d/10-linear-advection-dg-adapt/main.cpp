@@ -34,6 +34,8 @@ const double ERR_STOP = 1e-1;
 
 int main(int argc, char* args[])
 {
+  HermesCommonApi.set_integral_param_value(numThreads, 4);
+
   // Load the mesh.
   MeshSharedPtr mesh(new Mesh);
   MeshReaderH2D mloader;

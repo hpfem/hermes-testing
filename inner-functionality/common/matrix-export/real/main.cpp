@@ -159,7 +159,7 @@ void build_matrix_block(int n, std::map<unsigned int, MatrixEntry> &ar_mat, std:
                               matrix->pre_add_ij(i, j);
 
                           matrix->alloc();
-                          double* mat = new double[n * n];
+                          double* mat = (double*)calloc(n * n, sizeof(double));
                           int *cols = new int[n];
                           int *rows = new int[n];
                           for (int i = 0; i < n; i++) {

@@ -100,13 +100,8 @@ int main(int argc, char* argv[])
 
   bool success = true;
   for (int i = 0; i < 4; i++)
-  {
-    if(Hermes::abs(value[i] - sln->get_pt_value(coor_x[i], coor_y)->val[0]) > 1E-6)
-    {
-      std::cout << "Value desired: " << value[i] << ", value obtained: " << sln->get_pt_value(coor_x[i], coor_y)->val[0] << std::endl;
-      success = false;
-    }
-  }
+    success = Testing::test_value(sln->get_pt_value(coor_x[i], coor_y)->val[0], value[i], "value") && success;
+  
   if(success)
   {
     printf("Success!\n");

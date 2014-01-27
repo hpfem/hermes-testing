@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
   for (int i = 0; i < space->get_num_dofs(); i++)
     sum += linear_solver.get_sln_vector()[i];
 
-  bool success = Testing::test_value(sum, 3200.164635, "sln-norm", 1e-4);
+  bool success = Testing::test_value(sum, 3200.07417246116, "sln-norm", 1e-4);
 
   if(success == true)
   {

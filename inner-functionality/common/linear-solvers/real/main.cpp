@@ -159,7 +159,7 @@ void build_matrix_block(int n, std::map<unsigned int, MatrixEntry> &ar_mat, std:
                               matrix->pre_add_ij(i, j);
 
                           matrix->alloc();
-                          double* mat = new double[n * n];
+                          double* mat = (double*)calloc(n * n, sizeof(double));
                           int *cols = new int[n];
                           int *rows = new int[n];
                           for (int i = 0; i < n; i++) {
@@ -257,6 +257,8 @@ int main(int argc, char *argv[]) {
     build_matrix_block(n, ar_mat, ar_rhs, &mat, &rhs);
 
     UMFPackLinearMatrixSolver<double> solver(&mat, &rhs);
+    mat.export_to_file("matrix", "A", MatrixExportFormat::EXPORT_FORMAT_PLAIN_ASCII);
+    rhs.export_to_file("vector", "b", MatrixExportFormat::EXPORT_FORMAT_PLAIN_ASCII);
     solve(solver, n);
     sln = new double[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(double));
 #endif

@@ -16,7 +16,7 @@ using namespace Hermes::Hermes2D::RefinementSelectors;
 
 typedef ::std::complex<double> complex;
 
-// #define SHOW_OUTPUT
+//#define SHOW_OUTPUT
 
 namespace Hermes
 {
