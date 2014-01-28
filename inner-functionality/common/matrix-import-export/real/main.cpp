@@ -215,7 +215,7 @@ bool export_and_test(AlgebraicEntity* ent, int argc, char *argv[])
 
       ent->import_from_file(s, "A", EXPORT_FORMAT_MATLAB_MATIO);
       sprintf(s2, "Real_%s_%s_matio2.dat", argv[1], argv[2]);
-      ent->export_to_file("fff", "A", EXPORT_FORMAT_PLAIN_ASCII);
+      ent->export_to_file(s2, "A", EXPORT_FORMAT_MATLAB_MATIO);
       success = Testing::compare_files(s, s2) && success;
 #else
       break;

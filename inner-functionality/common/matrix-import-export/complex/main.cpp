@@ -31,6 +31,7 @@ bool export_and_test_matrix(Matrix<complex>* mat, int argc, char *argv[])
   for(int i = 0; i < 3; i++)
   {
     char* s = new char[1000];
+    char* s2 = new char[1000];
 
     if(i == 0)
     {
@@ -49,12 +50,18 @@ bool export_and_test_matrix(Matrix<complex>* mat, int argc, char *argv[])
 #ifdef WITH_MATIO
       sprintf(s, "Complex_Matrix_%s_matio.mat", argv[1]);
       mat->export_to_file(s, "matrix", EXPORT_FORMAT_MATLAB_MATIO);
+      mat->free();
+
+      mat->import_from_file(s, "A", EXPORT_FORMAT_MATLAB_MATIO);
+      sprintf(s2, "Real_%s_%s_matio2.dat", argv[1], argv[2]);
+      mat->export_to_file(s2, "A", EXPORT_FORMAT_MATLAB_MATIO);
+      success = Testing::compare_files(s, s2) && success;
 #else
       break;
 #endif
     }
 
-    if(success)
+    if (success && i != 2)
     {
       char* test_s = new char[1000];
 #ifdef WIN32
@@ -75,6 +82,7 @@ bool export_and_test_vector(Vector<complex>* vec, int argc, char *argv[])
   for(int i = 0; i < 3; i++)
   {
     char* s = new char[1000];
+    char* s2 = new char[1000];
 
     if(i == 0)
     {
@@ -93,12 +101,18 @@ bool export_and_test_vector(Vector<complex>* vec, int argc, char *argv[])
 #ifdef WITH_MATIO
       sprintf(s, "Complex_Vector_%s_matio.vec", argv[1]);
       vec->export_to_file(s, "rhs", EXPORT_FORMAT_MATLAB_MATIO);
+      vec->free();
+
+      vec->import_from_file(s, "A", EXPORT_FORMAT_MATLAB_MATIO);
+      sprintf(s2, "Real_%s_%s_matio2.dat", argv[1], argv[2]);
+      vec->export_to_file(s2, "A", EXPORT_FORMAT_MATLAB_MATIO);
+      success = Testing::compare_files(s, s2) && success;
 #else
       break;
 #endif
     }
 
-    if(success)
+    if(success && i != 2)
     {
       char* test_s = new char[1000];
 #ifdef WIN32
