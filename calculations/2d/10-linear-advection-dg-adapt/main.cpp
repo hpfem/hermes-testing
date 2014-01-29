@@ -110,7 +110,7 @@ int main(int argc, char* args[])
   for (int i = 0; i < space->get_num_dofs(); i++)
     sum += linear_solver.get_sln_vector()[i];
 
-  bool success = Testing::test_value(sum, 32.950958, "coefficient sum", 1e-4);
+  bool success = Testing::test_value(sum, 32.950958, "coefficient sum", 1e-2);
 
   if(success == true)
   {

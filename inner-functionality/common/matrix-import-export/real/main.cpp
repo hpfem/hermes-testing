@@ -435,8 +435,9 @@ int main(int argc, char *argv_local[])
 #endif
   }
 
-  bool success = mat ? export_and_test(mat, argc, argv_local) : true;
-  success = rhs ? export_and_test(rhs, argc, argv_local) && success : success;
+  bool success = true;
+  if(mat && rhs)
+    success = export_and_test(mat, argc, argv_local) && export_and_test(rhs, argc, argv_local);
   
   if (sln)
   {
