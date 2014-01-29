@@ -78,33 +78,48 @@ namespace Hermes
       }
     }
 
+    static bool compare_files_internal(const char* filename_1, const char* filename_2)
+    {
+        std::ifstream lFile(filename_1, std::ios::in | std::ios::binary);
+        std::ifstream rFile(filename_2, std::ios::in | std::ios::binary);
+
+
+        if(!lFile.good() || !rFile.good())
+        {
+            return false;
+        }
+
+        std::streamsize lReadBytesCount = 0;
+        std::streamsize rReadBytesCount = 0;
+
+        int bufferSize = 100;
+        char p_lBuffer[bufferSize];
+        char p_rBuffer[bufferSize];
+
+        do {
+            lFile.read(p_lBuffer, bufferSize);
+            rFile.read(p_rBuffer, bufferSize);
+            lReadBytesCount = lFile.gcount();
+            rReadBytesCount = rFile.gcount();
+
+            if (lReadBytesCount != rReadBytesCount || std::memcmp(p_lBuffer, p_rBuffer, lReadBytesCount) != 0)
+            {
+                return false;
+            }
+        } while (lFile.good() || rFile.good());
+
+        return true;
+    }
+
     bool compare_files(const char* filename_1, const char* filename_2)
     {
-      FILE* f1 = fopen(filename_1, "r");
-      FILE* f2 = fopen(filename_2, "r");
-
-      int N = 10000;
-      char* buf1 = new char[N];
-      char* buf2 = new char[N];
-
-      do
+      if(compare_files_internal(filename_1, filename_2))
+        return true;
+      else
       {
-        size_t r1 = fread(buf1, 1, N, f1);
-        size_t r2 = fread(buf2, 1, N, f2);
-
-        if (r1 != r2 || memcmp(buf1, buf2, r1))
-        {
-          fclose(f1);
-          fclose(f2);
           std::cout << "Failed test: files not the same: " << filename_1 << ", " << filename_2 << std::endl;
           return false;
         }
-      }
-      while (!feof(f1) && !feof(f2));
-
-      fclose(f1);
-      fclose(f2);
-      return true;
     }
   }
 }

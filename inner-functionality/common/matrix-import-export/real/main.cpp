@@ -234,7 +234,21 @@ int main(int argc, char *argv[])
   std::map<unsigned int, MatrixEntry> ar_mat;
   std::map<unsigned int, double > ar_rhs;
 
-  switch(atoi(argv[2]))
+  char* argv_local[3];
+  if(argc < 2)
+  {
+      argv_local[1] = new char[20];
+      sprintf(argv_local[1], "mumps");
+      argv_local[2] = new char[1];
+      sprintf(argv_local[2], "1");
+  }
+  else
+  {
+      argv_local[1] = argv[1];
+      argv_local[2] = argv[2];
+  }
+
+  switch(atoi(argv_local[2]))
   {
   case 1:
     if(read_matrix_and_rhs((char*)"in/linsys-1", n, nnz, ar_mat, ar_rhs) != 0)
@@ -252,49 +266,49 @@ int main(int argc, char *argv[])
 
   SparseMatrix<double> *mat = nullptr;
   Vector<double> *rhs = nullptr;
-  if(strcasecmp(argv[1], "petsc") == 0) {
+  if(strcasecmp(argv_local[1], "petsc") == 0) {
 #ifdef WITH_PETSC
     mat = new PetscMatrix<double>;
     rhs = new PetscVector<double>;
     build_matrix(n, ar_mat, ar_rhs, mat, rhs);
 #endif
   }
-  else if(strcasecmp(argv[1], "petsc_block") == 0) {
+  else if(strcasecmp(argv_local[1], "petsc_block") == 0) {
 #ifdef WITH_PETSC
     mat = new PetscMatrix<double>;
     rhs = new PetscVector<double>;
     build_matrix_block(n, ar_mat, ar_rhs, mat, rhs);
 #endif
   }
-  else if(strcasecmp(argv[1], "umfpack") == 0) {
+  else if(strcasecmp(argv_local[1], "umfpack") == 0) {
 #ifdef WITH_UMFPACK
     mat = new CSCMatrix<double>;
     rhs = new SimpleVector<double>;
     build_matrix(n, ar_mat, ar_rhs, mat, rhs);
 #endif
   }
-  else if(strcasecmp(argv[1], "umfpack_block") == 0) {
+  else if(strcasecmp(argv_local[1], "umfpack_block") == 0) {
 #ifdef WITH_UMFPACK
     mat = new CSCMatrix<double>;
     rhs = new SimpleVector<double>;
     build_matrix_block(n, ar_mat, ar_rhs, mat, rhs);
 #endif
   }
-  else if(strcasecmp(argv[1], "aztecoo") == 0) {
+  else if(strcasecmp(argv_local[1], "aztecoo") == 0) {
 #ifdef WITH_TRILINOS
     mat = new EpetraMatrix<double>;
     rhs = new EpetraVector<double>;
     build_matrix(n, ar_mat, ar_rhs, mat, rhs);
 #endif
   }
-  else if(strcasecmp(argv[1], "aztecoo_block") == 0) {
+  else if(strcasecmp(argv_local[1], "aztecoo_block") == 0) {
 #ifdef WITH_TRILINOS
     mat = new EpetraMatrix<double>;
     rhs = new EpetraVector<double>;
     build_matrix_block(n, ar_mat, ar_rhs, mat, rhs);
 #endif
   }
-  else if(strcasecmp(argv[1], "amesos") == 0) {
+  else if(strcasecmp(argv_local[1], "amesos") == 0) {
 #ifdef WITH_TRILINOS
     mat = new EpetraMatrix<double>;
     rhs = new EpetraVector<double>;
@@ -302,7 +316,7 @@ int main(int argc, char *argv[])
   }
 #endif
 }
-  else if(strcasecmp(argv[1], "amesos_block") == 0) {
+  else if(strcasecmp(argv_local[1], "amesos_block") == 0) {
 #ifdef WITH_TRILINOS
     mat = new EpetraMatrix<double>;
     rhs = new EpetraVector<double>;
@@ -310,14 +324,14 @@ int main(int argc, char *argv[])
   }
 #endif
   }
-  else if(strcasecmp(argv[1], "mumps") == 0) {
+  else if(strcasecmp(argv_local[1], "mumps") == 0) {
 #ifdef WITH_MUMPS
     mat = new MumpsMatrix<double>;
     rhs = new SimpleVector<double>;
     build_matrix(n, ar_mat, ar_rhs, mat, rhs);
 #endif
   }
-  else if(strcasecmp(argv[1], "mumps_block") == 0) {
+  else if(strcasecmp(argv_local[1], "mumps_block") == 0) {
 #ifdef WITH_MUMPS
     mat = new MumpsMatrix<double>;
     rhs = new SimpleVector<double>;
@@ -327,8 +341,8 @@ int main(int argc, char *argv[])
 
   if(mat || rhs)
   {
-    bool success = mat ? export_and_test(mat, argc, argv) : true;
-    success = rhs ? export_and_test(rhs, argc, argv) && success : success;
+    bool success = mat ? export_and_test(mat, argc, argv_local) : true;
+    success = rhs ? export_and_test(rhs, argc, argv_local) && success : success;
 
     if(success)
     {
