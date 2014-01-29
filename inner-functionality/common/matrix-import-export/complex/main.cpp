@@ -36,41 +36,30 @@ bool export_and_test_matrix(Matrix<complex>* mat, int argc, char *argv[])
     if(i == 0)
     {
       sprintf(s, "Complex_Matrix_%s_plain.mat", argv[1]);
-      mat->export_to_file(s, "matrix", EXPORT_FORMAT_PLAIN_ASCII);
+      mat->export_to_file(s, "A", EXPORT_FORMAT_PLAIN_ASCII);
     }
 
     if(i == 1)
     {
       sprintf(s, "Complex_Matrix_%s_market.mat", argv[1]);
-      mat->export_to_file(s, "matrix", EXPORT_FORMAT_MATRIX_MARKET);
+      mat->export_to_file(s, "A", EXPORT_FORMAT_MATRIX_MARKET);
     }
 
     if(i == 2)
     {
 #ifdef WITH_MATIO
       sprintf(s, "Complex_Matrix_%s_matio.mat", argv[1]);
-      mat->export_to_file(s, "matrix", EXPORT_FORMAT_MATLAB_MATIO);
+      mat->export_to_file(s, "A", EXPORT_FORMAT_MATLAB_MATIO);
       mat->free();
 
       mat->import_from_file(s, "A", EXPORT_FORMAT_MATLAB_MATIO);
-      sprintf(s2, "Real_%s_%s_matio2.dat", argv[1], argv[2]);
+      sprintf(s2, "Real_%s_matio2.dat", argv[1]);
       mat->export_to_file(s2, "A", EXPORT_FORMAT_MATLAB_MATIO);
       success = Testing::compare_files(s, s2) && success;
 #else
       break;
 #endif
     }
-
-    if (success && i != 2)
-    {
-      char* test_s = new char[1000];
-#ifdef WIN32
-      sprintf(test_s, "win\\%s_stored", s);
-#else
-      sprintf(test_s, "linux/%s_stored", s);
-#endif
-      success = Testing::compare_files(s, test_s) && success;
-    } 
   }
 
   return success;
@@ -103,25 +92,14 @@ bool export_and_test_vector(Vector<complex>* vec, int argc, char *argv[])
       vec->export_to_file(s, "rhs", EXPORT_FORMAT_MATLAB_MATIO);
       vec->free();
 
-      vec->import_from_file(s, "A", EXPORT_FORMAT_MATLAB_MATIO);
+      vec->import_from_file(s, "rhs", EXPORT_FORMAT_MATLAB_MATIO);
       sprintf(s2, "Real_%s_%s_matio2.dat", argv[1], argv[2]);
-      vec->export_to_file(s2, "A", EXPORT_FORMAT_MATLAB_MATIO);
+      vec->export_to_file(s2, "rhs", EXPORT_FORMAT_MATLAB_MATIO);
       success = Testing::compare_files(s, s2) && success;
 #else
       break;
 #endif
     }
-
-    if(success && i != 2)
-    {
-      char* test_s = new char[1000];
-#ifdef WIN32
-      sprintf(test_s, "win\\%s_stored", s);
-#else
-      sprintf(test_s, "linux/%s_stored", s);
-#endif
-      success = Testing::compare_files(s, test_s) && success;
-    } 
   }
 
   return success;
@@ -296,6 +274,17 @@ int main(int argc, char *argv[])
   int n;
   int nnz;
 
+  char* argv_local[2];
+  if(argc < 2)
+  {
+      argv_local[1] = new char[20];
+      sprintf(argv_local[1], "mumps");
+  }
+  else
+  {
+      argv_local[1] = argv[1];
+  }
+
   std::map<unsigned int, MatrixEntry> ar_mat;
   std::map<unsigned int, complex> ar_rhs;
   complex* sln;
@@ -306,70 +295,70 @@ int main(int argc, char *argv[])
   SparseMatrix<complex> *mat = nullptr;
   Vector<complex> *rhs = nullptr;
 
-  if(strcasecmp(argv[1], "petsc") == 0) {
+  if(strcasecmp(argv_local[1], "petsc") == 0) {
 #ifdef WITH_PETSC
     mat = new PetscMatrix<complex>;
     rhs = new PetscVector<complex>;
     build_matrix(n, ar_mat, ar_rhs, mat, rhs);
 #endif
   }
-  else if(strcasecmp(argv[1], "petsc_block") == 0) {
+  else if(strcasecmp(argv_local[1], "petsc_block") == 0) {
 #ifdef WITH_PETSC
     mat = new PetscMatrix<complex>;
     rhs = new PetscVector<complex>;
     build_matrix_block(n, ar_mat, ar_rhs, mat, rhs);
 #endif
   }
-  else if(strcasecmp(argv[1], "umfpack") == 0) {
+  else if(strcasecmp(argv_local[1], "umfpack") == 0) {
 #ifdef WITH_UMFPACK
     mat = new  CSCMatrix<complex>;
     rhs = new SimpleVector<complex>;
     build_matrix(n, ar_mat, ar_rhs, mat, rhs);
 #endif
   }
-  else if(strcasecmp(argv[1], "umfpack_block") == 0) {
+  else if(strcasecmp(argv_local[1], "umfpack_block") == 0) {
 #ifdef WITH_UMFPACK
     mat = new CSCMatrix<complex>;
     rhs = new SimpleVector<complex>;
     build_matrix_block(n, ar_mat, ar_rhs, mat, rhs);
 #endif
   }
-  else if(strcasecmp(argv[1], "aztecoo") == 0) {
+  else if(strcasecmp(argv_local[1], "aztecoo") == 0) {
 #ifdef WITH_TRILINOS
     mat = new EpetraMatrix<complex>;
     rhs = EpetraVector<complex>;
     build_matrix(n, ar_mat, ar_rhs, mat, rhs);
 #endif
   }
-  else if(strcasecmp(argv[1], "aztecoo_block") == 0) {
+  else if(strcasecmp(argv_local[1], "aztecoo_block") == 0) {
 #ifdef WITH_TRILINOS
     mat = new EpetraMatrix<complex>;
     rhs = new EpetraVector<complex>;
     build_matrix_block(n, ar_mat, ar_rhs, mat, rhs);
 #endif
   }
-  else if(strcasecmp(argv[1], "amesos") == 0) {
+  else if(strcasecmp(argv_local[1], "amesos") == 0) {
 #ifdef WITH_TRILINOS
     mat = new EpetraMatrix<complex>;
     rhs = new EpetraVector<complex>;
     build_matrix(n, ar_mat, ar_rhs, mat, rhs);
 #endif
   }
-  else if(strcasecmp(argv[1], "amesos_block") == 0) {
+  else if(strcasecmp(argv_local[1], "amesos_block") == 0) {
 #ifdef WITH_TRILINOS
     mat = new EpetraMatrix<complex>;
     rhs = new EpetraVector<complex>;
     build_matrix_block(n, ar_mat, ar_rhs, mat, rhs);
 #endif
   }
-  else if(strcasecmp(argv[1], "mumps") == 0) {
+  else if(strcasecmp(argv_local[1], "mumps") == 0) {
 #ifdef WITH_MUMPS
     mat = new MumpsMatrix<complex>;
     rhs = new SimpleVector<complex>;
     build_matrix(n, ar_mat, ar_rhs, mat, rhs);
 #endif
   }
-  else if(strcasecmp(argv[1], "mumps_block") == 0) {
+  else if(strcasecmp(argv_local[1], "mumps_block") == 0) {
 #ifdef WITH_MUMPS
     mat = new MumpsMatrix<complex>;
     rhs = new SimpleVector<complex>;
@@ -377,10 +366,9 @@ int main(int argc, char *argv[])
 #endif
   }
 
-  if(mat || rhs)
+  if(mat && rhs)
   {
-    bool success = mat ? export_and_test_matrix(mat, argc, argv) : true;
-    success = rhs ? export_and_test_vector(rhs, argc, argv) && success : success;
+    bool success = export_and_test_matrix(mat, argc, argv_local) && export_and_test_vector(rhs, argc, argv_local);
 
     if(success)
     {

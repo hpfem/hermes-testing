@@ -226,7 +226,7 @@ bool export_and_test(AlgebraicEntity* ent, int argc, char *argv_local[])
   return success;
 }
 
-int main(int argc, char *argv_local[])
+int main(int argc, char *argv[])
 {
   int n;
   int nnz;
@@ -234,22 +234,22 @@ int main(int argc, char *argv_local[])
   std::map<unsigned int, MatrixEntry> ar_mat;
   std::map<unsigned int, double > ar_rhs;
 
-  char* argv_local_local[3];
+  char* argv_local[3];
   if(argc < 2)
   {
-      argv_local_local[1] = new char[20];
-      sprintf(argv_local_local[1], "mumps");
-      argv_local_local[2] = new char[1];
-      sprintf(argv_local_local[2], "1");
+      argv_local[1] = new char[20];
+      sprintf(argv_local[1], "mumps");
+      argv_local[2] = new char[1];
+      sprintf(argv_local[2], "1");
   }
   else
   {
-      argv_local_local[1] = argv_local[1];
-      argv_local_local[2] = argv_local[2];
+      argv_local[1] = argv[1];
+      argv_local[2] = argv[2];
   }
 
   double* sln = nullptr;
-  switch (atoi(argv_local_local[2]))
+  switch (atoi(argv_local[2]))
   {
   case 1:
     if(read_matrix_and_rhs((char*)"in/linsys-1", n, nnz, ar_mat, ar_rhs) != 0)
