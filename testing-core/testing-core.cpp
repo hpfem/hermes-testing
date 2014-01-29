@@ -92,7 +92,7 @@ namespace Hermes
         std::streamsize lReadBytesCount = 0;
         std::streamsize rReadBytesCount = 0;
 
-        int bufferSize = 100;
+        const int bufferSize = 100;
         char p_lBuffer[bufferSize];
         char p_rBuffer[bufferSize];
 

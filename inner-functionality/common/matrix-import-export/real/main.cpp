@@ -186,7 +186,7 @@ void build_matrix_block(int n, std::map<unsigned int, MatrixEntry> &ar_mat, std:
 }
 
 template<typename AlgebraicEntity>
-bool export_and_test(AlgebraicEntity* ent, int argc, char *argv[])
+bool export_and_test(AlgebraicEntity* ent, int argc, char *argv_local[])
 {
   bool success = true;
   char* s = new char[1000];
@@ -196,25 +196,25 @@ bool export_and_test(AlgebraicEntity* ent, int argc, char *argv[])
   {
     if(i == 0)
     {
-      sprintf(s, "Real_%s_%s_plain.dat", argv[1], argv[2]);
+      sprintf(s, "Real_%s_%s_plain.dat", argv_local[1], argv_local[2]);
       ent->export_to_file(s, "A", EXPORT_FORMAT_PLAIN_ASCII);
     }
 
     if(i == 1)
     {
-      sprintf(s, "Real_%s_%s_market.dat", argv[1], argv[2]);
+      sprintf(s, "Real_%s_%s_market.dat", argv_local[1], argv_local[2]);
       ent->export_to_file(s, "A", EXPORT_FORMAT_MATRIX_MARKET);
     }
 
     if(i == 2)
     {
 #ifdef WITH_MATIO
-      sprintf(s, "Real_%s_%s_matio.dat", argv[1], argv[2]);
+      sprintf(s, "Real_%s_%s_matio.dat", argv_local[1], argv_local[2]);
       ent->export_to_file(s, "A", EXPORT_FORMAT_MATLAB_MATIO);
       ent->free();
 
       ent->import_from_file(s, "A", EXPORT_FORMAT_MATLAB_MATIO);
-      sprintf(s2, "Real_%s_%s_matio2.dat", argv[1], argv[2]);
+      sprintf(s2, "Real_%s_%s_matio2.dat", argv_local[1], argv_local[2]);
       ent->export_to_file(s2, "A", EXPORT_FORMAT_MATLAB_MATIO);
       success = Testing::compare_files(s, s2) && success;
 #else
@@ -226,7 +226,7 @@ bool export_and_test(AlgebraicEntity* ent, int argc, char *argv[])
   return success;
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char *argv_local[])
 {
   int n;
   int nnz;
@@ -234,21 +234,22 @@ int main(int argc, char *argv[])
   std::map<unsigned int, MatrixEntry> ar_mat;
   std::map<unsigned int, double > ar_rhs;
 
-  char* argv_local[3];
+  char* argv_local_local[3];
   if(argc < 2)
   {
-      argv_local[1] = new char[20];
-      sprintf(argv_local[1], "mumps");
-      argv_local[2] = new char[1];
-      sprintf(argv_local[2], "1");
+      argv_local_local[1] = new char[20];
+      sprintf(argv_local_local[1], "mumps");
+      argv_local_local[2] = new char[1];
+      sprintf(argv_local_local[2], "1");
   }
   else
   {
-      argv_local[1] = argv[1];
-      argv_local[2] = argv[2];
+      argv_local_local[1] = argv_local[1];
+      argv_local_local[2] = argv_local[2];
   }
 
-  switch(atoi(argv_local[2]))
+  double* sln = nullptr;
+  switch (atoi(argv_local_local[2]))
   {
   case 1:
     if(read_matrix_and_rhs((char*)"in/linsys-1", n, nnz, ar_mat, ar_rhs) != 0)
@@ -266,85 +267,205 @@ int main(int argc, char *argv[])
 
   SparseMatrix<double> *mat = nullptr;
   Vector<double> *rhs = nullptr;
-  if(strcasecmp(argv_local[1], "petsc") == 0) {
+  if (strcasecmp(argv_local[1], "petsc") == 0) {
 #ifdef WITH_PETSC
-    mat = new PetscMatrix<double>;
-    rhs = new PetscVector<double>;
-    build_matrix(n, ar_mat, ar_rhs, mat, rhs);
+    PetscMatrix<double> mat;
+    PetscVector<double> rhs;
+    build_matrix(n, ar_mat, ar_rhs, &mat, &rhs);
+
+    PetscLinearMatrixSolver<double> solver(&mat, &rhs);
+    solver.solve();
+    sln = new double[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(double));
 #endif
   }
-  else if(strcasecmp(argv_local[1], "petsc_block") == 0) {
+  else if(strcasecmp(argv_local[1], "petsc-block") == 0) {
 #ifdef WITH_PETSC
-    mat = new PetscMatrix<double>;
-    rhs = new PetscVector<double>;
-    build_matrix_block(n, ar_mat, ar_rhs, mat, rhs);
+    PetscMatrix<double> mat;
+    PetscVector<double> rhs;
+    build_matrix_block(n, ar_mat, ar_rhs, &mat, &rhs);
+
+    PetscLinearMatrixSolver<double> solver(&mat, &rhs);
+    solver.solve();
+    sln = new double[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(double));
 #endif
   }
-  else if(strcasecmp(argv_local[1], "umfpack") == 0) {
+  else if (strcasecmp(argv_local[1], "umfpack") == 0) {
 #ifdef WITH_UMFPACK
-    mat = new CSCMatrix<double>;
-    rhs = new SimpleVector<double>;
-    build_matrix(n, ar_mat, ar_rhs, mat, rhs);
+    CSCMatrix<double> mat;
+    SimpleVector<double> rhs;
+    build_matrix(n, ar_mat, ar_rhs, &mat, &rhs);
+
+    UMFPackLinearMatrixSolver<double> solver(&mat, &rhs);
+    solver.solve();
+    sln = new double[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(double));
 #endif
   }
-  else if(strcasecmp(argv_local[1], "umfpack_block") == 0) {
+  else if (strcasecmp(argv_local[1], "umfpack-block") == 0) {
 #ifdef WITH_UMFPACK
-    mat = new CSCMatrix<double>;
-    rhs = new SimpleVector<double>;
-    build_matrix_block(n, ar_mat, ar_rhs, mat, rhs);
+    CSCMatrix<double> mat;
+    SimpleVector<double> rhs;
+    build_matrix_block(n, ar_mat, ar_rhs, &mat, &rhs);
+
+    UMFPackLinearMatrixSolver<double> solver(&mat, &rhs);
+    mat.export_to_file("matrix", "A", MatrixExportFormat::EXPORT_FORMAT_PLAIN_ASCII);
+    rhs.export_to_file("vector", "b", MatrixExportFormat::EXPORT_FORMAT_PLAIN_ASCII);
+    solver.solve();
+    sln = new double[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(double));
 #endif
   }
-  else if(strcasecmp(argv_local[1], "aztecoo") == 0) {
+  else if(strcasecmp(argv_local[1], "paralution") == 0) {
+#ifdef WITH_PARALUTION
+    ParalutionMatrix<double> mat;
+    ParalutionVector<double> rhs;
+    build_matrix(n, ar_mat, ar_rhs, &mat, &rhs);
+
+    Hermes::Solvers::IterativeParalutionLinearMatrixSolver<double> solver(&mat, &rhs);
+    if(atoi(argv_local[2]) != 1)
+      solver.set_solver_type(BiCGStab);
+    solver.set_precond(new ParalutionPrecond<double>(ILU));
+    // Tested as of 13th August 2013.
+    solver.set_max_iters(atoi(argv_local[2]) == 1 ? 1 : atoi(argv_local[2]) == 2 ? 2 : 5);
+    solver.solve();
+    sln = new double[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(double));
+#endif
+  }
+  else if(strcasecmp(argv_local[1], "paralution-block") == 0) {
+#ifdef WITH_PARALUTION
+    ParalutionMatrix<double> mat;
+    ParalutionVector<double> rhs;
+    build_matrix_block(n, ar_mat, ar_rhs, &mat, &rhs);
+
+    Hermes::Solvers::IterativeParalutionLinearMatrixSolver<double> solver(&mat, &rhs);
+    solver.set_precond(new ParalutionPrecond<double>(ILU));
+    solver.set_max_iters(10000);
+    solver.solve();
+    sln = new double[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(double));
+#endif
+  }
+  else if (strcasecmp(argv_local[1], "superlu") == 0) {
+#ifdef WITH_SUPERLU
+    CSCMatrix<double> mat;
+    SimpleVector<double> rhs;
+    build_matrix(n, ar_mat, ar_rhs, &mat, &rhs);
+
+    Hermes::Solvers::SuperLUSolver<double> solver(&mat, &rhs);
+    solver.solve();
+    sln = new double[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(double));
+#endif
+  }
+  else if (strcasecmp(argv_local[1], "superlu-block") == 0) {
+#ifdef WITH_SUPERLU
+    CSCMatrix<double> mat;
+    SimpleVector<double> rhs;
+    build_matrix_block(n, ar_mat, ar_rhs, &mat, &rhs);
+
+    Hermes::Solvers::SuperLUSolver<double> solver(&mat, &rhs);
+    solver.solve();
+    sln = new double[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(double));
+#endif
+  }
+  else if (strcasecmp(argv_local[1], "aztecoo") == 0) {
 #ifdef WITH_TRILINOS
-    mat = new EpetraMatrix<double>;
-    rhs = new EpetraVector<double>;
-    build_matrix(n, ar_mat, ar_rhs, mat, rhs);
+    EpetraMatrix<double> mat;
+    EpetraVector<double> rhs;
+    build_matrix(n, ar_mat, ar_rhs, &mat, &rhs);
+
+    AztecOOSolver<double> solver(&mat, &rhs);
+    solver.solve();
+    sln = new double[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(double));
 #endif
   }
-  else if(strcasecmp(argv_local[1], "aztecoo_block") == 0) {
+  else if (strcasecmp(argv_local[1], "aztecoo-block") == 0) {
 #ifdef WITH_TRILINOS
-    mat = new EpetraMatrix<double>;
-    rhs = new EpetraVector<double>;
-    build_matrix_block(n, ar_mat, ar_rhs, mat, rhs);
+    EpetraMatrix<double> mat;
+    EpetraVector<double> rhs;
+    build_matrix_block(n, ar_mat, ar_rhs, &mat, &rhs);
+
+    AztecOOSolver<double> solver(&mat, &rhs);
+    solver.solve();
+    sln = new double[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(double));
 #endif
   }
-  else if(strcasecmp(argv_local[1], "amesos") == 0) {
+  else if (strcasecmp(argv_local[1], "amesos") == 0) {
 #ifdef WITH_TRILINOS
-    mat = new EpetraMatrix<double>;
-    rhs = new EpetraVector<double>;
-    build_matrix(n, ar_mat, ar_rhs, mat, rhs);
-  }
+    EpetraMatrix<double> mat;
+    EpetraVector<double> rhs;
+    build_matrix(n, ar_mat, ar_rhs, &mat, &rhs);
+
+    if (AmesosSolver<double>::is_available("Klu")) {
+      AmesosSolver<double> solver("Klu", &mat, &rhs);
+      solver.solve();
+      sln = new double[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(double));
+    }
 #endif
-}
-  else if(strcasecmp(argv_local[1], "amesos_block") == 0) {
+  }
+  else if (strcasecmp(argv_local[1], "amesos-block") == 0) {
 #ifdef WITH_TRILINOS
-    mat = new EpetraMatrix<double>;
-    rhs = new EpetraVector<double>;
-    build_matrix_block(n, ar_mat, ar_rhs, mat, rhs);
-  }
+    EpetraMatrix<double> mat;
+    EpetraVector<double> rhs;
+    build_matrix_block(n, ar_mat, ar_rhs, &mat, &rhs);
+
+    if (AmesosSolver<double>::is_available("Klu")) {
+      AmesosSolver<double> solver("Klu", &mat, &rhs);
+      solver.solve();
+      sln = new double[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(double));
+    }
 #endif
   }
-  else if(strcasecmp(argv_local[1], "mumps") == 0) {
+  else if (strcasecmp(argv_local[1], "mumps") == 0) {
 #ifdef WITH_MUMPS
-    mat = new MumpsMatrix<double>;
-    rhs = new SimpleVector<double>;
-    build_matrix(n, ar_mat, ar_rhs, mat, rhs);
+    MumpsMatrix<double> mat;
+    SimpleVector<double> rhs;
+    build_matrix(n, ar_mat, ar_rhs, &mat, &rhs);
+
+    MumpsSolver<double> solver(&mat, &rhs);
+    solver.solve();
+    sln = new double[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(double));
 #endif
   }
-  else if(strcasecmp(argv_local[1], "mumps_block") == 0) {
+  else if (strcasecmp(argv_local[1], "mumps-block") == 0) {
 #ifdef WITH_MUMPS
-    mat = new MumpsMatrix<double>;
-    rhs = new SimpleVector<double>;
-    build_matrix_block(n, ar_mat, ar_rhs, mat, rhs);
+    MumpsMatrix<double> mat;
+    SimpleVector<double> rhs;
+    build_matrix_block(n, ar_mat, ar_rhs, &mat, &rhs);
+
+    MumpsSolver<double> solver(&mat, &rhs);
+    solver.solve();
+    sln = new double[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(double));
 #endif
   }
 
-  if(mat || rhs)
+  bool success = mat ? export_and_test(mat, argc, argv_local) : true;
+  success = rhs ? export_and_test(rhs, argc, argv_local) && success : success;
+  
+  if (sln)
   {
-    bool success = mat ? export_and_test(mat, argc, argv_local) : true;
-    success = rhs ? export_and_test(rhs, argc, argv_local) && success : success;
+    switch (atoi(argv_local[2]))
+    {
+    case 1:
+      success = Testing::test_value(sln[0], 4, "sln[0]", 1E-6) && success;
+      success = Testing::test_value(sln[1], 2, "sln[1]", 1E-6) && success;
+      success = Testing::test_value(sln[2], 3, "sln[2]", 1E-6) && success;
+      break;
+    case 2:
+      success = Testing::test_value(sln[0], 2, "sln[0]", 1E-6) && success;
+      success = Testing::test_value(sln[1], 3, "sln[1]", 1E-6) && success;
+      success = Testing::test_value(sln[2], 1, "sln[2]", 1E-6) && success;
+      success = Testing::test_value(sln[3], -3, "sln[3]", 1E-6) && success;
+      success = Testing::test_value(sln[4], -1, "sln[4]", 1E-6) && success;
+      break;
+    case 3:
+      success = Testing::test_value(sln[0], 1, "sln[0]", 1E-6) && success;
+      success = Testing::test_value(sln[1], 2, "sln[1]", 1E-6) && success;
+      success = Testing::test_value(sln[2], 3, "sln[2]", 1E-6) && success;
+      success = Testing::test_value(sln[3], 4, "sln[3]", 1E-6) && success;
+      success = Testing::test_value(sln[4], 5, "sln[4]", 1E-6) && success;
+      break;
+    }
 
-    if(success)
+    delete[] sln;
+
+    if (success)
     {
 
       printf("Success!\n");
@@ -354,7 +475,7 @@ int main(int argc, char *argv[])
     {
       printf("Failure!\n");
       return -1;
-    } 
+    }
   }
   else
     return 0;
