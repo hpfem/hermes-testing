@@ -42,6 +42,22 @@ project(hermes_testing)
 
     set(RELEASE_FLAGS "-DNDEBUG -O3")
     set(DEBUG_FLAGS   "-g")
+    
+    # look for libbfd
+    find_library( BFD_LIBRARY  NAMES bfd libbfd bfd-2.23.2-system PATH /usr/lib /usr/lib64 )
+
+    include(CheckCSourceCompiles)
+    check_c_source_compiles(
+    "#include <bfd.h>
+    int main(void) {
+    return 0;
+    } " BFD_WORKS)
+
+    if (BFD_LIBRARY AND BFD_WORKS)
+      set( HAVE_BFD YES )
+    else()
+      set(BFD_LIBRARY "")
+    endif()    
   endif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 
   # This overrides CXX flags for MSVC
