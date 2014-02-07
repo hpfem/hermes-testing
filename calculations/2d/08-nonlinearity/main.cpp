@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
   // Perform Newton's iteration.
   try
   {
-    newton.solve(coeff_vec);
+    //newton.solve(coeff_vec);
   }
   catch(std::exception& e)
   {
@@ -84,12 +84,46 @@ int main(int argc, char* argv[])
     return -1;
   }
 
-  // Translate the resulting coefficient vector into a Solution.
-  MeshFunctionSharedPtr<double> sln(new Solution<double>);
-  Solution<double>::vector_to_solution(newton.get_sln_vector(), space, sln);
+  NewtonSolver<double> newtonAnd(&dp);
+  newtonAnd.set_manual_damping_coeff(true, 0.7);
+  newtonAnd.set_max_steps_with_reused_jacobian(0);
+  newtonAnd.set_tolerance(1e1, Hermes::Solvers::ResidualNormAbsolute, true);
+  newtonAnd.set_tolerance(1e-1, Hermes::Solvers::ResidualNormRatioToInitial, true);
+  try
+  {
+    newtonAnd.solve(coeff_vec);
+  }
+  catch (std::exception& e)
+  {
+    std::cout << e.what();
+    printf("Failure!\n");
+    return -1;
+  }
+
+  NewtonSolver<double> newtonOr(&dp);
+  newtonOr.set_manual_damping_coeff(true, 0.7);
+  newtonOr.set_max_steps_with_reused_jacobian(0);
+  newtonOr.set_tolerance(1e1, Hermes::Solvers::ResidualNormAbsolute, false);
+  newtonOr.set_tolerance(1e-1, Hermes::Solvers::ResidualNormRatioToInitial, false);
+  try
+  {
+    newtonOr.solve(coeff_vec);
+  }
+  catch (std::exception& e)
+  {
+    std::cout << e.what();
+    printf("Failure!\n");
+    return -1;
+  }
 
   // Clean up.
   delete [] coeff_vec;
+
+  if (newtonAnd.get_num_iters() != 19 || newtonOr.get_num_iters() != 11)
+  {
+    printf("Failure!\n");
+    return -1;
+  }
 
   printf("Success!\n");
   return 0;
