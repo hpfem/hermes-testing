@@ -4,6 +4,8 @@ project(hermes_testing)
   set(CMAKE_MODULE_PATH ${CMAKE_HOME_DIRECTORY}/cmake)
   include(CommonTargetProperties)
 
+  #SET(NO_VALGRIND_TESTS YES)
+  
   # For Win64
   if(${CMAKE_CL_64})
     set(WIN64 YES)
