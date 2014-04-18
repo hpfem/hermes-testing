@@ -14,20 +14,28 @@ project(hermes_testing)
   endif(${CMAKE_CL_64})
 
   # This has to be the same as in the library's CMake.
-  # Default "yes"
   set(H2D_WITH_GLUT YES)
-  set(WITH_TC_MALLOC YES)
-  set(WITH_PARALUTION YES)
+  # TC_MALLOC
+  set(WITH_TC_MALLOC NO)
+  # BSON 
+  set(WITH_BSON NO)
+  # MATIO
+  set(WITH_MATIO NO)
+  set(MATIO_WITH_HDF5 NO)
+  # UMFPACK
   set(WITH_UMFPACK YES)
+  # PARALUTION
+  set(WITH_PARALUTION NO)
+  # MUMPS
+  set(WITH_MUMPS              NO)
+  # Trilinos
+  set(WITH_TRILINOS           NO)
+  set(WITH_SUPERLU NO)
+  ### Mesh format ###
+  set(WITH_EXODUSII           NO)
+  set(WITH_HDF5               NO)
   set(WITH_OPENMP YES)
   set(WITH_PJLIB               NO)
-    
-  # Default "no"
-  set(WITH_EXODUSII NO)
-  set(WITH_MUMPS NO)
-  set(WITH_MATIO NO)
-  set(WITH_BSON NO)
-  set(WITH_SUPERLU NO)
 
   # Where to look for the static libraries.
   set(HERMES_DIRECTORY /usr/local/lib)
