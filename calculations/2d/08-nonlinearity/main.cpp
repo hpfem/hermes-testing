@@ -42,6 +42,8 @@ int main(int argc, char* argv[])
 
   // Initialize the FE problem.
   DiscreteProblem<double> dp(&wf, space);
+  DiscreteProblem<double> dpOr(&wf, space);
+  DiscreteProblem<double> dpAnd(&wf, space);
 
   // Project the initial condition on the FE space to obtain initial 
   // coefficient vector for the Newton's method.
@@ -75,7 +77,7 @@ int main(int argc, char* argv[])
   // Perform Newton's iteration.
   try
   {
-    //newton.solve(coeff_vec);
+    newton.solve(coeff_vec);
   }
   catch(std::exception& e)
   {
@@ -84,7 +86,7 @@ int main(int argc, char* argv[])
     return -1;
   }
 
-  NewtonSolver<double> newtonAnd(&dp);
+  NewtonSolver<double> newtonAnd(&dpAnd);
   newtonAnd.set_manual_damping_coeff(true, 0.7);
   newtonAnd.set_max_steps_with_reused_jacobian(0);
   newtonAnd.set_tolerance(1e1, Hermes::Solvers::ResidualNormAbsolute, true);
@@ -100,7 +102,7 @@ int main(int argc, char* argv[])
     return -1;
   }
 
-  NewtonSolver<double> newtonOr(&dp);
+  NewtonSolver<double> newtonOr(&dpOr);
   newtonOr.set_manual_damping_coeff(true, 0.7);
   newtonOr.set_max_steps_with_reused_jacobian(0);
   newtonOr.set_tolerance(1e1, Hermes::Solvers::ResidualNormAbsolute, false);
