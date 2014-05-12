@@ -33,21 +33,21 @@ int main(int argc, char* argv[])
   SpaceSharedPtr<double> spaceTemperature(new H1Space<double>(meshVertical, &bcsTemperature, P_INIT));
   SpaceSharedPtr<double> spaceAdvectionDiffusion(new H1Space<double>(meshHorizontal, &bcsAdvectionDiffusion, P_INIT));
   
-  CustomWeakForm wf("Top Left");
+  WeakFormSharedPtr<double> wf(new CustomWeakForm("Top Left"));
 
   MeshFunctionSharedPtr<double> slnTemp(new ZeroSolution<double>(meshVertical));
   MeshFunctionSharedPtr<double> slnAdv(new Solution<double>(meshHorizontal));
 
-  wf.set_ext(slnTemp);
+  wf->set_ext(slnTemp);
 
   std::vector<SpaceSharedPtr<double> > spaces({spaceTemperature, spaceAdvectionDiffusion});
-  LinearSolver<double> solver(&wf, spaces);
+  LinearSolver<double> solver(wf, spaces);
   for(int step = 0; step <= 1; step++)
   {
     try
     {
       solver.solve();
-      Solution<double>::vector_to_solutions(solver.get_sln_vector(), std::vector<SpaceSharedPtr<double> >({spaceTemperature, spaceAdvectionDiffusion}), std::vector<MeshFunctionSharedPtr<double> >(slnTemp, slnAdv));
+      Solution<double>::vector_to_solutions(solver.get_sln_vector(), { spaceTemperature, spaceAdvectionDiffusion }, {slnTemp, slnAdv});
     }
     catch(std::exception& e)
     {

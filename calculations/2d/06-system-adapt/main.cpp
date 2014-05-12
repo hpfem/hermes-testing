@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
   CustomRightHandSide2 g2(K, D_v);
 
   // Initialize the weak formulation.
-  CustomWeakForm wf(&g1, &g2);
+  WeakFormSharedPtr<double> wf(new CustomWeakForm(&g1, &g2));
 
   // Initialize boundary conditions
   DefaultEssentialBCConst<double> bc_u("Bdy", 0.0);
@@ -84,7 +84,7 @@ int main(int argc, char* argv[])
 
   NewtonSolver<double> newton;
   newton.set_max_steps_with_reused_jacobian(0);
-  newton.set_weak_formulation(&wf);
+  newton.set_weak_formulation(wf);
 
   // Adaptivity loop:
   int as = 1;
@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
     Space<double>::ReferenceSpaceCreator v_ref_space_creator(v_space, MULTI ? v_ref_mesh : u_ref_mesh);
     SpaceSharedPtr<double> v_ref_space = v_ref_space_creator.create_ref_space();
 
-    std::vector<SpaceSharedPtr<double> > ref_spaces_const({u_ref_space, v_ref_space});
+    std::vector<SpaceSharedPtr<double> > ref_spaces_const({ u_ref_space, v_ref_space });
 
     newton.set_spaces(ref_spaces_const);
 
@@ -113,20 +113,20 @@ int main(int argc, char* argv[])
     {
       newton.solve();
     }
-    catch(Hermes::Exceptions::Exception& e)
+    catch (Hermes::Exceptions::Exception& e)
     {
       std::cout << e.what();
     }
-    catch(std::exception& e)
+    catch (std::exception& e)
     {
       std::cout << e.what();
     }
 
     // Translate the resulting coefficient vector into the instance of Solution.
-    Solution<double>::vector_to_solutions(newton.get_sln_vector(), ref_spaces_const, std::vector<MeshFunctionSharedPtr<double> >(u_ref_sln, v_ref_sln));
+    Solution<double>::vector_to_solutions(newton.get_sln_vector(), ref_spaces_const, { u_ref_sln, v_ref_sln });
 
     // Project the fine mesh solution onto the coarse mesh.
-    OGProjection<double> ogProjection; ogProjection.project_global(std::vector<SpaceSharedPtr<double> >(u_space, v_space), ref_slns, slns);
+    OGProjection<double>::project_global({ u_space, v_space }, ref_slns, slns);
 
     // Calculate element errors.
     errorCalculator.calculate_errors(slns, exact_slns, false);
@@ -135,7 +135,7 @@ int main(int argc, char* argv[])
     errorCalculator.calculate_errors(slns, ref_slns, true);
     double err_est_rel_total = errorCalculator.get_total_error_squared() * 100;
 
-    adaptivity.set_spaces(std::vector<SpaceSharedPtr<double> >(u_space, v_space));
+    adaptivity.set_spaces({u_space, v_space});
 
     // If err_est too large, adapt the mesh->
     if (err_est_rel_total < ERR_STOP)

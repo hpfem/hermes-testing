@@ -50,12 +50,12 @@ int main(int argc, char* argv[])
   }
 
   // Perform initial mesh refinements (optional).
-  mesh->refine_in_areas(std::vector<std::string>("Aluminum", "Copper"), INIT_REF_NUM);
+  mesh->refine_in_areas({ "Aluminum", "Copper" }, INIT_REF_NUM);
   mesh->refine_in_area("Aluminum");
 
   // Initialize the weak formulation.
-  CustomWeakFormPoisson wf("Aluminum", new Hermes::Hermes1DFunction<double>(LAMBDA_AL), "Copper",
-    new Hermes::Hermes1DFunction<double>(LAMBDA_CU), new Hermes::Hermes2DFunction<double>(-VOLUME_HEAT_SRC));
+  WeakFormSharedPtr<double> wf(new CustomWeakFormPoisson("Aluminum", new Hermes::Hermes1DFunction<double>(LAMBDA_AL), "Copper",
+    new Hermes::Hermes1DFunction<double>(LAMBDA_CU), new Hermes::Hermes2DFunction<double>(-VOLUME_HEAT_SRC)));
 
   // Initialize essential boundary conditions.
   DefaultEssentialBCConst<double> bc_essential(std::vector<std::string>({ "Bottom", "Inner", "Outer", "Left" }),
@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
   MeshFunctionSharedPtr<double> sln(new Solution<double>());
 
   // Initialize linear solver.
-  LinearSolver<double> linear_solver(&wf, space);
+  LinearSolver<double> linear_solver(wf, space);
 
   // Solve the linear problem.
   try
