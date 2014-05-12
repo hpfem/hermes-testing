@@ -51,10 +51,10 @@ int main(int argc, char* argv[])
   MeshFunctionSharedPtr<double> sln(new Solution<double>);
 
   // Testing is happening here.
-  Hermes::vector<int> numbers_of_nonlinear_iterations;
-  Hermes::vector<int> numbers_of_linear_iterations_in_last_nonlinear_step;
+  std::vector<int> numbers_of_nonlinear_iterations;
+  std::vector<int> numbers_of_linear_iterations_in_last_nonlinear_step;
   // Iterative - original initial guess.
-  HermesCommonApi.set_integral_param_value(matrixSolverType, SOLVER_PARALUTION_ITERATIVE);
+  HermesCommonApi.set_integral_param_value({matrixSolverType, SOLVER_PARALUTION_ITERATIVE});
   {
     // Initialize Newton solver.
     NewtonSolver<double> newton(&wf, space);

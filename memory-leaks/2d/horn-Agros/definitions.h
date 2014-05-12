@@ -19,6 +19,6 @@ public:
 
   ~CustomWeakFormAcoustics();
 
-  Hermes::vector<Hermes1DFunction<complex>*> fns_1d;
-  Hermes::vector<Hermes2DFunction<complex>*> fns_2d;
+  std::vector<Hermes1DFunction<complex>*> fns_1d;
+  std::vector<Hermes2DFunction<complex>*> fns_2d;
 };

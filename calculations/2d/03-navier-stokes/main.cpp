@@ -73,9 +73,9 @@ int main(int argc, char* argv[])
   
   // Initialize boundary conditions.
   EssentialBCNonConst bc_left_vel_x(BDY_LEFT, VEL_INLET, H, STARTUP_TIME);
-  DefaultEssentialBCConst<double> bc_other_vel_x(Hermes::vector<std::string>(BDY_BOTTOM, BDY_TOP, BDY_OBSTACLE), 0.0);
-  EssentialBCs<double> bcs_vel_x(Hermes::vector<EssentialBoundaryCondition<double> *>(&bc_left_vel_x, &bc_other_vel_x));
-  DefaultEssentialBCConst<double> bc_vel_y(Hermes::vector<std::string>(BDY_LEFT, BDY_BOTTOM, BDY_TOP, BDY_OBSTACLE), 0.0);
+  DefaultEssentialBCConst<double> bc_other_vel_x(std::vector<std::string>({BDY_BOTTOM, BDY_TOP, BDY_OBSTACLE}), 0.0);
+  EssentialBCs<double> bcs_vel_x(std::vector<EssentialBoundaryCondition<double> *>({&bc_left_vel_x, &bc_other_vel_x}));
+  DefaultEssentialBCConst<double> bc_vel_y(std::vector<std::string>({BDY_LEFT, BDY_BOTTOM, BDY_TOP, BDY_OBSTACLE}), 0.0);
   EssentialBCs<double> bcs_vel_y(&bc_vel_y);
   EssentialBCs<double> bcs_pressure;
 
@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
 #endif
 
   // Calculate and report the number of degrees of freedom.
-  int ndof = Space<double>::get_num_dofs(Hermes::vector<SpaceSharedPtr<double> >(xvel_space, yvel_space, p_space));
+  int ndof = Space<double>::get_num_dofs(std::vector<SpaceSharedPtr<double> >({xvel_space, yvel_space, p_space}));
 
   // Define projection norms.
   NormType vel_proj_norm = HERMES_H1_NORM;
@@ -105,24 +105,24 @@ int main(int argc, char* argv[])
   MeshFunctionSharedPtr<double> p_prev_time(new ConstantSolution<double>(mesh, 0.0));
 
   // Initialize weak formulation.
-  WeakFormNSNewton wf(STOKES, RE, TAU, xvel_prev_time, yvel_prev_time);
+  WeakFormSharedPtr<double> wf(new WeakFormNSNewton(STOKES, RE, TAU, xvel_prev_time, yvel_prev_time));
   UExtFunctionSharedPtr<double> fn_0(new CustomUExtFunction(0));
   UExtFunctionSharedPtr<double> fn_1(new CustomUExtFunction(1));
-  wf.set_ext(Hermes::vector<MeshFunctionSharedPtr<double> >(xvel_prev_time, yvel_prev_time));
-  wf.set_u_ext_fn(Hermes::vector<UExtFunctionSharedPtr<double> >(fn_0, fn_1));
+  wf->set_ext(std::vector<MeshFunctionSharedPtr<double> >({xvel_prev_time, yvel_prev_time}));
+  wf->set_u_ext_fn(std::vector<UExtFunctionSharedPtr<double> >({fn_0, fn_1}));
 
   // Initialize the Newton solver.
-  Hermes::vector<SpaceSharedPtr<double> > spaces(xvel_space, yvel_space, p_space);
-  NewtonSolver<double> newton(&wf, spaces);
+  std::vector<SpaceSharedPtr<double> > spaces({ xvel_space, yvel_space, p_space });
+  NewtonSolver<double> newton(wf, spaces);
 
   // Project the initial condition on the FE space to obtain initial
   // coefficient vector for the Newton's method.
-  double* coeff_vec = new double[Space<double>::get_num_dofs(Hermes::vector<SpaceSharedPtr<double> >(xvel_space, yvel_space, p_space))];
+  double* coeff_vec = new double[Space<double>::get_num_dofs(std::vector<SpaceSharedPtr<double> >({xvel_space, yvel_space, p_space}))];
   OGProjection<double> ogProjection;
 
-  ogProjection.project_global(Hermes::vector<SpaceSharedPtr<double> >(xvel_space, yvel_space, p_space),
-    Hermes::vector<MeshFunctionSharedPtr<double> >(xvel_prev_time, yvel_prev_time, p_prev_time),
-    coeff_vec, Hermes::vector<NormType>(vel_proj_norm, vel_proj_norm, p_proj_norm));
+  ogProjection.project_global(std::vector<SpaceSharedPtr<double> >({xvel_space, yvel_space, p_space}),
+    std::vector<MeshFunctionSharedPtr<double> >({xvel_prev_time, yvel_prev_time, p_prev_time}),
+    coeff_vec, std::vector<NormType>({vel_proj_norm, vel_proj_norm, p_proj_norm}));
 
   newton.set_max_allowed_iterations(NEWTON_MAX_ITER);
   newton.set_tolerance(NEWTON_TOL, Hermes::Solvers::ResidualNormAbsolute);
@@ -147,9 +147,9 @@ int main(int argc, char* argv[])
     {
       e.print_msg();
     }
-    Hermes::vector<MeshFunctionSharedPtr<double> > tmp(xvel_prev_time, yvel_prev_time, p_prev_time);
+    std::vector<MeshFunctionSharedPtr<double> > tmp({ xvel_prev_time, yvel_prev_time, p_prev_time });
     Hermes::Hermes2D::Solution<double>::vector_to_solutions(newton.get_sln_vector(),
-      Hermes::vector<SpaceSharedPtr<double> >(xvel_space, yvel_space, p_space), tmp);
+      std::vector<SpaceSharedPtr<double> >({xvel_space, yvel_space, p_space}), tmp);
 
 #ifdef SHOW_OUTPUT
     // Visualization.

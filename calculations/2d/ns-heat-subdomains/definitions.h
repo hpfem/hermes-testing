@@ -679,10 +679,10 @@ protected:
 class EssentialBCNonConst : public EssentialBoundaryCondition<double>
 {
 public:
-  EssentialBCNonConst(Hermes::vector<std::string> markers, double vel_inlet, double H, double startup_time) : 
+  EssentialBCNonConst(std::vector<std::string> markers, double vel_inlet, double H, double startup_time) : 
       EssentialBoundaryCondition<double>(markers), vel_inlet(vel_inlet), H(H), startup_time(startup_time) {};
       EssentialBCNonConst(std::string marker, double vel_inlet, double H, double startup_time) : 
-      EssentialBoundaryCondition<double>(Hermes::vector<std::string>()), vel_inlet(vel_inlet), H(H), startup_time(startup_time) {
+      EssentialBoundaryCondition<double>(std::vector<std::string>()), vel_inlet(vel_inlet), H(H), startup_time(startup_time) {
         markers.push_back(marker);
       };
 
@@ -692,7 +692,7 @@ public:
         return BC_FUNCTION; 
       };
 
-      virtual double value(double x, double y, double n_x, double n_y, double t_x, double t_y) const {
+      virtual double value(double x, double y) const {
         double val_y = vel_inlet * y*(H-y) / (H/2.)/(H/2.);  // Parabolic profile.
         //double val_y = vel_inlet;                            // Constant profile.
         if (current_time <= startup_time) 

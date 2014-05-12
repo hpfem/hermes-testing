@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
     "Outer", ALPHA, T_EXTERIOR);
 
   // Initialize boundary conditions.
-  CustomDirichletCondition bc_essential(Hermes::vector<std::string>("Bottom", "Inner", "Left"),
+  CustomDirichletCondition bc_essential(std::vector<std::string>({"Bottom", "Inner", "Left"}),
     BDY_A_PARAM, BDY_B_PARAM, BDY_C_PARAM);
   EssentialBCs<double> bcs(&bc_essential);
 

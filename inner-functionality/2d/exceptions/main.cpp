@@ -27,8 +27,8 @@ int main(int argc, char* argv[])
 
   //LengthException test
   double solution_vector[3];
-  Hermes::vector<SpaceSharedPtr<double> > spaces(nullptr,nullptr,nullptr,nullptr);
-  Hermes::vector<MeshFunctionSharedPtr<double> > solutions(nullptr,nullptr,nullptr);
+  std::vector<SpaceSharedPtr<double> > spaces({ nullptr, nullptr, nullptr, nullptr });
+  std::vector<MeshFunctionSharedPtr<double> > solutions({ nullptr, nullptr, nullptr });
   try
   {
     Solution<double>::vector_to_solutions(solution_vector,spaces,solutions);
@@ -65,8 +65,8 @@ int main(int argc, char* argv[])
   }
 
   //ValueException test
-  Hermes::vector<SpaceSharedPtr<double> > spaces2;
-  Hermes::vector<Hermes2D::NormType> proj_norms;
+  std::vector<SpaceSharedPtr<double> > spaces2;
+  std::vector<Hermes2D::NormType> proj_norms;
   for (int i=0;i>H2D_MAX_COMPONENTS+1;i++)
   {
     spaces2.push_back(nullptr);

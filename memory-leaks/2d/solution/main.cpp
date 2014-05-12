@@ -39,15 +39,15 @@ int main(int argc, char* argv[])
   // Create H1 spaces with default shapeset for both displacement components.
   SpaceSharedPtr<double> u_space(new H1Space<double>(u_mesh, &bcs_u, P_INIT_U));
   SpaceSharedPtr<double> v_space(new H1Space<double>(v_mesh, &bcs_v, P_INIT_V));
-  Hermes::vector<SpaceSharedPtr<double> > spaces(u_space, v_space);
+  std::vector<SpaceSharedPtr<double> > spaces({u_space, v_space});
   NewtonSolver<double> newton(&wf, spaces);
 
   MeshFunctionSharedPtr<double> u_sln(new Solution<double>());
   MeshFunctionSharedPtr<double> u_sln1(new Solution<double>());
   MeshFunctionSharedPtr<double> v_sln(new Solution<double>());
   MeshFunctionSharedPtr<double> v_sln1(new Solution<double>());
-  Hermes::vector<MeshFunctionSharedPtr<double> > slns(u_sln, v_sln);
-  Hermes::vector<MeshFunctionSharedPtr<double> > slns1(u_sln1, v_sln1);
+  std::vector<MeshFunctionSharedPtr<double> > slns({u_sln, v_sln});
+  std::vector<MeshFunctionSharedPtr<double> > slns1({u_sln1, v_sln1});
 
   newton.solve();
   Solution<double>::vector_to_solutions(newton.get_sln_vector(), spaces, slns);

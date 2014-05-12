@@ -23,12 +23,12 @@ class CustomVolumeIntegralCalculator : public Hermes2D::PostProcessing::Volumetr
 {
 public:
   CustomVolumeIntegralCalculator(MeshFunctionSharedPtr<double> source_function, int number_of_integrals) : Hermes2D::PostProcessing::VolumetricIntegralCalculator<double>(source_function, number_of_integrals) {} ;
-  CustomVolumeIntegralCalculator(Hermes::vector<MeshFunctionSharedPtr<double> > source_functions, int number_of_integrals) : Hermes2D::PostProcessing::VolumetricIntegralCalculator<double>(source_functions, number_of_integrals) {} ;
+  CustomVolumeIntegralCalculator(std::vector<MeshFunctionSharedPtr<double> > source_functions, int number_of_integrals) : Hermes2D::PostProcessing::VolumetricIntegralCalculator<double>(source_functions, number_of_integrals) {} ;
   
   /// The integral description.
   /// \param[in] n - number of integration points.
   /// \param[in] result - preallocated (see number_of_integrals in the constructor) and zeroed array for the results.
-  virtual void integral(int n, double* wt, Func<double> **fns, Geom<double> *e, double* result)
+  virtual void integral(int n, double* wt, Func<double> **fns, GeomVol<double> *e, double* result)
   {
     for(int j = 0; j < this->number_of_integrals; j++)
       for (int i = 0; i < n; i++)
@@ -49,12 +49,12 @@ class CustomSurfaceIntegralCalculator : public Hermes2D::PostProcessing::Surface
 {
 public:
   CustomSurfaceIntegralCalculator(MeshFunctionSharedPtr<double> source_function, int number_of_integrals) : Hermes2D::PostProcessing::SurfaceIntegralCalculator<double>(source_function, number_of_integrals) {} ;
-  CustomSurfaceIntegralCalculator(Hermes::vector<MeshFunctionSharedPtr<double> > source_functions, int number_of_integrals) : Hermes2D::PostProcessing::SurfaceIntegralCalculator<double>(source_functions, number_of_integrals) {} ;
+  CustomSurfaceIntegralCalculator(std::vector<MeshFunctionSharedPtr<double> > source_functions, int number_of_integrals) : Hermes2D::PostProcessing::SurfaceIntegralCalculator<double>(source_functions, number_of_integrals) {} ;
 
   /// The integral description.
   /// \param[in] n - number of integration points.
   /// \param[in] result - preallocated (see number_of_integrals in the constructor) and zeroed array for the results.
-  virtual void integral(int n, double* wt, Func<double> **fns, Geom<double> *e, double* result)
+  virtual void integral(int n, double* wt, Func<double> **fns, GeomSurf<double> *e, double* result)
   {
     for(int j = 0; j < this->number_of_integrals; j++)
       for (int i = 0; i < n; i++)

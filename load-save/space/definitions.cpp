@@ -77,7 +77,7 @@ namespace L2_real
 
   template<typename Real, typename Scalar>
   Scalar CustomWeakForm::CustomMatrixFormSurface::matrix_form(int n, double *wt, Func<Scalar> *u_ext[], Func<Real> *u, Func<Real> *v,
-    Geom<Real> *e, Func<Scalar> **ext) const
+    GeomSurf<Real> *e, Func<Scalar> **ext) const
   {
     Scalar result = Scalar(0);
     for (int i = 0; i < n; i++)
@@ -90,13 +90,13 @@ namespace L2_real
   }
 
   double CustomWeakForm::CustomMatrixFormSurface::value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, Func<double> *v,
-    Geom<double> *e, Func<double> **ext) const
+    GeomSurf<double> *e, Func<double> **ext) const
   {
     return matrix_form<double, double>(n, wt, u_ext, u, v, e, ext);
   }
 
   Ord CustomWeakForm::CustomMatrixFormSurface::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v,
-    Geom<Ord> *e, Func<Ord> **ext) const
+    GeomSurf<Ord> *e, Func<Ord> **ext) const
   {
     return matrix_form<Ord, Ord>(n, wt, u_ext, u, v, e, ext);
   }
@@ -108,7 +108,7 @@ namespace L2_real
 
   template<typename Real, typename Scalar>
   Scalar CustomWeakForm::CustomMatrixFormInterface::matrix_form(int n, double *wt, DiscontinuousFunc<Scalar>** u_ext, DiscontinuousFunc<Real> *u, DiscontinuousFunc<Real> *v,
-    Geom<Real> *e, DiscontinuousFunc<Scalar> **ext) const
+    GeomSurf<Real> *e, DiscontinuousFunc<Scalar> **ext) const
   {
     Scalar result = Scalar(0);
 
@@ -124,13 +124,13 @@ namespace L2_real
   }
 
   double CustomWeakForm::CustomMatrixFormInterface::value(int n, double *wt, DiscontinuousFunc<double> **u_ext, DiscontinuousFunc<double> *u, DiscontinuousFunc<double> *v,
-    Geom<double> *e, DiscontinuousFunc<double> **ext) const
+    GeomSurf<double> *e, DiscontinuousFunc<double> **ext) const
   {
     return matrix_form<double, double>(n, wt, u_ext, u, v, e, ext);
   }
 
   Ord CustomWeakForm::CustomMatrixFormInterface::ord(int n, double *wt, DiscontinuousFunc<Ord> **u_ext, DiscontinuousFunc<Ord> *u, DiscontinuousFunc<Ord> *v,
-    Geom<Ord> *e, DiscontinuousFunc<Ord> **ext) const
+    GeomSurf<Ord> *e, DiscontinuousFunc<Ord> **ext) const
   {
     return matrix_form<Ord, Ord>(n, wt, u_ext, u, v, e, ext);
   }
@@ -141,7 +141,7 @@ namespace L2_real
   }
 
   double CustomWeakForm::CustomVectorFormSurface::value(int n, double *wt, Func<double> *u_ext[], Func<double> *v,
-    Geom<double> *e, Func<double> **ext) const
+    GeomSurf<double> *e, Func<double> **ext) const
   {
     double result = 0;
     for (int i = 0; i < n; i++) {
@@ -153,7 +153,7 @@ namespace L2_real
     return result;
   }
 
-  Ord CustomWeakForm::CustomVectorFormSurface::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, Geom<Ord> *e, Func<Ord> **ext) const
+  Ord CustomWeakForm::CustomVectorFormSurface::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, GeomSurf<Ord> *e, Func<Ord> **ext) const
   {
     Ord result = Ord(0);
     for (int i = 0; i < n; i++)

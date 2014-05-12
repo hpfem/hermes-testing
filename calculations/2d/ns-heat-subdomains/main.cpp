@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
 {
   // Load the mesh.
   MeshSharedPtr mesh_whole_domain(new Mesh), mesh_with_hole(new Mesh);
-  Hermes::vector<MeshSharedPtr> meshes (mesh_whole_domain, mesh_with_hole);
+  std::vector<MeshSharedPtr> meshes ({mesh_whole_domain, mesh_with_hole});
   MeshReaderH2DXML mloader;
   mloader.load("domain.xml", meshes);
 
@@ -102,12 +102,12 @@ int main(int argc, char* argv[])
 
   // Initialize boundary conditions.
   EssentialBCNonConst bc_inlet_vel_x("Inlet", VEL_INLET, H, STARTUP_TIME);
-  DefaultEssentialBCConst<double> bc_other_vel_x(Hermes::vector<std::string>("Outer Wall", "Inner Wall"), 0.0);
-  EssentialBCs<double> bcs_vel_x(Hermes::vector<EssentialBoundaryCondition<double> *>(&bc_inlet_vel_x, &bc_other_vel_x));
-  DefaultEssentialBCConst<double> bc_vel_y(Hermes::vector<std::string>("Inlet", "Outer Wall", "Inner Wall"), 0.0);
+  DefaultEssentialBCConst<double> bc_other_vel_x(std::vector<std::string>({ "Outer Wall", "Inner Wall" }), 0.0);
+  EssentialBCs<double> bcs_vel_x(std::vector<EssentialBoundaryCondition<double> *>({ &bc_inlet_vel_x, &bc_other_vel_x }));
+  DefaultEssentialBCConst<double> bc_vel_y(std::vector<std::string>({ "Inlet", "Outer Wall", "Inner Wall" }), 0.0);
   EssentialBCs<double> bcs_vel_y(&bc_vel_y);
   EssentialBCs<double> bcs_pressure;
-  DefaultEssentialBCConst<double> bc_temperature(Hermes::vector<std::string>("Outer Wall", "Inlet"), 20.0);
+  DefaultEssentialBCConst<double> bc_temperature(std::vector<std::string>({ "Outer Wall", "Inlet" }), 20.0);
   EssentialBCs<double> bcs_temperature(&bc_temperature);
 
   // Spaces for velocity components, pressure and temperature.
@@ -119,11 +119,10 @@ int main(int argc, char* argv[])
   SpaceSharedPtr<double> p_space(new H1Space<double>(mesh_with_hole, &bcs_pressure, P_INIT_PRESSURE));
 #endif
   SpaceSharedPtr<double> temperature_space(new H1Space<double> (mesh_whole_domain, &bcs_temperature, P_INIT_TEMPERATURE));
-  Hermes::vector<SpaceSharedPtr<double> > all_spaces(xvel_space, yvel_space, p_space, temperature_space);
+  std::vector<SpaceSharedPtr<double> > all_spaces({ xvel_space, yvel_space, p_space, temperature_space });
 
   // Calculate and report the number of degrees of freedom.
-  int ndof = Space<double>::get_num_dofs(Hermes::vector<SpaceSharedPtr<double> >(xvel_space, 
-      yvel_space, p_space, temperature_space));
+  int ndof = Space<double>::get_num_dofs(std::vector<SpaceSharedPtr<double> >({ xvel_space, yvel_space, p_space, temperature_space }));
 
   // Define projection norms.
   NormType vel_proj_norm = HERMES_H1_NORM;
@@ -133,8 +132,7 @@ int main(int argc, char* argv[])
   NormType p_proj_norm = HERMES_H1_NORM;
 #endif
   NormType temperature_proj_norm = HERMES_H1_NORM;
-  Hermes::vector<NormType> all_proj_norms = Hermes::vector<NormType>(vel_proj_norm, 
-      vel_proj_norm, p_proj_norm, temperature_proj_norm);
+  std::vector<NormType> all_proj_norms = std::vector<NormType>({ vel_proj_norm, vel_proj_norm, p_proj_norm, temperature_proj_norm });
 
   // Initial conditions and such.
   //Hermes::Mixins::Loggable::Static::Hermes::Mixins::Loggable::Static::info("Setting initial conditions.");
@@ -142,10 +140,8 @@ int main(int argc, char* argv[])
   MeshFunctionSharedPtr<double> temperature_init_cond(new CustomInitialConditionTemperature (mesh_whole_domain, HOLE_MID_X, HOLE_MID_Y, 
       0.5*OBSTACLE_DIAMETER, TEMPERATURE_INIT_FLUID, TEMPERATURE_INIT_GRAPHITE)); 
   MeshFunctionSharedPtr<double> temperature_prev_time(new Solution<double>);
-  Hermes::vector<MeshFunctionSharedPtr<double> > initial_solutions = Hermes::vector<MeshFunctionSharedPtr<double> >(xvel_prev_time, 
-      yvel_prev_time, p_prev_time, temperature_init_cond);
-  Hermes::vector<MeshFunctionSharedPtr<double> > all_solutions = Hermes::vector<MeshFunctionSharedPtr<double> >(xvel_prev_time, 
-      yvel_prev_time, p_prev_time, temperature_prev_time);
+  std::vector<MeshFunctionSharedPtr<double> > initial_solutions = std::vector<MeshFunctionSharedPtr<double> >({ xvel_prev_time, yvel_prev_time, p_prev_time, temperature_init_cond });
+  std::vector<MeshFunctionSharedPtr<double> > all_solutions = std::vector<MeshFunctionSharedPtr<double> >({ xvel_prev_time, yvel_prev_time, p_prev_time, temperature_prev_time });
 
   Hermes::Mixins::Loggable::Static::info("Projecting initial condition to obtain initial vector for the Newton's method.");
   OGProjection<double> ogProjection;

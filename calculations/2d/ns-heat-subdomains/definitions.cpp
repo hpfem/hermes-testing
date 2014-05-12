@@ -38,7 +38,7 @@ CustomWeakFormHeatAndFlow::CustomWeakFormHeatAndFlow(bool Stokes, double Reynold
   : WeakForm<double>(4), Stokes(Stokes), Reynolds(Reynolds), time_step(time_step), x_vel_previous_time(x_vel_previous_time), y_vel_previous_time(y_vel_previous_time)
   {
     // For passing to forms.
-    Hermes::vector<MeshFunctionSharedPtr<double> > ext(x_vel_previous_time, y_vel_previous_time);
+    std::vector<MeshFunctionSharedPtr<double> > ext({x_vel_previous_time, y_vel_previous_time});
 
     // Jacobian - flow part.
     add_matrix_form(new BilinearFormSymVel(0, 0, Stokes, Reynolds, time_step));

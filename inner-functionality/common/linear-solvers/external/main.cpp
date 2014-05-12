@@ -19,6 +19,8 @@ class CustomExternalSolver : public SimpleExternalSolver<double>
 public:
   CustomExternalSolver(CSCMatrix<double> *m, SimpleVector<double> *rhs) : SimpleExternalSolver<double>(m, rhs) {};
 
+  void free() {};
+
   virtual std::string command()
   {
     SimpleVector<double> vec(this->m->get_size());
@@ -50,11 +52,11 @@ int main(int argc, char* argv[])
   mloader.load("domain.xml", mesh);
 
   // Refine all elements, do it INIT_REF_NUM-times.
-  for(unsigned int i = 0; i < INIT_REF_NUM; i++)
+  for (unsigned int i = 0; i < INIT_REF_NUM; i++)
     mesh->refine_all_elements();
 
   // Initialize essential boundary conditions.
-  Hermes::Hermes2D::DefaultEssentialBCConst<double> bc_essential(Hermes::vector<std::string>("Bottom", "Inner", "Outer", "Left"), 0.);
+  Hermes::Hermes2D::DefaultEssentialBCConst<double> bc_essential({"Bottom", "Inner", "Outer", "Left"}, 0.);
   Hermes::Hermes2D::EssentialBCs<double> bcs(&bc_essential);
 
   // Initialize space->

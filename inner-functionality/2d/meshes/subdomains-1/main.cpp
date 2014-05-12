@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
 {
   // Load the mesh.
   MeshSharedPtr mesh_whole_domain(new Mesh), mesh_bottom_left_corner(new Mesh), mesh_complement(new Mesh);
-  Hermes::vector<MeshSharedPtr> meshes (mesh_bottom_left_corner, mesh_whole_domain, mesh_complement);
+  std::vector<MeshSharedPtr> meshes({ mesh_bottom_left_corner, mesh_whole_domain, mesh_complement });
   MeshReaderH2DXML mloader;
   mloader.set_validation(false);
   mloader.load("subdomains.xml", meshes);
@@ -28,13 +28,13 @@ int main(int argc, char* argv[])
   mloader.load("subdomains2.xml", meshes);
 
   // Initialize essential boundary conditions.
-  DefaultEssentialBCConst<double> bc_essential_whole_domain(Hermes::vector<std::string>("Bottom Left", "Bottom Right", "Top Left", "Top Right"), 0.0);
+  DefaultEssentialBCConst<double> bc_essential_whole_domain(std::vector<std::string>({"Bottom Left", "Bottom Right", "Top Left", "Top Right"}), 0.0);
   EssentialBCs<double> bcs_whole_domain(&bc_essential_whole_domain);
 
-  DefaultEssentialBCConst<double> bc_essential_bottom_left_corner(Hermes::vector<std::string>("Bottom Left", "Horizontal Left"), 0.0);
+  DefaultEssentialBCConst<double> bc_essential_bottom_left_corner(std::vector<std::string>({"Bottom Left", "Horizontal Left"}), 0.0);
   EssentialBCs<double> bcs_bottom_left_corner(&bc_essential_bottom_left_corner);
 
-  DefaultEssentialBCConst<double> bc_essential_complement(Hermes::vector<std::string>("Bottom Right", "Top Right", "Top Left", "Horizontal Left", "Vertical Bottom"), 0.0);
+  DefaultEssentialBCConst<double> bc_essential_complement(std::vector<std::string>({"Bottom Right", "Top Right", "Top Left", "Horizontal Left", "Vertical Bottom"}), 0.0);
   EssentialBCs<double> bcs_complement(&bc_essential_complement);
 
   // Create H1 spaces with default shapeset.

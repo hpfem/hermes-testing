@@ -19,7 +19,7 @@ class BCNonConst : public DefaultEssentialBCNonConst<double>
 public:
   BCNonConst(std::string marker, MeshFunctionSharedPtr<double> exact_solution) : DefaultEssentialBCNonConst<double>(marker, exact_solution) {};
 
-  double value(double x, double y, double n_x, double n_y, double t_x, double t_y) const
+  double value(double x, double y) const
   {
     return exact_solution->value(x, y);
   }
@@ -30,15 +30,14 @@ public:
 int main(int argc, char* argv[])
 {
   // Tested entities.
-  Hermes::vector<int> dofs;
-  Hermes::vector<double*> bc_values;
+  std::vector<int> dofs;
+  std::vector<double*> bc_values;
 
   // Known values (tested Element IDs etc.).
-  Hermes::vector<Hermes::vector<int> > element_ids_boundary(
-    Hermes::vector<int>(4, 21, 101),
-    Hermes::vector<int>(13, 46, 170),
-    Hermes::vector<int>(17, 72, 293),
-    Hermes::vector<int>(19, 71, 291));
+  std::vector<std::vector<int> > element_ids_boundary({ { 4, 21, 101 },
+  { 13, 46, 170 },
+  { 17, 72, 293 },
+  { 19, 71, 291 } });
 
   // Load the mesh_lshape.
   MeshSharedPtr mesh_lshape(new Mesh), mesh_square(new Mesh);
@@ -55,10 +54,10 @@ int main(int argc, char* argv[])
 
     // H1Spaces from order 1 for various boundary conditions:
     MeshFunctionSharedPtr<double> exact(new CustomExactSol(mesh_lshape));
-    Hermes::vector<BCNonConst> bc_essential(BCNonConst("Bottom", exact),
+    std::vector<BCNonConst> bc_essential({ BCNonConst("Bottom", exact),
       BCNonConst("Outer", exact),
       BCNonConst("Inner", exact),
-      BCNonConst("Left", exact));
+      BCNonConst("Left", exact) });
 
     for(unsigned int poly_order_i = 1; poly_order_i < 10; poly_order_i++)
       for(unsigned int bc_i = 0; bc_i < 4; bc_i++)

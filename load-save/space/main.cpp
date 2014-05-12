@@ -167,8 +167,8 @@ typedef std::complex<double> complex;
     int ndof = space->get_num_dofs();
 
     // Initialize the weak formulation.
-    CustomWeakForm wf("Air", MU_0, "Iron", MU_IRON, GAMMA_IRON,
-      "Wire", MU_0, complex(J_EXT, 0.0), OMEGA);
+    WeakFormSharedPtr<complex> wf(new CustomWeakForm("Air", MU_0, "Iron", MU_IRON, GAMMA_IRON,
+      "Wire", MU_0, complex(J_EXT, 0.0), OMEGA));
 
     // Initialize coarse and reference mesh solution.
     MeshFunctionSharedPtr<complex> sln(new Hermes::Hermes2D::Solution<complex>());
@@ -184,7 +184,7 @@ typedef std::complex<double> complex;
     Views::OrderView oview("Polynomial orders", new Views::WinGeom(610, 0, 520, 350));
 #endif
 
-    DiscreteProblem<complex> dp(&wf, space);
+    DiscreteProblem<complex> dp(wf, space);
 
     // Perform Newton's iteration and translate the resulting coefficient vector into a Solution.
     Hermes::Hermes2D::NewtonSolver<complex> newton(&dp);

@@ -11,11 +11,11 @@ public:
   {
   }
 
-  MyVolumetricIntegralCalculator(Hermes::vector<MeshFunctionSharedPtr<double> > source_functions, int number_of_integrals) : Hermes2D::PostProcessing::VolumetricIntegralCalculator<double>(source_functions, number_of_integrals)
+  MyVolumetricIntegralCalculator(std::vector<MeshFunctionSharedPtr<double> > source_functions, int number_of_integrals) : Hermes2D::PostProcessing::VolumetricIntegralCalculator<double>(source_functions, number_of_integrals)
   {
   }
 
-  virtual void integral(int n, double* wt, Func<double> **fns, Geom<double> *e, double* result)
+  virtual void integral(int n, double* wt, Func<double> **fns, GeomVol<double> *e, double* result)
   {
     for(int j = 0; j < this->number_of_integrals; j++)
       for (int i = 0; i < n; i++)
@@ -36,11 +36,11 @@ public:
   {
   }
 
-  MyVolumetricIntegralCalculatorL2(Hermes::vector<MeshFunctionSharedPtr<double> > source_functions, int number_of_integrals) : Hermes2D::PostProcessing::VolumetricIntegralCalculator<double>(source_functions, number_of_integrals)
+  MyVolumetricIntegralCalculatorL2(std::vector<MeshFunctionSharedPtr<double> > source_functions, int number_of_integrals) : Hermes2D::PostProcessing::VolumetricIntegralCalculator<double>(source_functions, number_of_integrals)
   {
   }
 
-  virtual void integral(int n, double* wt, Func<double> **fns, Geom<double> *e, double* result)
+  virtual void integral(int n, double* wt, Func<double> **fns, GeomVol<double> *e, double* result)
   {
     for(int j = 0; j < this->number_of_integrals; j++)
       for (int i = 0; i < n; i++)
@@ -60,11 +60,11 @@ public:
   {
   }
 
-  MySurfaceIntegralCalculator(Hermes::vector<MeshFunctionSharedPtr<double> > source_functions, int number_of_integrals) : Hermes2D::PostProcessing::SurfaceIntegralCalculator<double>(source_functions, number_of_integrals)
+  MySurfaceIntegralCalculator(std::vector<MeshFunctionSharedPtr<double> > source_functions, int number_of_integrals) : Hermes2D::PostProcessing::SurfaceIntegralCalculator<double>(source_functions, number_of_integrals)
   {
   }
 
-  virtual void integral(int n, double* wt, Func<double> **fns, Geom<double> *e, double* result)
+  virtual void integral(int n, double* wt, Func<double> **fns, GeomSurf<double> *e, double* result)
   {
     for(int j = 0; j < this->number_of_integrals; j++)
       for (int i = 0; i < n; i++)
@@ -88,12 +88,12 @@ void handle_success(bool success)
 #ifdef _SHOW_OUTPUT
 Views::MeshView m;
 #endif
-Hermes::vector<int> measured_elems;
-Hermes::vector<int> elems;
-Hermes::vector<double> measured_integrals;
-Hermes::vector<double> integrals;
+std::vector<int> measured_elems;
+std::vector<int> elems;
+std::vector<double> measured_integrals;
+std::vector<double> integrals;
 
-bool part2OneCase(int i, MeshSharedPtr mesh, Hermes::vector<std::string> markers, int layers, int poly_degree)
+bool part2OneCase(int i, MeshSharedPtr mesh, std::vector<std::string> markers, int layers, int poly_degree)
 {
   bool success = true;
   try
@@ -115,7 +115,7 @@ bool part2OneCase(int i, MeshSharedPtr mesh, Hermes::vector<std::string> markers
     Hermes::Hermes2D::MeshFunctionSharedPtr<double> zeroSlnWholeMesh(new Hermes::Hermes2D::ConstantSolution<double>(mesh, 1341.13213));
     Hermes::Hermes2D::MeshFunctionSharedPtr<double> zeroSlnEggShellMesh(new Hermes::Hermes2D::ConstantSolution<double>(egg_shell_mesh, 1.575674));
 
-    MyVolumetricIntegralCalculatorL2 integral(Hermes::vector<MeshFunctionSharedPtr<double> >(eggShell, zeroSlnEggShellMesh, zeroSlnWholeMesh), 3);
+    MyVolumetricIntegralCalculatorL2 integral(std::vector<MeshFunctionSharedPtr<double> >({ eggShell, zeroSlnEggShellMesh, zeroSlnWholeMesh }), 3);
     double* result = integral.calculate(HERMES_ANY);
     success = Hermes::Testing::test_value(result[0], measured_integrals[i*3 + 0], "Integral-0") && success;
     success = Hermes::Testing::test_value(result[1], measured_integrals[i*3 + 1], "Integral-1") && success;
@@ -131,8 +131,8 @@ bool part2OneCase(int i, MeshSharedPtr mesh, Hermes::vector<std::string> markers
 
 bool part2OneCase(int i, MeshSharedPtr mesh, std::string marker, int layers, int poly_degree)
 {
-  Hermes::vector<std::string> markers;
-  markers.push_back(marker);
+  std::vector<std::string> markers;
+  markers.push_back({marker});
   return part2OneCase(i, mesh, markers, layers, poly_degree);
 }
 
@@ -270,15 +270,15 @@ int main(int argc, char* argv[])
 
     success = part2OneCase(3, mesh, "4", 2, 5) && success;
 
-    success = part2OneCase(5, mesh, Hermes::vector<std::string>("2", "4"), 5, 6) && success;
+    success = part2OneCase(5, mesh, std::vector<std::string>({ "2", "4" }), 5, 6) && success;
 
-    success = part2OneCase(6, mesh, Hermes::vector<std::string>("3", "5", "1"), 4, 4) && success;
+    success = part2OneCase(6, mesh, std::vector<std::string>({ "3", "5", "1" }), 4, 4) && success;
 
-    success = part2OneCase(7, mesh, Hermes::vector<std::string>("3", "2", "2"), 3, 2) && success;
+    success = part2OneCase(7, mesh, std::vector<std::string>({ "3", "2", "2" }), 3, 2) && success;
 
-    success = part2OneCase(8, mesh, Hermes::vector<std::string>("1", "2"), 2, 3) && success;
+    success = part2OneCase(8, mesh, std::vector<std::string>({ "1", "2" }), 2, 3) && success;
 
-    success = part2OneCase(9, mesh, Hermes::vector<std::string>("3", "4"), 4, 1) && success;
+    success = part2OneCase(9, mesh, std::vector<std::string>({ "3", "4" }), 4, 1) && success;
 
     if(!success)
     {

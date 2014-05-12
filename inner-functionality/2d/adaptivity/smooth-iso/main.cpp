@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
   // Initialize the weak formulation.
   Hermes1DFunction<double> lambda(1.0);
   CustomFunction f;
-  DefaultWeakFormPoisson<double> wf(Hermes::HERMES_ANY, &lambda, &f);
+  WeakFormSharedPtr<double> wf(new DefaultWeakFormPoisson<double>(Hermes::HERMES_ANY, &lambda, &f));
 
   // Initialize boundary conditions.
   DefaultEssentialBCConst<double> bc_essential("Bdy", 0.0);
@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
   H1ProjBasedSelector<double> selector(CAND_LIST);
 
   // Assemble the discrete problem.
-  DiscreteProblem<double> dp(&wf, space);
+  DiscreteProblem<double> dp(wf, space);
 
   // Adaptivity loop:
   int as = 1; bool done = false;

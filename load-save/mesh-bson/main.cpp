@@ -11,10 +11,10 @@ int main(int argc, char* argv[])
   MeshSharedPtr mesh4(new Mesh);
   MeshReaderH2DXML mloader;
   MeshReaderH2DBSON mloaderb;
-  Hermes::vector<MeshSharedPtr> meshes;
-  Hermes::vector<MeshSharedPtr> meshes1;
-  Hermes::vector<MeshSharedPtr> meshes2;
-  meshes.push_back(mesh1);
+  std::vector<MeshSharedPtr> meshes;
+  std::vector<MeshSharedPtr> meshes1;
+  std::vector<MeshSharedPtr> meshes2;
+  meshes.push_back({mesh1});
   meshes1.push_back(mesh2);
   meshes1.push_back(mesh3);
   meshes1.push_back(mesh4);
@@ -82,15 +82,15 @@ int main(int argc, char* argv[])
   // Create H1 spaces with default shapeset for both displacement components.
   SpaceSharedPtr<double> u_space(new H1Space<double>(mesh3, &bcs_u, 2));
   SpaceSharedPtr<double> v_space(new H1Space<double>(mesh4, &bcs_v, 2));
-  Hermes::vector<SpaceSharedPtr<double> > spaces(u_space, v_space);
+  std::vector<SpaceSharedPtr<double> > spaces({u_space, v_space});
   LinearSolver<double> solver(&wf, spaces);
   solver.solve();
-  double norm = get_l2_norm(solver.get_sln_vector(), Space<double>::get_num_dofs(Hermes::vector<SpaceSharedPtr<double> >(u_space, v_space)));
+  double norm = get_l2_norm(solver.get_sln_vector(), Space<double>::get_num_dofs(std::vector<SpaceSharedPtr<double> >(u_space, v_space)));
 
 #ifdef SHOW_OUTPUT
   MeshFunctionSharedPtr<double> sln1(new Solution<double>());
   MeshFunctionSharedPtr<double> sln2(new Solution<double>());
-  Solution<double>::vector_to_solutions(solver.get_sln_vector(), Hermes::vector<SpaceSharedPtr<double> >(u_space, v_space), Hermes::vector<MeshFunctionSharedPtr<double> >(sln1, sln2));
+  Solution<double>::vector_to_solutions(solver.get_sln_vector(), std::vector<SpaceSharedPtr<double> >({u_space, v_space}), std::vector<MeshFunctionSharedPtr<double> >(sln1, sln2));
 
   Views::ScalarView s;
   s.show(sln1);

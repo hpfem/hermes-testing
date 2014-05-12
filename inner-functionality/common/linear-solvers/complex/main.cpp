@@ -39,8 +39,8 @@ void show_mat(const char *msg, std::map<unsigned int, MatrixEntry> mp)
   std::cout << std::endl;
 }
 
-void show_rhs(const char *msg, std::map<unsigned int, complex > mp) {
-  std::map<unsigned int, complex >::iterator itr;
+void show_rhs(const char *msg, std::map<unsigned int, complex> mp) {
+  std::map<unsigned int, complex>::iterator itr;
 
   std::cout << msg << std::endl;
 
@@ -130,8 +130,8 @@ int read_matrix_and_rhs(char *file_name, int &n, int &nnz,
   return 0;
 }
 
-void build_matrix(int n, std::map<unsigned int, MatrixEntry> &ar_mat, std::map<unsigned int, complex > &ar_rhs,
-                  SparseMatrix<complex > *mat, Vector<complex > *rhs)
+void build_matrix(int n, std::map<unsigned int, MatrixEntry> &ar_mat, std::map<unsigned int, complex> &ar_rhs,
+                  SparseMatrix<complex> *mat, Vector<complex> *rhs)
 {
   mat->prealloc(n);
   for (std::map<unsigned int, MatrixEntry>::iterator it = ar_mat.begin(); it != ar_mat.end(); it++) {
@@ -147,14 +147,14 @@ void build_matrix(int n, std::map<unsigned int, MatrixEntry> &ar_mat, std::map<u
   mat->finish();
 
   rhs->alloc(n);
-  for (std::map<unsigned int, complex >::iterator it = ar_rhs.begin(); it != ar_rhs.end(); it++) {
+  for (std::map<unsigned int, complex>::iterator it = ar_rhs.begin(); it != ar_rhs.end(); it++) {
     rhs->add(it->first, it->second);
   }
   rhs->finish();
 }
 
-void build_matrix_block(int n, std::map<unsigned int, MatrixEntry> &ar_mat, std::map<unsigned int, complex > &ar_rhs,
-                        SparseMatrix<complex > *matrix, Vector<complex > *rhs) {
+void build_matrix_block(int n, std::map<unsigned int, MatrixEntry> &ar_mat, std::map<unsigned int, complex> &ar_rhs,
+                        SparseMatrix<complex> *matrix, Vector<complex> *rhs) {
                           matrix->prealloc(n);
                           for (int i = 0; i < n; i++)
                             for (int j = 0; j < n; j++)
@@ -177,7 +177,7 @@ void build_matrix_block(int n, std::map<unsigned int, MatrixEntry> &ar_mat, std:
 
                           rhs->alloc(n);
                           complex  *rs = new complex[n];
-                          for (std::map<unsigned int, complex >::iterator it = ar_rhs.begin(); it != ar_rhs.end(); it++) {
+                          for (std::map<unsigned int, complex>::iterator it = ar_rhs.begin(); it != ar_rhs.end(); it++) {
                             rs[it->first] = it->second;
                           }
                           unsigned int *u_rows = new unsigned int[n];
@@ -188,7 +188,7 @@ void build_matrix_block(int n, std::map<unsigned int, MatrixEntry> &ar_mat, std:
 }
 
 // Test code.
-void solve(LinearMatrixSolver<complex > &solver, int n)
+void solve(LinearMatrixSolver<complex> &solver, int n)
 {
   solver.solve();
   complex *sln = solver.get_sln_vector();
@@ -206,7 +206,7 @@ int main(int argc, char *argv[]) {
   int nnz;
 
   std::map<unsigned int, MatrixEntry> ar_mat;
-  std::map<unsigned int, complex > ar_rhs;
+  std::map<unsigned int, complex> ar_rhs;
 
   complex* sln = nullptr;
 
@@ -215,78 +215,78 @@ int main(int argc, char *argv[]) {
 
   if(strcasecmp(argv[1], "petsc") == 0) {
 #ifdef WITH_PETSC
-    PetscMatrix<complex > mat;
-    PetscVector<complex > rhs;
+    PetscMatrix<complex> mat;
+    PetscVector<complex> rhs;
     build_matrix(n, ar_mat, ar_rhs, &mat, &rhs);
 
-    PetscLinearMatrixSolver<complex > solver(&mat, &rhs);
+    PetscLinearMatrixSolver<complex> solver(&mat, &rhs);
     solve(solver, n);
     sln = new complex[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(complex));
 #endif
   }
   else if(strcasecmp(argv[1], "petsc-block") == 0) {
 #ifdef WITH_PETSC
-    PetscMatrix<complex > mat;
-    PetscVector<complex > rhs;
+    PetscMatrix<complex> mat;
+    PetscVector<complex> rhs;
     build_matrix_block(n, ar_mat, ar_rhs, &mat, &rhs);
 
-    PetscLinearMatrixSolver<complex > solver(&mat, &rhs);
+    PetscLinearMatrixSolver<complex> solver(&mat, &rhs);
     solve(solver, n);
     sln = new complex[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(complex));
 #endif
   }
   else if(strcasecmp(argv[1], "umfpack") == 0) {
 #ifdef WITH_UMFPACK
-    CSCMatrix<complex > mat;
-    SimpleVector<complex > rhs;
+    CSCMatrix<complex> mat;
+    SimpleVector<complex> rhs;
     build_matrix(n, ar_mat, ar_rhs, &mat, &rhs);
 
-    UMFPackLinearMatrixSolver<complex > solver(&mat, &rhs);
+    UMFPackLinearMatrixSolver<complex> solver(&mat, &rhs);
     solve(solver, n);
     sln = new complex[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(complex));
 #endif
   }
   else if(strcasecmp(argv[1], "umfpack-block") == 0) {
 #ifdef WITH_UMFPACK
-    CSCMatrix<complex > mat;
-    SimpleVector<complex > rhs;
+    CSCMatrix<complex> mat;
+    SimpleVector<complex> rhs;
     build_matrix_block(n, ar_mat, ar_rhs, &mat, &rhs);
 
-    UMFPackLinearMatrixSolver<complex > solver(&mat, &rhs);
+    UMFPackLinearMatrixSolver<complex> solver(&mat, &rhs);
     solve(solver, n);
     sln = new complex[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(complex));
 #endif
   }
   else if(strcasecmp(argv[1], "aztecoo") == 0) {
 #ifdef WITH_TRILINOS
-    EpetraMatrix<complex > mat;
-    EpetraVector<complex > rhs;
+    EpetraMatrix<complex> mat;
+    EpetraVector<complex> rhs;
     build_matrix(n, ar_mat, ar_rhs, &mat, &rhs);
 
-    AztecOOSolver<complex > solver(&mat, &rhs);
+    AztecOOSolver<complex> solver(&mat, &rhs);
     solve(solver, n);
     sln = new complex[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(complex));
 #endif
   }
   else if(strcasecmp(argv[1], "aztecoo-block") == 0) {
 #ifdef WITH_TRILINOS
-    EpetraMatrix<complex > mat;
-    EpetraVector<complex > rhs;
+    EpetraMatrix<complex> mat;
+    EpetraVector<complex> rhs;
     build_matrix_block(n, ar_mat, ar_rhs, &mat, &rhs);
 
-    AztecOOSolver<complex > solver(&mat, &rhs);
+    AztecOOSolver<complex> solver(&mat, &rhs);
     solve(solver, n);
     sln = new complex[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(complex));
 #endif
   }
   else if(strcasecmp(argv[1], "amesos") == 0) {
 #ifdef WITH_TRILINOS
-    EpetraMatrix<complex > mat;
-    EpetraVector<complex > rhs;
+    EpetraMatrix<complex> mat;
+    EpetraVector<complex> rhs;
     build_matrix(n, ar_mat, ar_rhs, &mat, &rhs);
 
-    if(AmesosSolver<complex >::is_available("Klu")) {
-      AmesosSolver<complex > solver("Klu", &mat, &rhs);
+    if(AmesosSolver<complex>::is_available("Klu")) {
+      AmesosSolver<complex> solver("Klu", &mat, &rhs);
       solve(solver, n);
       sln = new complex[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(complex));
     }
@@ -294,12 +294,12 @@ int main(int argc, char *argv[]) {
   }
   else if(strcasecmp(argv[1], "amesos-block") == 0) {
 #ifdef WITH_TRILINOS
-    EpetraMatrix<complex > mat;
-    EpetraVector<complex > rhs;
+    EpetraMatrix<complex> mat;
+    EpetraVector<complex> rhs;
     build_matrix_block(n, ar_mat, ar_rhs, &mat, &rhs);
 
-    if(AmesosSolver<complex >::is_available("Klu")) {
-      AmesosSolver<complex > solver("Klu", &mat, &rhs);
+    if(AmesosSolver<complex>::is_available("Klu")) {
+      AmesosSolver<complex> solver("Klu", &mat, &rhs);
       solve(solver, n);
       sln = new complex[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(complex));
     }
@@ -307,22 +307,22 @@ int main(int argc, char *argv[]) {
   }
   else if(strcasecmp(argv[1], "mumps") == 0) {
 #ifdef WITH_MUMPS
-    MumpsMatrix<complex > mat;
-    SimpleVector<complex > rhs;
+    MumpsMatrix<complex> mat;
+    SimpleVector<complex> rhs;
     build_matrix(n, ar_mat, ar_rhs, &mat, &rhs);
 
-    MumpsSolver<complex > solver(&mat, &rhs);
+    MumpsSolver<complex> solver(&mat, &rhs);
     solve(solver, n);
     sln = new complex[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(complex));
 #endif
   }
   else if(strcasecmp(argv[1], "mumps-block") == 0) {
 #ifdef WITH_MUMPS
-    MumpsMatrix<complex > mat;
-    SimpleVector<complex > rhs;
+    MumpsMatrix<complex> mat;
+    SimpleVector<complex> rhs;
     build_matrix_block(n, ar_mat, ar_rhs, &mat, &rhs);
 
-    MumpsSolver<complex > solver(&mat, &rhs);
+    MumpsSolver<complex> solver(&mat, &rhs);
     solve(solver, n);
     sln = new complex[mat.get_size()]; memcpy(sln, solver.get_sln_vector(), mat.get_size() * sizeof(complex));
 #endif

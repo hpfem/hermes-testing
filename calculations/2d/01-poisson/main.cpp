@@ -19,14 +19,14 @@ int main(int argc, char* argv[])
   mloader.load("domain.xml", mesh);
 
   // Perform initial mesh refinements (optional).
-  mesh->refine_in_areas(Hermes::vector<std::string>("Aluminum", "Copper"), INIT_REF_NUM);
+  mesh->refine_in_areas(std::vector<std::string>({"Aluminum", "Copper"}), INIT_REF_NUM);
 
   // Initialize the weak formulation.
   CustomWeakFormPoisson wf("Aluminum", new Hermes::Hermes1DFunction<double>(LAMBDA_AL), "Copper",
     new Hermes::Hermes1DFunction<double>(LAMBDA_CU), new Hermes::Hermes2DFunction<double>(-VOLUME_HEAT_SRC));
 
   // Initialize essential boundary conditions.
-  DefaultEssentialBCConst<double> bc_essential(Hermes::vector<std::string>("Bottom", "Inner", "Outer", "Left"),
+  DefaultEssentialBCConst<double> bc_essential(std::vector<std::string>({"Bottom", "Inner", "Outer", "Left"}),
     FIXED_BDY_TEMP);
   EssentialBCs<double> bcs(&bc_essential);
 
