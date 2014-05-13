@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
   linearizer.save_solution_vtk(fn44, "fn44.vtk", "sln", true, 1);
 
   // Initialize the weak formulation.
-  CustomWeakForm wf;
+  WeakFormSharedPtr<double> wf(new CustomWeakForm);
 
   // Initialize boundary conditions
   DefaultEssentialBCConst<double> bc_u(HERMES_ANY, 0.0);
@@ -83,7 +83,7 @@ int main(int argc, char* argv[])
   SpaceSharedPtr<double> u_space(new H1Space<double>(mesh3, &bcs_u, 2));
   SpaceSharedPtr<double> v_space(new H1Space<double>(mesh4, &bcs_v, 2));
   std::vector<SpaceSharedPtr<double> > spaces({u_space, v_space});
-  LinearSolver<double> solver(&wf, spaces);
+  LinearSolver<double> solver(wf, spaces);
   solver.solve();
   double norm = get_l2_norm(solver.get_sln_vector(), Space<double>::get_num_dofs(std::vector<SpaceSharedPtr<double> >(u_space, v_space)));
 

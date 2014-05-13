@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
   mloader.load("domain.mesh", mesh);
 
   // Initialize the weak formulation.
-  CustomWeakFormPoisson wf("Motor", EPS_MOTOR, "Air", EPS_AIR);
+  WeakFormSharedPtr<double> wf(new CustomWeakFormPoisson("Motor", EPS_MOTOR, "Air", EPS_AIR));
 
   // Initialize boundary conditions
   DefaultEssentialBCConst<double> bc_essential_out("Outer", 0.0);
@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
   Hermes::Mixins::TimeMeasurable cpu_time;
 
   // solver
-  LinearSolver<double> solver(&wf, space);
+  LinearSolver<double> solver(wf, space);
   solver.get_linear_matrix_solver()->as_AMGSolver()->set_tolerance(1e-1, RelativeTolerance);
 
   // Test values.

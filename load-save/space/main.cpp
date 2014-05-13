@@ -24,6 +24,8 @@ namespace L2_real
 
   int main(int argc, char* args[])
   {
+    HermesCommonApi.set_integral_param_value(numThreads, 1);
+
     // Load the mesh.
     MeshSharedPtr mesh(new Mesh);
     MeshReaderH2D mloader;
@@ -49,7 +51,7 @@ namespace L2_real
     MeshFunctionSharedPtr<double> ref_sln(new Solution<double>);
 
     // Initialize the weak formulation.
-    CustomWeakForm wf("Bdy_bottom_left", mesh);
+    WeakFormSharedPtr<double> wf(new CustomWeakForm("Bdy_bottom_left", mesh));
 
 #ifdef SHOW_OUTPUT
     ScalarView view1("Solution", new WinGeom(900, 0, 450, 350));
@@ -57,7 +59,7 @@ namespace L2_real
 #endif
 
     // Initialize linear solver.
-    Hermes::Hermes2D::LinearSolver<double> linear_solver(&wf, space);
+    Hermes::Hermes2D::LinearSolver<double> linear_solver(wf, space);
 
     int as = 1; bool done = false;
     do

@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
   CustomRightHandSide2* g2 = new CustomRightHandSide2(K, D_v);
 
   // Initialize the weak formulation.
-  CustomWeakForm wf(g1, g2);
+  WeakFormSharedPtr<double> wf(new CustomWeakForm(g1, g2));
 
   // Initialize boundary conditions
   DefaultEssentialBCConst<double> bc_u("Bdy", 0.0);
@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
   SpaceSharedPtr<double> u_space(new H1Space<double>(u_mesh, &bcs_u, P_INIT_U));
   SpaceSharedPtr<double> v_space(new H1Space<double>(v_mesh, &bcs_v, P_INIT_V));
   std::vector<SpaceSharedPtr<double> > spaces({u_space, v_space});
-  NewtonSolver<double> newton(&wf, spaces);
+  NewtonSolver<double> newton(wf, spaces);
 
   MeshFunctionSharedPtr<double> u_sln(new Solution<double>());
   MeshFunctionSharedPtr<double> u_sln1(new Solution<double>());

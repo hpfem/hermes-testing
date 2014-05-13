@@ -66,8 +66,7 @@ int main(int argc, char* argv[])
 
   // Initialize the weak formulation.
   double current_time = 0;
-  CustomWeakFormHeatRK1 wf("Boundary air", ALPHA, LAMBDA, HEATCAP, RHO, time_step, 
-                           &current_time, TEMP_INIT, T_FINAL, tsln);
+  WeakFormSharedPtr<double> wf(new CustomWeakFormHeatRK1("Boundary air", ALPHA, LAMBDA, HEATCAP, RHO, time_step, &current_time, TEMP_INIT, T_FINAL, tsln));
   
   // Initialize boundary conditions.
   DefaultEssentialBCConst<double> bc_essential("Boundary ground", TEMP_INIT);
@@ -79,7 +78,7 @@ int main(int argc, char* argv[])
   Hermes::Mixins::Loggable::Static::info("ndof = %d", ndof);
  
   // Initialize Newton solver.
-  NewtonSolver<double> newton(&wf, space);
+  NewtonSolver<double> newton(wf, space);
 #ifdef SHOW_OUTPUT
   newton.set_verbose_output(true);
 #else

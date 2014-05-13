@@ -55,11 +55,11 @@ int main(int argc, char* args[])
   MeshFunctionSharedPtr<double> ref_sln(new Solution<double>);
 
   // Initialize the weak formulation.
-  CustomWeakForm wf("Bdy_bottom_left", mesh);
+  WeakFormSharedPtr<double> wf(new CustomWeakForm("Bdy_bottom_left", mesh));
 
 
   // Initialize linear solver.
-  Hermes::Hermes2D::LinearSolver<double> linear_solver(&wf, space);
+  Hermes::Hermes2D::LinearSolver<double> linear_solver(wf, space);
 
   int as = 1; bool done = false;
   do

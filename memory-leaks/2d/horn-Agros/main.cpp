@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
   adaptivity.set_space(space);
 
   // Initialize the weak formulation.
-  CustomWeakFormAcoustics wf("0", RHO, SOUND_SPEED, OMEGA);
+  WeakFormSharedPtr<complex> wf(new CustomWeakFormAcoustics("0", RHO, SOUND_SPEED, OMEGA));
 
   // Initialize coarse and reference mesh solution.
   MeshFunctionSharedPtr<complex>  sln(new Solution<complex>), ref_sln(new Solution<complex>);
@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
   H1ProjBasedSelector<complex> selector(CAND_LIST);
 
   Hermes::Hermes2D::NewtonSolver<complex> newton;
-  newton.set_weak_formulation(&wf);
+  newton.set_weak_formulation(wf);
 
   // 2 Adaptivity steps:
   int as = 1;

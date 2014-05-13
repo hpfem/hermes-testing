@@ -29,8 +29,8 @@ int main(int argc, char* argv[])
   SpaceSharedPtr<complex> space_c( new Hermes::Hermes2D::H1Space<complex>(mesh, &bcs_c, 2));
 
   // Initialize the weak formulation.
-  WeakFormsH1::DefaultWeakFormPoissonLinear<double> wf_r(HERMES_ANY, nullptr);
-  WeakFormsH1::DefaultWeakFormPoissonLinear<complex> wf_c(HERMES_ANY, nullptr);
+  WeakFormSharedPtr<double> wf_r(new WeakFormsH1::DefaultWeakFormPoissonLinear<double>(HERMES_ANY, nullptr));
+  WeakFormSharedPtr<complex> wf_c(new WeakFormsH1::DefaultWeakFormPoissonLinear<complex>(HERMES_ANY, nullptr));
 
   // Initialize the solution.
   MeshFunctionSharedPtr<double> sln_r(new Solution<double>);
@@ -42,8 +42,8 @@ int main(int argc, char* argv[])
   MeshFunctionSharedPtr<complex> sln2_c(new Solution<complex>);
 
   // Initialize linear solver.
-  Hermes::Hermes2D::LinearSolver<double> linear_solver_r(&wf_r, space_r);
-  Hermes::Hermes2D::LinearSolver<complex> linear_solver_c(&wf_c, space_c);
+  Hermes::Hermes2D::LinearSolver<double> linear_solver_r(wf_r, space_r);
+  Hermes::Hermes2D::LinearSolver<complex> linear_solver_c(wf_c, space_c);
 
 #ifdef SHOW_OUTPUT
   Views::ScalarView s;

@@ -69,10 +69,10 @@ int main(int argc, char* argv[])
   // Initialize the weak formulation.
   CustomNonlinearity lambda(alpha);
   Hermes2DFunction<double> src(-heat_src);
-  CustomWeakFormPicard wf(init_condition, &lambda, &src);
+  WeakFormSharedPtr<double> wf(new CustomWeakFormPicard(init_condition, &lambda, &src));
 
   // Initialize the Picard solver.
-  PicardSolver<double> picard(&wf, space);
+  PicardSolver<double> picard(wf, space);
   picard.set_max_allowed_iterations(PICARD_MAX_ITER);
   logger.info("Default tolerance");
   try
@@ -104,7 +104,7 @@ int main(int argc, char* argv[])
   MeshFunctionSharedPtr<double> sln(new Solution<double>);
   Solution<double>::vector_to_solution(picard.get_sln_vector(), space, sln);
   logger.info("Default tolerance without Anderson and good initial guess");
-  PicardSolver<double> picard2(&wf, space);
+  PicardSolver<double> picard2(wf, space);
   picard2.set_tolerance(1e-3, Hermes::Solvers::SolutionChangeRelative);
   picard2.set_max_allowed_iterations(PICARD_MAX_ITER);
   try

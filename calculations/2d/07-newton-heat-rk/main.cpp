@@ -57,8 +57,8 @@ int main(int argc, char* argv[])
   MeshFunctionSharedPtr<double> sln_time_new2(new Solution<double>(mesh));
   std::vector<MeshFunctionSharedPtr<double> > sln_time_new({sln_time_new1, sln_time_new2});
 
-  CustomWeakFormHeatRK wf("Boundary_air", ALPHA, LAMBDA, HEATCAP, RHO,
-    &current_time, TEMP_INIT, T_FINAL);
+  WeakFormSharedPtr<double> wf(new CustomWeakFormHeatRK("Boundary_air", ALPHA, LAMBDA, HEATCAP, RHO,
+    &current_time, TEMP_INIT, T_FINAL));
 
 #ifdef _SHOW_OUTPUT
   // Initialize views.
@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
 #endif
 
   // Initialize Runge-Kutta time stepping.
-  RungeKutta<double> runge_kutta(&wf, spaces, &bt);
+  RungeKutta<double> runge_kutta(wf, spaces, &bt);
   runge_kutta.set_tolerance(NEWTON_TOL);
   runge_kutta.set_verbose_output(true);
   runge_kutta.set_time_step(time_step);

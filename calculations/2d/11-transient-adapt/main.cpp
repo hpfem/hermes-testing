@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
   // Initialize the weak formulation
   CustomNonlinearity lambda(alpha);
   Hermes2DFunction<double> f(heat_src);
-  CustomWeakFormPoisson wf(&lambda, &f);
+  WeakFormSharedPtr<double> wf(new CustomWeakFormPoisson(&lambda, &f));
 
   // Next time level solution.
   MeshFunctionSharedPtr<double> sln_time_new(new Solution<double>(mesh));
@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
   H1ProjBasedSelector<double> selector(CAND_LIST);
 
   // Initialize Runge-Kutta time stepping.
-  RungeKutta<double> runge_kutta(&wf, space, &bt);
+  RungeKutta<double> runge_kutta(wf, space, &bt);
 
   // Time stepping loop.
   double current_time = 0; int ts = 1;

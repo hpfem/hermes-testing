@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
   // Initialize the weak formulation
   CustomNonlinearity lambda(alpha);
   Hermes2DFunction<double> src(-heat_src);
-  DefaultWeakFormPoisson<double> wf(HERMES_ANY, &lambda, &src);
+  WeakFormSharedPtr<double> wf(new DefaultWeakFormPoisson<double>(HERMES_ANY, &lambda, &src));
 #ifdef SHOW_OUTPUT
   ScalarView s_view("Solution");
 #endif
@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
   HermesCommonApi.set_integral_param_value({matrixSolverType, SOLVER_PARALUTION_ITERATIVE});
   {
     // Initialize Newton solver.
-    NewtonSolver<double> newton(&wf, space);
+    NewtonSolver<double> newton(wf, space);
     newton.set_tolerance(NEWTON_TOL, ResidualNormAbsolute);
     newton.set_max_steps_with_reused_jacobian(0);
 
@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
   // Iterative - "exact" initial guess.
   {
     // Initialize Newton solver.
-    NewtonSolver<double> newton(&wf, space);
+    NewtonSolver<double> newton(wf, space);
     newton.set_tolerance(NEWTON_TOL, ResidualNormAbsolute);
 
     newton.get_linear_matrix_solver()->as_IterSolver()->set_solver_type(Solvers::GMRES);

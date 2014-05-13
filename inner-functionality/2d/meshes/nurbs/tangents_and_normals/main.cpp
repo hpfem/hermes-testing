@@ -114,7 +114,7 @@ int main(int argc, char* argv[])
   // Instantiate a class with global functions.
   Hermes2D hermes2d;
 
-  // Load the mesh->
+  // Load the mesh.
   MeshSharedPtr mesh(new Mesh);
   MeshReaderH2D mloader;
   mloader.load("domain.mesh", mesh);
@@ -135,7 +135,7 @@ int main(int argc, char* argv[])
   EssentialBCs bcs(Hermes::vector<EssentialBoundaryCondition*>(&bc_bottom, &bc_top, &bc_left, &bc_right));
 
   // Initialize the weak formulation.
-  CustomWeakFormPoisson wf(1.0);
+  WeakFormSharedPtr<double> wf(new CustomWeakFormPoisson(1.0));
 
   // Create an H1 space with default shapeset.
   H1Space space(mesh, &bcs, P_INIT);
@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
   info("ndof = %d", ndof);
 
   // Initialize the FE problem.
-  DiscreteProblem dp(&wf, space);
+  DiscreteProblem dp(wf, space);
 
   // Set up the solver, matrix, and rhs according to the solver selection.
   SparseMatrix* matrix = create_matrix(matrix_solver);

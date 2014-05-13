@@ -26,10 +26,10 @@ int main(int argc, char* argv[])
     mesh->refine_all_elements();
 
   // Initialize the weak formulation.
-  CustomWeakFormPoissonNewton wf("Aluminum", new Hermes::Hermes1DFunction<double>(LAMBDA_AL),
+  WeakFormSharedPtr<double> wf(new CustomWeakFormPoissonNewton("Aluminum", new Hermes::Hermes1DFunction<double>(LAMBDA_AL),
     "Copper", new Hermes::Hermes1DFunction<double>(LAMBDA_CU),
     new Hermes::Hermes2DFunction<double>(-VOLUME_HEAT_SRC),
-    "Outer", ALPHA, T_EXTERIOR);
+    "Outer", ALPHA, T_EXTERIOR));
 
   // Initialize boundary conditions.
   CustomDirichletCondition bc_essential(std::vector<std::string>({"Bottom", "Inner", "Left"}),
@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
     memset(coeff_vec, 0, ndof*sizeof(double));
 
     // Initialize the Newton solver.
-    NewtonSolver<double> newton(&wf, space);
+    NewtonSolver<double> newton(wf, space);
 
     // Perform Newton's iteration and translate the resulting coefficient vector into a Solution.
     MeshFunctionSharedPtr<double> sln(new Solution<double>());

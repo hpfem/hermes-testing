@@ -144,8 +144,7 @@ int main(int argc, char* argv[])
   std::vector<MeshFunctionSharedPtr<double> > all_solutions = std::vector<MeshFunctionSharedPtr<double> >({ xvel_prev_time, yvel_prev_time, p_prev_time, temperature_prev_time });
 
   Hermes::Mixins::Loggable::Static::info("Projecting initial condition to obtain initial vector for the Newton's method.");
-  OGProjection<double> ogProjection;
-  ogProjection.project_global(all_spaces, initial_solutions, all_solutions, all_proj_norms);
+  OGProjection<double>::project_global(all_spaces, initial_solutions, all_solutions, all_proj_norms);
 
 
   // Calculate Reynolds number.
@@ -153,12 +152,12 @@ int main(int argc, char* argv[])
   //Hermes::Mixins::Loggable::Static::Hermes::Mixins::Loggable::Static::info("RE = %g", reynolds_number);
 
   // Initialize weak formulation.
-  CustomWeakFormHeatAndFlow wf(STOKES, reynolds_number, time_step, xvel_prev_time, yvel_prev_time, temperature_prev_time, 
+  WeakFormSharedPtr<double> wf(new CustomWeakFormHeatAndFlow(STOKES, reynolds_number, time_step, xvel_prev_time, yvel_prev_time, temperature_prev_time, 
       HEAT_SOURCE_GRAPHITE, SPECIFIC_HEAT_GRAPHITE, SPECIFIC_HEAT_FLUID, RHO_GRAPHITE, RHO_FLUID, 
-      THERMAL_CONDUCTIVITY_GRAPHITE, THERMAL_CONDUCTIVITY_FLUID, SIMPLE_TEMPERATURE_ADVECTION);
+      THERMAL_CONDUCTIVITY_GRAPHITE, THERMAL_CONDUCTIVITY_FLUID, SIMPLE_TEMPERATURE_ADVECTION));
   
   // Initialize the FE problem.
-  DiscreteProblem<double> dp(&wf, all_spaces);
+  DiscreteProblem<double> dp(wf, all_spaces);
 
   // Initialize the Newton solver.
   NewtonSolver<double> newton(&dp);
