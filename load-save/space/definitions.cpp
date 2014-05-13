@@ -17,7 +17,7 @@ namespace L2_real
 
   template<typename Real, typename Scalar>
   Scalar CustomWeakForm::CustomMatrixFormVol::matrix_form(int n, double *wt, Func<Scalar> *u_ext[], Func<Real> *u, Func<Real> *v,
-    Geom<Real> *e, Func<Scalar> **ext) const
+    GeomVol<Real> *e, Func<Scalar> **ext) const
   {
     Scalar result = Scalar(0);
     for (int i = 0; i < n; i++)
@@ -26,13 +26,13 @@ namespace L2_real
   }
 
   double CustomWeakForm::CustomMatrixFormVol::value(int n, double *wt, Func<double> *u_ext[], Func<double> *u, Func<double> *v,
-    Geom<double> *e, Func<double> **ext) const
+    GeomVol<double> *e, Func<double> **ext) const
   {
     return matrix_form<double, double>(n, wt, u_ext, u, v, e, ext);
   }
 
   Ord CustomWeakForm::CustomMatrixFormVol::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v,
-    Geom<Ord> *e, Func<Ord> **ext) const
+    GeomVol<Ord> *e, Func<Ord> **ext) const
   {
     return matrix_form<Ord, Ord>(n, wt, u_ext, u, v, e, ext);
   }
@@ -44,7 +44,7 @@ namespace L2_real
 
   template<typename Real, typename Scalar>
   Scalar CustomWeakForm::CustomVectorFormVol::vector_form(int n, double *wt, Func<Scalar> *u_ext[], Func<Real> *v,
-    Geom<Real> *e, Func<Scalar> **ext) const
+    GeomVol<Real> *e, Func<Scalar> **ext) const
   {
     Scalar result = Scalar(0);
     for (int i = 0; i < n; i++)
@@ -53,13 +53,13 @@ namespace L2_real
   }
 
   double CustomWeakForm::CustomVectorFormVol::value(int n, double *wt, Func<double> *u_ext[], Func<double> *v,
-    Geom<double> *e, Func<double> **ext) const
+    GeomVol<double> *e, Func<double> **ext) const
   {
     return vector_form<double, double>(n, wt, u_ext, v, e, ext);
   }
 
   Ord CustomWeakForm::CustomVectorFormVol::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v,
-    Geom<Ord> *e, Func<Ord> **ext) const
+    GeomVol<Ord> *e, Func<Ord> **ext) const
   {
     return vector_form<Ord, Ord>(n, wt, u_ext, v, e, ext);
   }

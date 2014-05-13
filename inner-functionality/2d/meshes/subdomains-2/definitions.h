@@ -16,10 +16,10 @@ private:
       CustomFormAdvection(int i, int j, std::string area);
 
       virtual double value(int n, double *wt, Func<double> *u_ext[], Func<double> *u,
-        Func<double> *v, Geom<double> *e, Func<double> **ext) const;
+        Func<double> *v, GeomVol<double> *e, Func<double> **ext) const;
 
       virtual Hermes::Ord ord(int n, double *wt, Func<Hermes::Ord> *u_ext[], Func<Hermes::Ord> *u, Func<Hermes::Ord> *v,
-        Geom<Hermes::Ord> *e, Func<Ord> **ext) const;
+        GeomVol<Hermes::Ord> *e, Func<Ord> **ext) const;
 
       virtual MatrixFormVol<double>* clone() const;
     };

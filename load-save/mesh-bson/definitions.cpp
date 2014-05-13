@@ -19,7 +19,7 @@ CustomWeakForm::CustomFormAdvection::CustomFormAdvection(int i, int j, std::stri
 }
 
 double CustomWeakForm::CustomFormAdvection::value(int n, double *wt, Func<double> *u_ext[], Func<double> *u,
-  Func<double> *v, Geom<double> *e, Func<double> **ext) const
+  Func<double> *v, GeomVol<double> *e, Func<double> **ext) const
 {
   double result = 0;
   for (int i = 0; i < n; i++) 
@@ -30,7 +30,7 @@ double CustomWeakForm::CustomFormAdvection::value(int n, double *wt, Func<double
 }
 
 Ord CustomWeakForm::CustomFormAdvection::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *u, Func<Ord> *v,
-  Geom<Ord> *e, Func<Ord> **ext) const
+  GeomVol<Ord> *e, Func<Ord> **ext) const
 {
   Ord result = Ord(0);
   for (int i = 0; i < n; i++) 

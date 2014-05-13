@@ -70,20 +70,20 @@ Scalar2 exact(double x, double y, Scalar2& dx, Scalar2& dy)
 }
 
 template<typename Real, typename Scalar>
-Scalar bilinear_form(int n, double *wt, Func<Scalar> *u_ext[], Func<Real> *u, Func<Real> *v, Geom<Real> *e, ExtData<Scalar> *ext)
+Scalar bilinear_form(int n, double *wt, Func<Scalar> *u_ext[], Func<Real> *u, Func<Real> *v, GeomVol<Real> *e, ExtData<Scalar> *ext)
 {
   return 1.0/mu_r * int_curl_e_curl_f<Real, Scalar>(n, wt, u, v) -
          kappa * kappa * int_e_f<Real, Scalar>(n, wt, u, v);
 }
 
 template<typename Real, typename Scalar>
-Scalar bilinear_form_surf(int n, double *wt, Func<Scalar> *u_ext[], Func<Real> *u, Func<Real> *v, Geom<Real> *e, ExtData<Scalar> *ext)
+Scalar bilinear_form_surf(int n, double *wt, Func<Scalar> *u_ext[], Func<Real> *u, Func<Real> *v, GeomVol<Real> *e, ExtData<Scalar> *ext)
 {
   cplx ii = cplx(0.0, 1.0);
   return ii * (-kappa) * int_e_tau_f_tau<Real, Scalar>(n, wt, u, v, e);
 }
 
-Scalar linear_form_surf(int n, double *wt, Func<Scalar> *u_ext[], Func<double> *v, Geom<double> *e, ExtData<Scalar> *ext)
+Scalar linear_form_surf(int n, double *wt, Func<Scalar> *u_ext[], Func<double> *v, GeomVol<double> *e, ExtData<Scalar> *ext)
 {
   Scalar result = 0;
   for (int i = 0; i < n; i++)
@@ -104,6 +104,6 @@ Scalar linear_form_surf(int n, double *wt, Func<Scalar> *u_ext[], Func<double> *
 }
 
 // Maximum polynomial order to integrate surface linear form.
-Ord linear_form_surf_ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, Geom<Ord> *e, ExtData<Ord> *ext)
+Ord linear_form_surf_ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, GeomVol<Ord> *e, ExtData<Ord> *ext)
   {  return Ord(v->val[0].get_max_order());  }
 
