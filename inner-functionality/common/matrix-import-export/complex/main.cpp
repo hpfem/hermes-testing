@@ -47,7 +47,7 @@ bool export_and_test_matrix(Matrix<complex>* mat, int argc, char *argv[])
 
     if(i == 2)
     {
-#if defined WITH_MATIO && !defined WIN32
+#if defined (WITH_MATIO) && !defined (WIN32)
       sprintf(s, "Complex_Matrix_%s_matio.mat", argv[1]);
       mat->export_to_file(s, "A", EXPORT_FORMAT_MATLAB_MATIO);
       mat->free();
@@ -87,7 +87,7 @@ bool export_and_test_vector(Vector<complex>* vec, int argc, char *argv[])
 
     if(i == 2)
     {
-#if defined WITH_MATIO && !defined WIN32
+#if defined (WITH_MATIO) && !defined (WIN32)
       sprintf(s, "Complex_Vector_%s_matio.vec", argv[1]);
       vec->export_to_file(s, "rhs", EXPORT_FORMAT_MATLAB_MATIO);
       vec->free();

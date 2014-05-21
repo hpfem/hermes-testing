@@ -141,7 +141,7 @@ bool export_and_test(AlgebraicEntity* ent, int argc, char *argv_local[])
   sprintf(s, "Real_%s_%s_market.dat", argv_local[1], argv_local[2]);
   ent->export_to_file(s, "A", EXPORT_FORMAT_MATRIX_MARKET);
 
-#if defined WITH_MATIO && !defined WIN32
+#if defined (WITH_MATIO) && !defined (WIN32)
   sprintf(s, "Real_%s_%s_matio.dat", argv_local[1], argv_local[2]);
   ent->export_to_file(s, "A", EXPORT_FORMAT_MATLAB_MATIO);
   ent->free();
