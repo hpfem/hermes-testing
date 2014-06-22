@@ -17,13 +17,13 @@ public:
 
   virtual void integral(int n, double* wt, Func<double> **fns, Geom<double> *e, double* result)
   {
-    for(int j = 0; j < this->number_of_integrals; j++)
-      for (int i = 0; i < n; i++)
-        result[j] += wt[i];
+    for (int j = 0; j < this->number_of_integrals; j++)
+    for (int i = 0; i < n; i++)
+      result[j] += wt[i];
   };
 
   virtual void order(Func<Hermes::Ord> **fns, Hermes::Ord* result) {
-    for(int j = 0; j < this->number_of_integrals; j++)
+    for (int j = 0; j < this->number_of_integrals; j++)
       result[j] = Hermes::Ord(j);
   }
 };
@@ -42,13 +42,13 @@ public:
 
   virtual void integral(int n, double* wt, Func<double> **fns, Geom<double> *e, double* result)
   {
-    for(int j = 0; j < this->number_of_integrals; j++)
-      for (int i = 0; i < n; i++)
-        result[j] += wt[i] * fns[j]->val[i] * fns[j]->val[i];
+    for (int j = 0; j < this->number_of_integrals; j++)
+    for (int i = 0; i < n; i++)
+      result[j] += wt[i] * fns[j]->val[i] * fns[j]->val[i];
   };
 
   virtual void order(Func<Hermes::Ord> **fns, Hermes::Ord* result) {
-    for(int j = 0; j < this->number_of_integrals; j++)
+    for (int j = 0; j < this->number_of_integrals; j++)
       result[j] = fns[j]->val[0];
   }
 };
@@ -66,20 +66,20 @@ public:
 
   virtual void integral(int n, double* wt, Func<double> **fns, Geom<double> *e, double* result)
   {
-    for(int j = 0; j < this->number_of_integrals; j++)
-      for (int i = 0; i < n; i++)
-        result[j] += wt[i];
+    for (int j = 0; j < this->number_of_integrals; j++)
+    for (int i = 0; i < n; i++)
+      result[j] += wt[i];
   };
 
   virtual void order(Func<Hermes::Ord> **fns, Hermes::Ord* result) {
-    for(int j = 0; j < this->number_of_integrals; j++)
+    for (int j = 0; j < this->number_of_integrals; j++)
       result[j] = Hermes::Ord(j);
   }
 };
 
 void handle_success(bool success)
 {
-  if(success == true)
+  if (success == true)
     printf("Success!\n");
   else
     printf("Failure!\n");
@@ -102,14 +102,10 @@ bool part2OneCase(int i, MeshSharedPtr mesh, Hermes::vector<std::string> markers
     elems.push_back(egg_shell_mesh->get_num_active_elements());
     success = Hermes::Testing::test_value(egg_shell_mesh->get_num_active_elements(), measured_elems[i], "Num elems", 1) && success;
 
-#ifdef _SHOW_OUTPUT
-    m.show(egg_shell_mesh);
-    m.wait_for_keypress();
-#endif
     Hermes::Hermes2D::MeshFunctionSharedPtr<double> eggShell(new Hermes::Hermes2D::ExactSolutionEggShell(egg_shell_mesh, poly_degree));
 #ifdef _SHOW_OUTPUT
     m.show(egg_shell_mesh);
-    m.wait_for_keypress();
+    //m.wait_for_keypress();
 #endif
 
     Hermes::Hermes2D::MeshFunctionSharedPtr<double> zeroSlnWholeMesh(new Hermes::Hermes2D::ConstantSolution<double>(mesh, 1341.13213));
@@ -117,11 +113,11 @@ bool part2OneCase(int i, MeshSharedPtr mesh, Hermes::vector<std::string> markers
 
     MyVolumetricIntegralCalculatorL2 integral(Hermes::vector<MeshFunctionSharedPtr<double> >(eggShell, zeroSlnEggShellMesh, zeroSlnWholeMesh), 3);
     double* result = integral.calculate(HERMES_ANY);
-    success = Hermes::Testing::test_value(result[0], measured_integrals[i*3 + 0], "Integral-0") && success;
-    success = Hermes::Testing::test_value(result[1], measured_integrals[i*3 + 1], "Integral-1") && success;
-    success = Hermes::Testing::test_value(result[2], measured_integrals[i*3 + 2], "Integral-2") && success;
+    success = Hermes::Testing::test_value(result[0], measured_integrals[i * 3 + 0], "Integral-0") && success;
+    success = Hermes::Testing::test_value(result[1], measured_integrals[i * 3 + 1], "Integral-1") && success;
+    success = Hermes::Testing::test_value(result[2], measured_integrals[i * 3 + 2], "Integral-2") && success;
   }
-  catch(Hermes::Exceptions::Exception& e)
+  catch (Hermes::Exceptions::Exception& e)
   {
     std::cout << e.what();
     return false;
@@ -181,151 +177,397 @@ void part2FillData()
   measured_integrals.push_back(134897.6543);
 }
 
+void part4TestLoadAgros(std::string filename, Hermes::vector<Hermes::vector<std::string> > marker_set,
+  Hermes::vector<std::pair<std::string, int> > surf_refinements = Hermes::vector<std::pair<std::string, int> >(),
+  Hermes::vector<std::pair<std::string, int> > vol_refinements = Hermes::vector<std::pair<std::string, int> >())
+{
+  // Load the mesh.
+  MeshSharedPtr mesh(new Mesh);
+  MeshReaderH2DXML mloader;
+  Hermes::vector<MeshSharedPtr> meshes;
+  meshes.push_back(mesh);
+  mloader.load(filename.c_str(), meshes);
+
+  Views::ScalarView sview;
+
+  for (int i = 0; i < surf_refinements.size(); i++)
+    mesh->refine_towards_boundary(surf_refinements[i].first, surf_refinements[i].second);
+
+  for (int i = 0; i < vol_refinements.size(); i++)
+    mesh->refine_in_area(vol_refinements[i].first, vol_refinements[i].second);
+
+  std::cout << "Test4-mesh size: " << mesh->get_num_active_elements() << std::endl;
+
+  // 2 layers & 2-nd polynomial order.
+  for (int i = 0; i < marker_set.size(); i++)
+  {
+    std::cout << "Test4: " << filename << ", v #" << i << ", 2-layer version";
+    // Create the egg shell.
+    Hermes::Hermes2D::MeshSharedPtr egg_shell_mesh = Hermes::Hermes2D::EggShell::get_egg_shell(mesh, marker_set[i], 2);
+
+    if (egg_shell_mesh->get_num_active_elements() == 0)
+    {
+      std::cout << "- empty eggShell mesh." << std::endl;
+      continue;
+    }
+    std::cout << "\t- mesh done" << std::endl;
+
+    // Create the egg shell function.
+    Hermes::Hermes2D::MeshFunctionSharedPtr<double> eggShell(new Hermes::Hermes2D::ExactSolutionEggShell(egg_shell_mesh, 2));
+
+    std::cout << "\t - done." << std::endl;
+
+#ifdef SHOW_OUTPUT
+    //sview.show(eggShell);
+    //sview.wait_for_keypress();
+#endif
+  }
+
+  // 3 layers & 3-rd polynomial order.
+  for (int i = 0; i < marker_set.size(); i++)
+  {
+    std::cout << "Test4: " << filename << ", v #" << i << ", 3-layer version";
+
+    // Create the egg shell.
+    Hermes::Hermes2D::MeshSharedPtr egg_shell_mesh = Hermes::Hermes2D::EggShell::get_egg_shell(mesh, marker_set[i], 3);
+
+    if (egg_shell_mesh->get_num_active_elements() == 0)
+    {
+      std::cout << "- empty eggShell mesh." << std::endl;
+      continue;
+    }
+    std::cout << "\t- mesh done" << std::endl;
+
+    // Create the egg shell function.
+    Hermes::Hermes2D::MeshFunctionSharedPtr<double> eggShell(new Hermes::Hermes2D::ExactSolutionEggShell(egg_shell_mesh, 3));
+
+    std::cout << "\t - done." << std::endl;
+
+#ifdef SHOW_OUTPUT
+    //sview.show(eggShell);
+    //sview.wait_for_keypress();
+#endif
+  }
+}
+
 int main(int argc, char* argv[])
 {
+  /*
   Hermes::Hermes2D::EggShell::egg_shell_verbose = false;
   // Part1: eggShellCreation + Integral (both Vol. + Surf.) comparison to calculation with for_all_active_elements.
   try
   {
-    // Load the mesh.
-    MeshSharedPtr mesh(new Mesh);
-    Hermes::Hermes2D::MeshReaderH2DXML mloader;
-    mloader.load("mesh_marker3.xml", mesh);
+  // Load the mesh.
+  MeshSharedPtr mesh(new Mesh);
+  Hermes::Hermes2D::MeshReaderH2DXML mloader;
+  mloader.load("mesh_marker3.xml", mesh);
 
-    Hermes::Hermes2D::MeshSharedPtr egg_shell_mesh = Hermes::Hermes2D::EggShell::get_egg_shell(mesh,"3", 2);
+  Hermes::Hermes2D::MeshSharedPtr egg_shell_mesh = Hermes::Hermes2D::EggShell::get_egg_shell(mesh,"3", 2);
 
-#ifdef SHOW_OUTPUT
-    Views::MeshView m;
-    m.show(egg_shell_mesh);
-    m.wait_for_keypress();
-#endif
+  #ifdef SHOW_OUTPUT
+  Views::MeshView m;
+  m.show(egg_shell_mesh);
+  m.wait_for_keypress();
+  #endif
 
-    Hermes::Hermes2D::MeshFunctionSharedPtr<double> eggShell(new Hermes::Hermes2D::ExactSolutionEggShell(egg_shell_mesh, 3));
+  Hermes::Hermes2D::MeshFunctionSharedPtr<double> eggShell(new Hermes::Hermes2D::ExactSolutionEggShell(egg_shell_mesh, 3));
 
-    MyVolumetricIntegralCalculator volume_integrator(eggShell, 15);
-    double* area_int = volume_integrator.calculate(HERMES_ANY);
+  MyVolumetricIntegralCalculator volume_integrator(eggShell, 15);
+  double* area_int = volume_integrator.calculate(HERMES_ANY);
 
-    MySurfaceIntegralCalculator surface_integrator(eggShell, 34);
-    double* surface_1_int = surface_integrator.calculate(EggShell::eggShell1Marker);
+  MySurfaceIntegralCalculator surface_integrator(eggShell, 34);
+  double* surface_1_int = surface_integrator.calculate(EggShell::eggShell1Marker);
 
-    Element* e;
-    double area = 0;
-    double surface_1 = 0;
-    Hermes::Hermes2D::Mesh::MarkersConversion::IntValid internalMarker = egg_shell_mesh->get_boundary_markers_conversion().get_internal_marker(EggShell::eggShell1Marker);
-    if(!internalMarker.valid)
-    {
-      handle_success(false);
-      return -1;
-    }
-    int innerEggShell1Marker = internalMarker.marker;
-    for_all_active_elements(e, egg_shell_mesh)
-    {
-      e->calc_area(true);
-      area += e->area;
-      for(int i = 0; i < e->get_nvert(); i++)
-      {
-        if(e->en[i]->marker == innerEggShell1Marker)
-          surface_1 += std::sqrt(((e->vn[(i + 1) % e->get_nvert()]->x - e->vn[i]->x) * (e->vn[(i + 1) % e->get_nvert()]->x - e->vn[i]->x)) + ((e->vn[(i + 1) % e->get_nvert()]->y - e->vn[i]->y) * (e->vn[(i + 1) % e->get_nvert()]->y - e->vn[i]->y)));
-      }
-    }
+  Element* e;
+  double area = 0;
+  double surface_1 = 0;
+  Hermes::Hermes2D::Mesh::MarkersConversion::IntValid internalMarker = egg_shell_mesh->get_boundary_markers_conversion().get_internal_marker(EggShell::eggShell1Marker);
+  if(!internalMarker.valid)
+  {
+  handle_success(false);
+  return -1;
+  }
+  int innerEggShell1Marker = internalMarker.marker;
+  for_all_active_elements(e, egg_shell_mesh)
+  {
+  e->calc_area(true);
+  area += e->area;
+  for(int i = 0; i < e->get_nvert(); i++)
+  {
+  if(e->en[i]->marker == innerEggShell1Marker)
+  surface_1 += std::sqrt(((e->vn[(i + 1) % e->get_nvert()]->x - e->vn[i]->x) * (e->vn[(i + 1) % e->get_nvert()]->x - e->vn[i]->x)) + ((e->vn[(i + 1) % e->get_nvert()]->y - e->vn[i]->y) * (e->vn[(i + 1) % e->get_nvert()]->y - e->vn[i]->y)));
+  }
+  }
 
-    bool success = true;
-    for(int i = 0; i < 15; i++)
-      success = Testing::test_value(area_int[i], area, "Area") && success;
-    for(int i = 0; i < 34; i++)
-      success = Testing::test_value(surface_1_int[i], surface_1, "Surface") && success;
+  bool success = true;
+  for(int i = 0; i < 15; i++)
+  success = Testing::test_value(area_int[i], area, "Area") && success;
+  for(int i = 0; i < 34; i++)
+  success = Testing::test_value(surface_1_int[i], surface_1, "Surface") && success;
 
-    handle_success(success);
-    if(!success)
-      return -1;
+  handle_success(success);
+  if(!success)
+  return -1;
 
-#ifdef SHOW_OUTPUT
-    Views::ScalarView s;
-    s.show(eggShell);
-    s.wait_for_keypress();
-#endif
+  #ifdef SHOW_OUTPUT
+  Views::ScalarView s;
+  s.show(eggShell);
+  s.wait_for_keypress();
+  #endif
   }
   catch(std::exception& e)
   {
-    handle_success(false);
-    return -1;
+  handle_success(false);
+  return -1;
   }
 
   // Part2: eggShellCreation with various settings.
   part2FillData();
 
   {
-    bool success = true;
+  bool success = true;
 
-    EggShell::egg_shell_verbose = false;
+  EggShell::egg_shell_verbose = false;
 
-    // Load the mesh.
-    MeshSharedPtr mesh(new Mesh);
-    Hermes::Hermes2D::MeshReaderH2DXML mloader;
-    mloader.load("pokus.xml", mesh);
+  // Load the mesh.
+  MeshSharedPtr mesh(new Mesh);
+  Hermes::Hermes2D::MeshReaderH2DXML mloader;
+  mloader.load("pokus.xml", mesh);
 
-    success = part2OneCase(1, mesh, "2", 2, 3) && success;
+  success = part2OneCase(1, mesh, "2", 2, 3) && success;
 
-    success = part2OneCase(2, mesh, "3", 3, 4) && success;
+  success = part2OneCase(2, mesh, "3", 3, 4) && success;
 
-    success = part2OneCase(3, mesh, "4", 2, 5) && success;
+  success = part2OneCase(3, mesh, "4", 2, 5) && success;
 
-    success = part2OneCase(5, mesh, Hermes::vector<std::string>("2", "4"), 5, 6) && success;
+  success = part2OneCase(5, mesh, Hermes::vector<std::string>("2", "4"), 5, 6) && success;
 
-    success = part2OneCase(6, mesh, Hermes::vector<std::string>("3", "5", "1"), 4, 4) && success;
+  success = part2OneCase(6, mesh, Hermes::vector<std::string>("3", "5", "1"), 4, 4) && success;
 
-    success = part2OneCase(7, mesh, Hermes::vector<std::string>("3", "2", "2"), 3, 2) && success;
+  success = part2OneCase(7, mesh, Hermes::vector<std::string>("3", "2", "2"), 3, 2) && success;
 
-    success = part2OneCase(8, mesh, Hermes::vector<std::string>("1", "2"), 2, 3) && success;
+  success = part2OneCase(8, mesh, Hermes::vector<std::string>("1", "2"), 2, 3) && success;
 
-    success = part2OneCase(9, mesh, Hermes::vector<std::string>("3", "4"), 4, 1) && success;
+  success = part2OneCase(9, mesh, Hermes::vector<std::string>("3", "4"), 4, 1) && success;
 
-    if(!success)
-    {
-      handle_success(success);
-      return (!success);
-    }
+  if(!success)
+  {
+  handle_success(success);
+  return (!success);
+  }
   }
   // Part 3.
   {
-#ifdef _SHOW_OUTPUT
-    MeshView m;
-    ScalarView s;
-#endif
-    // Load the mesh.
-    MeshSharedPtr mesh(new Mesh);
-    Hermes::Hermes2D::MeshReaderH2DXML mloader;
-    mloader.load("pokus.xml", mesh);
+  #ifdef _SHOW_OUTPUT
+  MeshView m;
+  ScalarView s;
+  #endif
+  // Load the mesh.
+  MeshSharedPtr mesh(new Mesh);
+  Hermes::Hermes2D::MeshReaderH2DXML mloader;
+  mloader.load("pokus.xml", mesh);
 
-    for(int k = 0; k < 5; k++)
-    {
-      std::cout << "k == " << k << std::endl;
+  for (int k = 0; k < 5; k++)
+  {
+  std::cout << "k == " << k << std::endl;
 
-      mesh->refine_towards_boundary("3");
+  mesh->refine_towards_boundary("3");
 
-      for(int i = 2; i < 5; i++)
-      {
-        std::cout << "i == " << i << std::endl;
-        Hermes::Hermes2D::MeshSharedPtr egg_shell_mesh = Hermes::Hermes2D::EggShell::get_egg_shell(mesh, "4", i);
+  for (int i = 2; i < 5; i++)
+  {
+  std::cout << "i == " << i << std::endl;
+  Hermes::Hermes2D::MeshSharedPtr egg_shell_mesh = Hermes::Hermes2D::EggShell::get_egg_shell(mesh, "4", i);
 
-#ifdef _SHOW_OUTPUT
-        m.show(egg_shell_mesh);
-          View::wait(HERMES_WAIT_KEYPRESS);
-#endif
+  #ifdef _SHOW_OUTPUT
+  m.show(egg_shell_mesh);
+  View::wait(HERMES_WAIT_KEYPRESS);
+  #endif
 
-        for(int j = 2; j < 4; j++)
-        {
-          std::cout << "j == " << j << std::endl;
-          Hermes::Hermes2D::MeshFunctionSharedPtr<double> eggShell(new Hermes::Hermes2D::ExactSolutionEggShell(egg_shell_mesh, j));
+  for (int j = 2; j < 4; j++)
+  {
+  std::cout << "j == " << j << std::endl;
+  Hermes::Hermes2D::MeshFunctionSharedPtr<double> eggShell(new Hermes::Hermes2D::ExactSolutionEggShell(egg_shell_mesh, j));
 
-#ifdef _SHOW_OUTPUT
-          s.show(eggShell);
-          View::wait(HERMES_WAIT_KEYPRESS);
-#endif
-        }
-      }
-    }
+  #ifdef _SHOW_OUTPUT
+  s.show(eggShell);
+  View::wait(HERMES_WAIT_KEYPRESS);
+  #endif
   }
+  }
+  }
+  }
+  */
+  // Part 4.
+part4TestLoadAgros("agros-porous-media-flow-repository3.msh",
+  Hermes::vector<Hermes::vector<std::string> >(
+  Hermes::vector<std::string>("0", "0"),
+  Hermes::vector<std::string>("1", "1"),
+  Hermes::vector<std::string>("3", "3"),
+  Hermes::vector<std::string>("2", "2"),
+  Hermes::vector<std::string>("3", "2"),
+  Hermes::vector<std::string>("1", "0"),
+  Hermes::vector<std::string>("3", "1"),
+  Hermes::vector<std::string>("0", "3"),
+  Hermes::vector<std::string>("0", "2"),
+  Hermes::vector<std::string>("1", "2"),
+  Hermes::vector<std::string>("0", "1", "2"),
+  Hermes::vector<std::string>("0", "2", "2"),
+  Hermes::vector<std::string>("0", "3", "2"),
+  Hermes::vector<std::string>("1", "3", "2")),
+  Hermes::vector<std::pair<std::string, int> >(
+  std::pair<std::string, int>("10", 3),
+  std::pair<std::string, int>("11", 3),
+  std::pair<std::string, int>("12", 4),
+  std::pair<std::string, int>("13", 2),
+  std::pair<std::string, int>("3", 2))
+  );
+
+part4TestLoadAgros("agros-porous-media-flow-repository2.msh",
+  Hermes::vector<Hermes::vector<std::string> >(
+  Hermes::vector<std::string>("0", "0"),
+  Hermes::vector<std::string>("1", "1"),
+  Hermes::vector<std::string>("3", "3"),
+  Hermes::vector<std::string>("2", "2"),
+  Hermes::vector<std::string>("3", "2"),
+  Hermes::vector<std::string>("1", "0"),
+  Hermes::vector<std::string>("3", "1"),
+  Hermes::vector<std::string>("0", "3"),
+  Hermes::vector<std::string>("0", "2"),
+  Hermes::vector<std::string>("1", "2"),
+  Hermes::vector<std::string>("0", "1", "2"),
+  Hermes::vector<std::string>("0", "2", "2"),
+  Hermes::vector<std::string>("0", "3", "2"),
+  Hermes::vector<std::string>("1", "3", "2")),
+  Hermes::vector<std::pair<std::string, int> >(),
+  Hermes::vector<std::pair<std::string, int> >(
+  std::pair<std::string, int>("0", 1),
+  std::pair<std::string, int>("2", 1))
+  );
+
+part4TestLoadAgros("agros-porous-media-flow-repository1.msh",
+  Hermes::vector<Hermes::vector<std::string> >(
+  Hermes::vector<std::string>("0", "0"),
+  Hermes::vector<std::string>("1", "1"),
+  Hermes::vector<std::string>("3", "3"),
+  Hermes::vector<std::string>("2", "2"),
+  Hermes::vector<std::string>("3", "2"),
+  Hermes::vector<std::string>("1", "0"),
+  Hermes::vector<std::string>("3", "1"),
+  Hermes::vector<std::string>("0", "3"),
+  Hermes::vector<std::string>("0", "2"),
+  Hermes::vector<std::string>("1", "2"),
+  Hermes::vector<std::string>("0", "1", "2"),
+  Hermes::vector<std::string>("0", "2", "2"),
+  Hermes::vector<std::string>("0", "3", "2"),
+  Hermes::vector<std::string>("1", "3", "2"))
+  );
+
+part4TestLoadAgros("agros-magnetic-motor.msh",
+  Hermes::vector<Hermes::vector<std::string> >(
+  Hermes::vector<std::string>("0", "0"),
+  Hermes::vector<std::string>("1", "1"),
+  Hermes::vector<std::string>("3", "3"),
+  Hermes::vector<std::string>("4", "4"),
+  Hermes::vector<std::string>("5", "5"),
+  Hermes::vector<std::string>("6", "6"),
+  Hermes::vector<std::string>("3", "1"),
+  Hermes::vector<std::string>("3", "4"),
+  Hermes::vector<std::string>("3", "5"),
+  Hermes::vector<std::string>("3", "6"),
+  Hermes::vector<std::string>("3", "7"),
+  Hermes::vector<std::string>("3", "2"),
+  Hermes::vector<std::string>("2", "1"),
+  Hermes::vector<std::string>("0", "1", "2")),
+  Hermes::vector<std::pair<std::string, int> >(
+  std::pair<std::string, int>("167", 1),
+  std::pair<std::string, int>("163", 1),
+  std::pair<std::string, int>("79", 2),
+  std::pair<std::string, int>("153", 1),
+  std::pair<std::string, int>("155", 1),
+  std::pair<std::string, int>("157", 1))
+  );
+
+part4TestLoadAgros("agros-magnetic-motor.msh",
+  Hermes::vector<Hermes::vector<std::string> >(
+  Hermes::vector<std::string>("0", "0"),
+  Hermes::vector<std::string>("1", "1"),
+  Hermes::vector<std::string>("3", "3"),
+  Hermes::vector<std::string>("4", "4"),
+  Hermes::vector<std::string>("5", "5"),
+  Hermes::vector<std::string>("6", "6"),
+  Hermes::vector<std::string>("3", "1"),
+  Hermes::vector<std::string>("3", "4"),
+  Hermes::vector<std::string>("3", "5"),
+  Hermes::vector<std::string>("3", "6"),
+  Hermes::vector<std::string>("3", "7"),
+  Hermes::vector<std::string>("3", "2"),
+  Hermes::vector<std::string>("2", "1"),
+  Hermes::vector<std::string>("0", "1", "2")),
+  Hermes::vector<std::pair<std::string, int> >(),
+  Hermes::vector<std::pair<std::string, int> >(
+  std::pair<std::string, int>("0", 1),
+  std::pair<std::string, int>("2", 1),
+  std::pair<std::string, int>("5", 1))
+  );
+
+part4TestLoadAgros("agros-magnetic-motor.msh",
+  Hermes::vector<Hermes::vector<std::string> >(
+  Hermes::vector<std::string>("0", "0"),
+  Hermes::vector<std::string>("1", "1"),
+  Hermes::vector<std::string>("3", "3"),
+  Hermes::vector<std::string>("4", "4"),
+  Hermes::vector<std::string>("5", "5"),
+  Hermes::vector<std::string>("6", "6"),
+  Hermes::vector<std::string>("3", "1"),
+  Hermes::vector<std::string>("3", "4"),
+  Hermes::vector<std::string>("3", "5"),
+  Hermes::vector<std::string>("3", "6"),
+  Hermes::vector<std::string>("3", "7"),
+  Hermes::vector<std::string>("3", "2"),
+  Hermes::vector<std::string>("2", "1"),
+  Hermes::vector<std::string>("0", "1", "2"))
+  );
+
+part4TestLoadAgros("agros-magnetic-levitation.msh",
+  Hermes::vector<Hermes::vector<std::string> >(
+  Hermes::vector<std::string>("0", "0"),
+  Hermes::vector<std::string>("1", "1"),
+  Hermes::vector<std::string>("0", "1"),
+  Hermes::vector<std::string>("2", "2"),
+  Hermes::vector<std::string>("2", "3"),
+  Hermes::vector<std::string>("3", "3"),
+  Hermes::vector<std::string>("0", "1", "2"),
+  Hermes::vector<std::string>("3", "0", "1", "2"),
+  Hermes::vector<std::string>("16", "16"),
+  Hermes::vector<std::string>("12", "13", "14", "15"))
+  );
+
+part4TestLoadAgros("agros-electrostatics-separator.msh",
+  Hermes::vector<Hermes::vector<std::string> >(
+  Hermes::vector<std::string>("0", "0"),
+  Hermes::vector<std::string>("1", "1"),
+  Hermes::vector<std::string>("2", "2"),
+  Hermes::vector<std::string>("3", "3"),
+  Hermes::vector<std::string>("0", "1"),
+  Hermes::vector<std::string>("1", "2"),
+  Hermes::vector<std::string>("2", "3"),
+  Hermes::vector<std::string>("3", "2", "1"),
+  Hermes::vector<std::string>("3", "0", "1"),
+  Hermes::vector<std::string>("0", "2", "1"),
+  Hermes::vector<std::string>("0", "2", "1", "3"))
+  );
+
+  part4TestLoadAgros("agros-electrostatics-oscilloscope.msh",
+    Hermes::vector<Hermes::vector<std::string> >(
+    Hermes::vector<std::string>("3", "0"),
+    Hermes::vector<std::string>("3", "3"),
+    Hermes::vector<std::string>("0", "0")));
+
+  part4TestLoadAgros("agros-electrostatics-actuator.msh",
+    Hermes::vector<Hermes::vector<std::string> >(
+    Hermes::vector<std::string>("0", "2"),
+    Hermes::vector<std::string>("2", "2"),
+    Hermes::vector<std::string>("0", "0")));
 
   handle_success(true);
   return 0;
