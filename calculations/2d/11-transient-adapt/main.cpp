@@ -170,7 +170,7 @@ int main(int argc, char* argv[])
   for (int i = 0; i < space->get_num_dofs(); i++)
     sum += result[i];
 
-  bool success = Testing::test_value(sum, 346.83002753031604, "coefficient sum", 2.);
+  bool success = Testing::test_value(sum, 349.579072949291, "coefficient sum", 2.);
 
   if(success == true)
   {

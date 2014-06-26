@@ -9,7 +9,7 @@ namespace L2_real
   const int P_INIT = 1;
   // This is a quantitative parameter of the adapt(...) function and
   // it has different meanings for various adaptive strategies.
-  const double THRESHOLD = 0.9;
+  const double THRESHOLD = 0.8;
 
   // Error calculation & adaptivity.
   DefaultErrorCalculator<double, HERMES_L2_NORM> errorCalculator(RelativeErrorToGlobalNorm, 1);
@@ -20,7 +20,7 @@ namespace L2_real
   // Predefined list of element refinement candidates.
   const CandList CAND_LIST = H2D_HP_ANISO;
   // Stopping criterion for adaptivity.
-  const double ERR_STOP = 2e-1;
+  const double ERR_STOP = .5;
 
   int main(int argc, char* args[])
   {
@@ -100,7 +100,7 @@ namespace L2_real
 
       // Calculate element errors and total error estimate.
       errorCalculator.calculate_errors(sln, ref_sln);
-      double err_est_rel = errorCalculator.get_total_error_squared() * 100;
+      double err_est_rel = errorCalculator.get_total_error_squared() * 100.;
 
       adaptivity.set_space(space);
 #ifdef SHOW_OUTPUT
@@ -128,7 +128,7 @@ namespace H1_complex
 typedef std::complex<double> complex;
   const int INIT_REF_NUM = 0;                       // Number of initial uniform mesh refinements.
   const int P_INIT = 1;                             // Initial polynomial degree of all mesh elements.
-  const double THRESHOLD = 0.95;                    // This is a quantitative parameter of Adaptivity.
+  const double THRESHOLD = 0.8;                    // This is a quantitative parameter of Adaptivity.
 
   // Error calculation & adaptivity.
   DefaultErrorCalculator<complex, HERMES_H1_NORM> errorCalculator(RelativeErrorToGlobalNorm, 1);
@@ -260,7 +260,7 @@ typedef std::complex<double> complex;
 #endif
 
       // If err_est too large, adapt the mesh->
-      if(errorCalculator.get_total_error_squared()  * 100. < ERR_STOP)
+      if((errorCalculator.get_total_error_squared()  * 100.) < ERR_STOP)
         done = true;
       else
       {
@@ -300,7 +300,7 @@ int main(int argc, char* args[])
   total_check += H1_complex::main(argc, args);
 
   bool success = Hermes::Testing::test_value(total_check, 18, "Adaptivity steps", 1);
-  if (total_check == 18)
+  if (total_check == 28)
   {
     printf("Success!\n");
     return 0;

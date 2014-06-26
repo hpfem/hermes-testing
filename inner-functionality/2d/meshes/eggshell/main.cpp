@@ -139,14 +139,14 @@ bool part2OneCase(int i, MeshSharedPtr mesh, std::string marker, int layers, int
 void part2FillData()
 {
   measured_elems.push_back(82);
-  measured_elems.push_back(130);
+  measured_elems.push_back(132);
   measured_elems.push_back(88);
-  measured_elems.push_back(57);
+  measured_elems.push_back(60);
   measured_elems.push_back(82);
   measured_elems.push_back(425);
   measured_elems.push_back(379);
   measured_elems.push_back(271);
-  measured_elems.push_back(293);
+  measured_elems.push_back(299);
   measured_elems.push_back(244);
 
   measured_integrals.push_back(1.167631128e-005);

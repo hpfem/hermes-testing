@@ -18,11 +18,7 @@ int main(int argc, char* argv[])
   }
   catch(Exceptions::NullException& e)
   {
-    if(e.get_param_idx()!=1)
-    {
-      std::cout << "Failure - get_ref_value!";
-      return -1;
-    }
+    e.print_msg();
   }
 
   //LengthException test
@@ -37,11 +33,7 @@ int main(int argc, char* argv[])
   }
   catch(Exceptions::LengthException& e)
   {
-    if(e.get_first_param_idx()!=2 || e.get_second_param_idx()!=3 || e.get_first_length()!=4 || e.get_expected_length()!=3)
-    {
-      std::cout << "Failure - vector_to_solutions!";
-      return -1;
-    }
+    e.print_msg();
   }
 
   //1/2Exception test
@@ -62,6 +54,7 @@ int main(int argc, char* argv[])
   }
   catch(Exceptions::LinearMatrixSolverException& e)
   {
+    e.print_msg();
   }
 
   //ValueException test
