@@ -8,8 +8,8 @@ int main(int argc, char* argv[])
   // Load the mesh.
   MeshSharedPtr mesh1(new Mesh);
   MeshSharedPtr mesh2(new Mesh);
-  std::vector<MeshSharedPtr> meshes;
-  std::vector<MeshSharedPtr> meshes1;
+  std::vector<MeshSharedPtr > meshes;
+  std::vector<MeshSharedPtr > meshes1;
   meshes.push_back({mesh1});
   meshes1.push_back(mesh1);
   meshes1.push_back(mesh2);
@@ -188,7 +188,7 @@ int main(int argc, char* argv[])
   {
     mloader.set_validation(false);
     MeshSharedPtr mesh_agros1(new Mesh), mesh_agros2(new Mesh);
-    std::vector<MeshSharedPtr> meshes_agros({mesh_agros1, mesh_agros2});
+    std::vector<MeshSharedPtr > meshes_agros({mesh_agros1, mesh_agros2});
     mloader.load("agros-test.msh", meshes_agros);
     DefaultEssentialBCConst<double> bc(HERMES_ANY, 1.0);
     EssentialBCs<double> bcs(&bc);

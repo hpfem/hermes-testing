@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 #endif
   // Load the mesh.
   MeshSharedPtr mesh(new Mesh);
-  std::vector<MeshSharedPtr> meshes;
+  std::vector<MeshSharedPtr > meshes;
   meshes.push_back({mesh});
   MeshReaderH2DXML mloader;
   mloader.load("agrosMesh.msh", meshes);

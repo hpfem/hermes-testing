@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
 {
   // Load the mesh.
   MeshSharedPtr mesh_whole_domain(new Mesh), mesh_with_hole(new Mesh);
-  std::vector<MeshSharedPtr> meshes ({mesh_whole_domain, mesh_with_hole});
+  std::vector<MeshSharedPtr > meshes ({mesh_whole_domain, mesh_with_hole});
   MeshReaderH2DXML mloader;
   mloader.load("domain.xml", meshes);
 

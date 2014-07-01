@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
 {
   // Load the mesh.
   MeshSharedPtr mesh_whole_domain(new Mesh), mesh_bottom_left_corner(new Mesh), mesh_complement(new Mesh);
-  std::vector<MeshSharedPtr> meshes({ mesh_bottom_left_corner, mesh_whole_domain, mesh_complement });
+  std::vector<MeshSharedPtr > meshes({ mesh_bottom_left_corner, mesh_whole_domain, mesh_complement });
   MeshReaderH2DXML mloader;
   mloader.set_validation(false);
   mloader.load("subdomains.xml", meshes);

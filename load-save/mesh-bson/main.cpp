@@ -11,9 +11,9 @@ int main(int argc, char* argv[])
   MeshSharedPtr mesh4(new Mesh);
   MeshReaderH2DXML mloader;
   MeshReaderH2DBSON mloaderb;
-  std::vector<MeshSharedPtr> meshes;
-  std::vector<MeshSharedPtr> meshes1;
-  std::vector<MeshSharedPtr> meshes2;
+  std::vector<MeshSharedPtr > meshes;
+  std::vector<MeshSharedPtr > meshes1;
+  std::vector<MeshSharedPtr > meshes2;
   meshes.push_back({mesh1});
   meshes1.push_back(mesh2);
   meshes1.push_back(mesh3);

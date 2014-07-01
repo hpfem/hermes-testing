@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
 {
   // Load the mesh.
   MeshSharedPtr meshVertical(new Mesh), meshHorizontal(new Mesh);
-  std::vector<MeshSharedPtr> meshes ({meshVertical, meshHorizontal});
+  std::vector<MeshSharedPtr > meshes ({meshVertical, meshHorizontal});
   MeshReaderH2DXML mloader;
 	mloader.set_validation(false);
   mloader.load("subdomains.xml", meshes);
@@ -123,7 +123,7 @@ int main(int argc, char* argv[])
   Hermes2D::MeshReaderH2DBSON bson_loader;
   bson_loader.save("meshes.bson", meshes);
   MeshSharedPtr meshVertical2(new Mesh), meshHorizontal2(new Mesh);
-  std::vector<MeshSharedPtr> meshes2({meshVertical2, meshHorizontal2});
+  std::vector<MeshSharedPtr > meshes2({meshVertical2, meshHorizontal2});
   bson_loader.load("meshes.bson", meshes2);
   success = (4 * first_mesh_elem_count == meshes2[0]->get_num_active_elements()) && success;
   success = (4 * second_mesh_elem_count == meshes2[1]->get_num_active_elements()) && success;
