@@ -220,13 +220,13 @@ int main(int argc, char* argv[])
     pview.show(p_prev_time);
     sprintf(title, "Temperature [C], time %g s", current_time);
     tempview.set_title(title);
-    tempview.show(temperature_prev_time,  Views::HERMES_EPS_HIGH);
+    tempview.show(temperature_prev_time);
 #endif
   }
 
   double norm = get_l2_norm(newton.get_sln_vector(), Space<double>::get_num_dofs(all_spaces));
 
-  bool success = Testing::test_value(norm, 567.394037318211, "sln-norm", 1e-4);
+  bool success = Testing::test_value(norm, 567.255162890298, "sln-norm", 1e-4);
 
   // Wait for all views to be closed.
 #ifdef SHOW_OUTPUT
