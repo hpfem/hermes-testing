@@ -4,7 +4,6 @@
 using namespace Hermes::Algebra::DenseMatrixOperations;
 using namespace Hermes::Solvers;
 
-//#define SHOW_OUTPUT
 const int P_INIT = 3;                     // Uniform polynomial degree of mesh elements.
 const int INIT_REF_NUM = 3;               // Number of initial uniform mesh refinements.
 
