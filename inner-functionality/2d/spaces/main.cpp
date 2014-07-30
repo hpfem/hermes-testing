@@ -24,7 +24,7 @@ public:
     return exact_solution->value(x, y);
   }
 
-  EssentialBoundaryCondition<double>::EssentialBCValueType get_value_type() const { return EssentialBoundaryCondition<double>::BC_FUNCTION; }
+  EssentialBCValueType get_value_type() const { return BC_FUNCTION; }
 };
 
 int main(int argc, char* argv[])
