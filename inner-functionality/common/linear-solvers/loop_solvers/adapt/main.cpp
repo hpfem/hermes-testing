@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
 {
 #ifdef WITH_PARALUTION
   HermesCommonApi.set_integral_param_value(matrixSolverType, SOLVER_PARALUTION_AMG);
-  HermesCommonApi.set_integral_param_value(numThreads,1);
+  HermesCommonApi.set_integral_param_value(numThreads, 1);
 
   // Load the mesh.
   MeshSharedPtr mesh(new Mesh);
@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
   // Initialize boundary conditions
   DefaultEssentialBCConst<double> bc_essential_out("Outer", 0.0);
   DefaultEssentialBCConst<double> bc_essential_stator("Stator", VOLTAGE);
-  EssentialBCs<double> bcs(std::vector<EssentialBoundaryCondition<double> *>(&bc_essential_out, &bc_essential_stator));
+  EssentialBCs<double> bcs({&bc_essential_out, &bc_essential_stator});
 
   // Create an H1 space with default shapeset.
   SpaceSharedPtr<double> space(new H1Space<double>(mesh, &bcs, P_INIT));

@@ -19,31 +19,31 @@ int main(int argc, char* argv[])
 
   // Initialize essential boundary conditions.
   Hermes::Hermes2D::DefaultEssentialBCConst<double> bc_essential_r("Bdy", 0.);
-  Hermes::Hermes2D::DefaultEssentialBCConst<complex> bc_essential_c("Bdy", complex(.132, -.12));
+  Hermes::Hermes2D::DefaultEssentialBCConst<::complex> bc_essential_c("Bdy", ::complex (.132, -.12));
   Hermes::Hermes2D::EssentialBCs<double> bcs_r(&bc_essential_r);
-  Hermes::Hermes2D::EssentialBCs<complex> bcs_c(&bc_essential_c);
+  Hermes::Hermes2D::EssentialBCs<::complex> bcs_c(&bc_essential_c);
 
   // Initialize space.
   SpaceSharedPtr<double> space_r( new Hermes::Hermes2D::H1Space<double>(mesh, &bcs_r, 2));
   SpaceSharedPtr<double> space_l2( new Hermes::Hermes2D::L2Space<double>(mesh, 0));
-  SpaceSharedPtr<complex> space_c( new Hermes::Hermes2D::H1Space<complex>(mesh, &bcs_c, 2));
+  SpaceSharedPtr<::complex> space_c( new Hermes::Hermes2D::H1Space<::complex>(mesh, &bcs_c, 2));
 
   // Initialize the weak formulation.
   WeakFormSharedPtr<double> wf_r(new WeakFormsH1::DefaultWeakFormPoissonLinear<double>(HERMES_ANY, nullptr));
-  WeakFormSharedPtr<complex> wf_c(new WeakFormsH1::DefaultWeakFormPoissonLinear<complex>(HERMES_ANY, nullptr));
+  WeakFormSharedPtr<::complex> wf_c(new WeakFormsH1::DefaultWeakFormPoissonLinear<::complex>(HERMES_ANY, nullptr));
 
   // Initialize the solution.
   MeshFunctionSharedPtr<double> sln_r(new Solution<double>);
   MeshFunctionSharedPtr<double> sln1_r(new Solution<double>);
   MeshFunctionSharedPtr<double> sln2_r(new Solution<double>);
 
-  MeshFunctionSharedPtr<complex> sln_c(new Solution<complex>);
-  MeshFunctionSharedPtr<complex> sln1_c(new Solution<complex>);
-  MeshFunctionSharedPtr<complex> sln2_c(new Solution<complex>);
+  MeshFunctionSharedPtr<::complex> sln_c(new Solution<::complex>);
+  MeshFunctionSharedPtr<::complex> sln1_c(new Solution<::complex>);
+  MeshFunctionSharedPtr<::complex> sln2_c(new Solution<::complex>);
 
   // Initialize linear solver.
   Hermes::Hermes2D::LinearSolver<double> linear_solver_r(wf_r, space_r);
-  Hermes::Hermes2D::LinearSolver<complex> linear_solver_c(wf_c, space_c);
+  Hermes::Hermes2D::LinearSolver<::complex> linear_solver_c(wf_c, space_c);
 
 #ifdef SHOW_OUTPUT
   Views::ScalarView s;
@@ -75,9 +75,9 @@ int main(int argc, char* argv[])
 #endif
 #endif
 
-  // 2nd - save & load complex one.
+  // 2nd - save & load ::complex  one.
   linear_solver_c.solve();
-  Solution<complex>::vector_to_solution(linear_solver_c.get_sln_vector(), space_c, sln_c);
+  Solution<::complex>::vector_to_solution(linear_solver_c.get_sln_vector(), space_c, sln_c);
   sln_c.get_solution()->save("saved_sln_c.xml");
   sln1_c.get_solution()->load("saved_sln_c.xml", space_c);
   sln1_c.get_solution()->save("saved_sln_c-final.xml");

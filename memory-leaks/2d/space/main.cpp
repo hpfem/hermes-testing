@@ -64,7 +64,6 @@ namespace L2_real
 
 namespace H1_complex
 {
-  typedef std::complex<double> complex;
   const int INIT_REF_NUM = 0;                       // Number of initial uniform mesh refinements.
 
   int main(int argc, char* argv[])
@@ -79,14 +78,14 @@ namespace H1_complex
       mesh->refine_all_elements();
 
     // Initialize boundary conditions.
-    Hermes::Hermes2D::DefaultEssentialBCConst<complex> bc_essential("Dirichlet", complex(0.0, 0.0));
-    EssentialBCs<complex> bcs(&bc_essential);
+    Hermes::Hermes2D::DefaultEssentialBCConst<::complex> bc_essential("Dirichlet", ::complex (0.0, 0.0));
+    EssentialBCs<::complex> bcs(&bc_essential);
 
     int orders[2] = { 1, 2 };
     for (int k = 0; k < 2; k++)
     {
       // Create an H1 space with default shapeset.
-      SpaceSharedPtr<complex> space(new H1Space<complex>(mesh, &bcs, orders[k]));
+      SpaceSharedPtr<::complex> space(new H1Space<::complex>(mesh, &bcs, orders[k]));
       space->update_essential_bc_values();
       int ndof = space->get_num_dofs();
 
@@ -97,8 +96,8 @@ namespace H1_complex
         // Construct globally refined reference mesh and setup reference space->
         Mesh::ReferenceMeshCreator ref_mesh_creator(mesh);
         MeshSharedPtr ref_mesh = ref_mesh_creator.create_ref_mesh();
-        Space<complex>::ReferenceSpaceCreator ref_space_creator(space, ref_mesh);
-        SpaceSharedPtr<complex> ref_space = ref_space_creator.create_ref_space();
+        Space<::complex>::ReferenceSpaceCreator ref_space_creator(space, ref_mesh);
+        SpaceSharedPtr<::complex> ref_space = ref_space_creator.create_ref_space();
         ref_space->update_essential_bc_values();
 
         ref_space->save("space-complex.xml");
@@ -113,14 +112,14 @@ namespace H1_complex
         int ndof_ref = ref_space->get_num_dofs();
 
         // Perform Newton's iteration and translate the resulting coefficient vector into a Solution.
-        SpaceSharedPtr<complex> space_test = Space<complex>::load("space-complex.xml", ref_mesh, false, &bcs);
+        SpaceSharedPtr<::complex> space_test = Space<::complex>::load("space-complex.xml", ref_mesh, false, &bcs);
 
 #ifdef WITH_BSON
         space->save_bson("space-complex-coarse.bson");
-        SpaceSharedPtr<complex> space_test2 = Space<complex>::load_bson("space-complex-coarse.bson", mesh, &bcs);
+        SpaceSharedPtr<::complex> space_test2 = Space<::complex>::load_bson("space-complex-coarse.bson", mesh, &bcs);
 #else
         space->save("space-complex-coarse.xml2");
-        SpaceSharedPtr<complex> space_test2 = Space<complex>::load("space-complex-coarse.xml2", mesh, false, &bcs);
+        SpaceSharedPtr<::complex> space_test2 = Space<::complex>::load("space-complex-coarse.xml2", mesh, false, &bcs);
 #endif
       } while (as++ < 4);
     }

@@ -1,17 +1,10 @@
 #include "hermes2d.h"
 
-/* Namespaces used */
-
-using namespace Hermes;
-using namespace Hermes::Hermes2D;
-using namespace Hermes::Hermes2D::Views;
-using namespace Hermes::Hermes2D::RefinementSelectors;
-
-typedef std::complex<double> complex;
+#include "../../../testing-core/testing-core.h"
 
 /* Weak forms */
 
-class CustomWeakFormAcoustics : public WeakForm<complex>
+class CustomWeakFormAcoustics : public WeakForm<::complex>
 {
 public:
   CustomWeakFormAcoustics(std::string bdy_newton, double rho,
@@ -19,6 +12,6 @@ public:
 
   ~CustomWeakFormAcoustics();
 
-  std::vector<Hermes1DFunction<complex>*> fns_1d;
-  std::vector<Hermes2DFunction<complex>*> fns_2d;
+  std::vector<Hermes1DFunction<::complex>*> fns_1d;
+  std::vector<Hermes2DFunction<::complex>*> fns_2d;
 };
