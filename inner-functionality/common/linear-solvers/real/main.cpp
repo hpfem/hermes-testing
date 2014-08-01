@@ -265,6 +265,7 @@ int main(int argc, char *argv[]) {
   }
   else if(strcasecmp(argv[1], "paralution") == 0) {
 #ifdef WITH_PARALUTION
+    HermesCommonApi.set_integral_param_value(matrixSolverType, SOLVER_PARALUTION_ITERATIVE);
     ParalutionMatrix<double> mat;
     ParalutionVector<double> rhs;
     build_matrix(n, ar_mat, ar_rhs, &mat, &rhs);
@@ -281,6 +282,7 @@ int main(int argc, char *argv[]) {
   }
   else if(strcasecmp(argv[1], "paralution-block") == 0) {
 #ifdef WITH_PARALUTION
+    HermesCommonApi.set_integral_param_value(matrixSolverType, SOLVER_PARALUTION_ITERATIVE);
     ParalutionMatrix<double> mat;
     ParalutionVector<double> rhs;
     build_matrix_block(n, ar_mat, ar_rhs, &mat, &rhs);

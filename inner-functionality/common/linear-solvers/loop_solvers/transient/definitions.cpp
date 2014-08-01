@@ -44,12 +44,12 @@ VectorFormVol<double>* CustomWeakFormHeatRK1::CustomVectorFormVol::clone() const
   return new CustomVectorFormVol(this->i, this->time_step);
 }
 
-double CustomWeakFormHeatRK1::CustomVectorFormSurf::value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, GeomVol<double> *e, Func<double>**ext) const 
+double CustomWeakFormHeatRK1::CustomVectorFormSurf::value(int n, double *wt, Func<double> *u_ext[], Func<double> *v, GeomSurf<double> *e, Func<double>**ext) const 
 {
   return -alpha / (rho * heatcap) * temp_ext(*current_time_ptr + time_step) * int_v<double>(n, wt, v);
 }
 
-Ord CustomWeakFormHeatRK1::CustomVectorFormSurf::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, GeomVol<Ord> *e, Func<Ord>**ext) const 
+Ord CustomWeakFormHeatRK1::CustomVectorFormSurf::ord(int n, double *wt, Func<Ord> *u_ext[], Func<Ord> *v, GeomSurf<Ord> *e, Func<Ord>**ext) const
 {
   return -alpha / (rho * heatcap) * temp_ext(*current_time_ptr + time_step) * int_v<Ord>(n, wt, v);
 }

@@ -30,7 +30,7 @@ Adapt<double> adaptivity(&errorCalculator, &stoppingCriterion);
 // Predefined list of element refinement candidates.
 const CandList CAND_LIST = H2D_HP_ANISO;
 // Stopping criterion for adaptivity.
-const double ERR_STOP = 1.5e-1;
+const double ERR_STOP = 1e-2;
 
 int main(int argc, char* args[])
 {
@@ -43,7 +43,7 @@ int main(int argc, char* args[])
   for (int i=0; i<INIT_REF; i++)
     mesh->refine_all_elements();
 
-  // Create an L2 space->
+  // Create an L2 space.
   SpaceSharedPtr<double> space(new L2Space<double>(mesh, P_INIT));
 
   // Initialize refinement selector.
@@ -55,9 +55,10 @@ int main(int argc, char* args[])
   // Initialize the weak formulation.
   WeakFormSharedPtr<double> wf(new CustomWeakForm("Bdy_bottom_left", mesh));
 
-
   // Initialize linear solver.
-  Hermes::Hermes2D::LinearSolver<double> linear_solver(wf, space);
+  Hermes::Hermes2D::LinearSolver<double> linear_solver;
+  linear_solver.set_weak_formulation(wf);
+  adaptivity.set_space(space);
 
   int as = 1; bool done = false;
   do
@@ -66,14 +67,14 @@ int main(int argc, char* args[])
     // and setup reference space->
     Mesh::ReferenceMeshCreator ref_mesh_creator(mesh);
     MeshSharedPtr ref_mesh = ref_mesh_creator.create_ref_mesh();
-    Space<double>::ReferenceSpaceCreator ref_space_creator(space, ref_mesh);
-    SpaceSharedPtr<double> ref_space = ref_space_creator.create_ref_space();
 
-    linear_solver.set_space(ref_space);
+    Space<double>::ReferenceSpaceCreator refspace_creator(space, ref_mesh, 0);
+    SpaceSharedPtr<double> ref_space = refspace_creator.create_ref_space();
 
     // Solve the linear system. If successful, obtain the solution.
     try
     {
+      linear_solver.set_space(ref_space);
       linear_solver.solve();
       Solution<double>::vector_to_solution(linear_solver.get_sln_vector(), ref_space, ref_sln);
     }
@@ -83,24 +84,18 @@ int main(int argc, char* args[])
       printf("Failure!\n");
       return -1;
     }
-    // Project the fine mesh solution onto the coarse mesh.
-    OGProjection<double> ogProjection;
-    ogProjection.project_global(space, ref_sln, sln, HERMES_L2_NORM);
-
-    MeshFunctionSharedPtr<double> val_filter(new ValFilter(ref_sln, 0.0, 1.0));
 
     // Calculate element errors and total error estimate.
+    OGProjection<double>::project_global(space, ref_sln, sln, HERMES_L2_NORM);
     errorCalculator.calculate_errors(sln, ref_sln);
     double err_est_rel = errorCalculator.get_total_error_squared() * 100.;
 
-    adaptivity.set_space(space);
-
     // If err_est_rel too large, adapt the mesh->
-    if(err_est_rel < ERR_STOP)
+    printf("Error: %f.\n", err_est_rel);
+    if (err_est_rel < ERR_STOP)
       done = true;
     else
     {
-      printf("Error: %f.\n", err_est_rel);
       done = adaptivity.adapt(&selector);
     }
     as++;

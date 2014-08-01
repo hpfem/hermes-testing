@@ -116,8 +116,8 @@ int read_matrix_and_rhs(char *file_name, int &n, int &nnz, std::map<unsigned int
 
     case STATE_RHS:
     { // if cplx_2_real is false.
-                    if (read_n_nums(row, 2, buffer))
-                      rhs[(int)buffer[0]] = (double)buffer[1];
+      if (read_n_nums(row, 2, buffer))
+        rhs[(int)buffer[0]] = (double)buffer[1];
     }
       break;
     }
@@ -166,7 +166,7 @@ bool export_and_test(AlgebraicEntity* ent, int argc, char *argv_local[])
   return success;
 }
 
-void build_matrix(int n, std::map<unsigned int, MatrixEntry> &ar_mat, std::map<unsigned int, double > &ar_rhs,
+bool build_matrix(int n, std::map<unsigned int, MatrixEntry> &ar_mat, std::map<unsigned int, double > &ar_rhs,
   SparseMatrix<double> *mat, Vector<double> *rhs, int argc, char *argv_local[])
 {
   mat->prealloc(n);
@@ -188,17 +188,25 @@ void build_matrix(int n, std::map<unsigned int, MatrixEntry> &ar_mat, std::map<u
   }
   rhs->finish();
 
-  export_and_test(mat, argc, argv_local);
-  export_and_test(rhs, argc, argv_local);
+  try
+  {
+    export_and_test(mat, argc, argv_local);
+    export_and_test(rhs, argc, argv_local);
+  }
+  catch (Hermes::Exceptions::MethodNotImplementedException& e)
+  {
+    e.print_msg();
+    return false;
+  }
 }
 
-void build_matrix_block(int n, std::map<unsigned int, MatrixEntry> &ar_mat, std::map<unsigned int, double > &ar_rhs,
+bool build_matrix_block(int n, std::map<unsigned int, MatrixEntry> &ar_mat, std::map<unsigned int, double > &ar_rhs,
   SparseMatrix<double> *matrix, Vector<double> *rhs, int argc, char *argv_local[])
 {
   matrix->prealloc(n);
   for (int i = 0; i < n; i++)
-  for (int j = 0; j < n; j++)
-    matrix->pre_add_ij(i, j);
+    for (int j = 0; j < n; j++)
+      matrix->pre_add_ij(i, j);
 
   matrix->alloc();
   double* mat = (double*)calloc(n * n, sizeof(double));
@@ -226,8 +234,16 @@ void build_matrix_block(int n, std::map<unsigned int, MatrixEntry> &ar_mat, std:
   rhs->add(n, u_rows, rs);
   rhs->finish();
 
-  export_and_test(matrix, argc, argv_local);
-  export_and_test(rhs, argc, argv_local);
+  try
+  {
+    export_and_test(matrix, argc, argv_local);
+    export_and_test(rhs, argc, argv_local);
+  }
+  catch (Hermes::Exceptions::MethodNotImplementedException& e)
+  {
+    e.print_msg();
+    return false;
+  }
 }
 
 int main(int argc, char *argv[])
@@ -286,131 +302,142 @@ int main(int argc, char *argv[])
 #ifdef WITH_PETSC
     mat = new PetscMatrix<double>;
     rhs = new PetscVector<double>;
-    build_matrix_block(n, ar_mat, ar_rhs, mat, rhs, argc, argv);
-
-    PetscLinearMatrixSolver<double> solver((PetscMatrix<double>*)mat, (PetscVector<double>*)rhs);
-    solver.solve();
-    sln = new double[mat->get_size()]; memcpy(sln, solver.get_sln_vector(), mat->get_size() * sizeof(double));
+    if(build_matrix_block(n, ar_mat, ar_rhs, mat, rhs, argc, argv))
+    {
+      PetscLinearMatrixSolver<double> solver((PetscMatrix<double>*)mat, (PetscVector<double>*)rhs);
+      solver.solve();
+      sln = new double[mat->get_size()]; memcpy(sln, solver.get_sln_vector(), mat->get_size() * sizeof(double));
+    }
 #endif
   }
   else if (strcasecmp(argv_local[1], "umfpack") == 0) {
 #ifdef WITH_UMFPACK
-    mat = new CSCMatrix<double>;
-    rhs = new SimpleVector<double>;
-    build_matrix(n, ar_mat, ar_rhs, mat, rhs, argc, argv);
-
-    UMFPackLinearMatrixSolver<double> solver((CSCMatrix<double>*)mat, (SimpleVector<double>*)rhs);
-    solver.solve();
-    sln = new double[mat->get_size()]; memcpy(sln, solver.get_sln_vector(), mat->get_size() * sizeof(double));
+    mat = new CSCMatrix < double > ;
+    rhs = new SimpleVector < double > ;
+    if (build_matrix(n, ar_mat, ar_rhs, mat, rhs, argc, argv))
+    {
+      UMFPackLinearMatrixSolver<double> solver((CSCMatrix<double>*)mat, (SimpleVector<double>*)rhs);
+      solver.solve();
+      sln = new double[mat->get_size()]; memcpy(sln, solver.get_sln_vector(), mat->get_size() * sizeof(double));
+    }
 #endif
   }
   else if (strcasecmp(argv_local[1], "umfpack-block") == 0) {
 #ifdef WITH_UMFPACK
-    mat = new CSCMatrix<double>;
-    rhs = new SimpleVector<double>;
-    build_matrix_block(n, ar_mat, ar_rhs, mat, rhs, argc, argv);
-
-    UMFPackLinearMatrixSolver<double> solver((CSCMatrix<double>*)mat, (SimpleVector<double>*)rhs);
-    solver.solve();
-    sln = new double[mat->get_size()]; memcpy(sln, solver.get_sln_vector(), mat->get_size() * sizeof(double));
+    mat = new CSCMatrix < double > ;
+    rhs = new SimpleVector < double > ;
+    if (build_matrix_block(n, ar_mat, ar_rhs, mat, rhs, argc, argv))
+    {
+      UMFPackLinearMatrixSolver<double> solver((CSCMatrix<double>*)mat, (SimpleVector<double>*)rhs);
+      solver.solve();
+      sln = new double[mat->get_size()]; memcpy(sln, solver.get_sln_vector(), mat->get_size() * sizeof(double));
+    }
 #endif
   }
   else if (strcasecmp(argv_local[1], "paralution") == 0) {
 #ifdef WITH_PARALUTION
-    mat = new ParalutionMatrix<double>;
-    rhs = new ParalutionVector<double>;
-    build_matrix(n, ar_mat, ar_rhs, mat, rhs, argc, argv);
-
-    Hermes::Solvers::IterativeParalutionLinearMatrixSolver<double> solver((ParalutionMatrix<double>*)mat, (ParalutionVector<double>*)rhs);
-    if (atoi(argv_local[2]) != 1)
-      solver.set_solver_type(BiCGStab);
-    solver.set_precond(new ParalutionPrecond<double>(ILU));
-    // Tested as of 13th August 2013.
-    solver.set_max_iters(atoi(argv_local[2]) == 1 ? 1 : atoi(argv_local[2]) == 2 ? 2 : 5);
-    solver.solve();
-    sln = new double[mat->get_size()]; memcpy(sln, solver.get_sln_vector(), mat->get_size() * sizeof(double));
+    mat = new ParalutionMatrix < double > ;
+    rhs = new ParalutionVector < double > ;
+    if (build_matrix(n, ar_mat, ar_rhs, mat, rhs, argc, argv))
+    {
+      Hermes::Solvers::IterativeParalutionLinearMatrixSolver<double> solver((ParalutionMatrix<double>*)mat, (ParalutionVector<double>*)rhs);
+      if (atoi(argv_local[2]) != 1)
+        solver.set_solver_type(BiCGStab);
+      solver.set_precond(new ParalutionPrecond<double>(ILU));
+      // Tested as of 13th August 2013.
+      solver.set_max_iters(atoi(argv_local[2]) == 1 ? 1 : atoi(argv_local[2]) == 2 ? 2 : 5);
+      solver.solve();
+      sln = new double[mat->get_size()]; memcpy(sln, solver.get_sln_vector(), mat->get_size() * sizeof(double));
+    }
 #endif
   }
   else if (strcasecmp(argv_local[1], "paralution-block") == 0) {
 #ifdef WITH_PARALUTION
-    mat = new  ParalutionMatrix<double>;
-    rhs = new ParalutionVector<double>;
-    build_matrix_block(n, ar_mat, ar_rhs, mat, rhs, argc, argv);
-
-    Hermes::Solvers::IterativeParalutionLinearMatrixSolver<double> solver((ParalutionMatrix<double>*)mat, (ParalutionVector<double>*)rhs);
-    solver.set_precond(new ParalutionPrecond<double>(ILU));
-    solver.set_max_iters(10000);
-    solver.solve();
-    sln = new double[mat->get_size()]; memcpy(sln, solver.get_sln_vector(), mat->get_size() * sizeof(double));
+    mat = new  ParalutionMatrix < double > ;
+    rhs = new ParalutionVector < double > ;
+    if (build_matrix_block(n, ar_mat, ar_rhs, mat, rhs, argc, argv))
+    {
+      Hermes::Solvers::IterativeParalutionLinearMatrixSolver<double> solver((ParalutionMatrix<double>*)mat, (ParalutionVector<double>*)rhs);
+      solver.set_precond(new ParalutionPrecond<double>(ILU));
+      solver.set_max_iters(10000);
+      solver.solve();
+      sln = new double[mat->get_size()]; memcpy(sln, solver.get_sln_vector(), mat->get_size() * sizeof(double));
+    }
 #endif
   }
   else if (strcasecmp(argv_local[1], "superlu") == 0) {
 #ifdef WITH_SUPERLU
     mat = new CSCMatrix<double>;
     rhs = new SimpleVector<double>;
-    build_matrix(n, ar_mat, ar_rhs, mat, rhs, argc, argv);
-
-    Hermes::Solvers::SuperLUSolver<double> solver((CSCMatrix<double>*)mat, (SimpleVector<double>*)rhs);
-    solver.solve();
-    sln = new double[mat->get_size()]; memcpy(sln, solver.get_sln_vector(), mat->get_size() * sizeof(double));
+    if(build_matrix(n, ar_mat, ar_rhs, mat, rhs, argc, argv))
+    {
+      Hermes::Solvers::SuperLUSolver<double> solver((CSCMatrix<double>*)mat, (SimpleVector<double>*)rhs);
+      solver.solve();
+      sln = new double[mat->get_size()]; memcpy(sln, solver.get_sln_vector(), mat->get_size() * sizeof(double));
+    }
 #endif
   }
   else if (strcasecmp(argv_local[1], "superlu-block") == 0) {
 #ifdef WITH_SUPERLU
     mat = new CSCMatrix<double>;
     rhs = new SimpleVector<double>;
-    build_matrix_block(n, ar_mat, ar_rhs, mat, rhs, argc, argv);
-
-    Hermes::Solvers::SuperLUSolver<double> solver((CSCMatrix<double>*)mat, (SimpleVector<double>*)rhs);
-    solver.solve();
-    sln = new double[mat->get_size()]; memcpy(sln, solver.get_sln_vector(), mat->get_size() * sizeof(double));
-#endif
-  }
-  else if (strcasecmp(argv_local[1], "aztecoo") == 0) {
-#ifdef WITH_TRILINOS
-    mat = new EpetraMatrix<double>;
-    rhs = new EpetraVector<double>;
-    build_matrix(n, ar_mat, ar_rhs, mat, rhs, argc, argv);
-
-    AztecOOSolver<double> solver((EpetraMatrix<double>*)mat, (EpetraVector<double>*)rhs);
-    solver.solve();
-    sln = new double[mat->get_size()]; memcpy(sln, solver.get_sln_vector(), mat->get_size() * sizeof(double));
-#endif
-  }
-  else if (strcasecmp(argv_local[1], "aztecoo-block") == 0) {
-#ifdef WITH_TRILINOS
-    mat = new EpetraMatrix<double>;
-    rhs = new EpetraVector<double>;
-    build_matrix_block(n, ar_mat, ar_rhs, mat, rhs, argc, argv);
-
-    AztecOOSolver<double> solver((EpetraMatrix<double>*)mat, (EpetraVector<double>*)rhs);
-    solver.solve();
-    sln = new double[mat->get_size()]; memcpy(sln, solver.get_sln_vector(), mat->get_size() * sizeof(double));
-#endif
-  }
-  else if (strcasecmp(argv_local[1], "amesos") == 0) {
-#ifdef WITH_TRILINOS
-    mat = new EpetraMatrix<double>;
-    rhs = new EpetraVector<double>;
-    build_matrix(n, ar_mat, ar_rhs, mat, rhs, argc, argv);
-
-    if (AmesosSolver<double>::is_available("Klu")) {
-      AmesosSolver<double> solver("Klu", (EpetraMatrix<double>*)mat, (EpetraVector<double>*)rhs);
+    if(build_matrix_block(n, ar_mat, ar_rhs, mat, rhs, argc, argv))
+    {
+      Hermes::Solvers::SuperLUSolver<double> solver((CSCMatrix<double>*)mat, (SimpleVector<double>*)rhs);
       solver.solve();
       sln = new double[mat->get_size()]; memcpy(sln, solver.get_sln_vector(), mat->get_size() * sizeof(double));
     }
 #endif
   }
-  else if (strcasecmp(argv_local[1], "amesos-block") == 0) {
+  else if (strcasecmp(argv_local[1], "aztecoo") == 0) {
 #ifdef WITH_TRILINOS
-    mat = new EpetraMatrix<double>;
-    rhs = new EpetraVector<double>;
-    build_matrix_block(n, ar_mat, ar_rhs, mat, rhs, argc, argv);
-
-    if (AmesosSolver<double>::is_available("Klu")) {
-      AmesosSolver<double> solver("Klu", (EpetraMatrix<double>*)mat, (EpetraVector<double>*)rhs);
+    mat = new EpetraMatrix < double > ;
+    rhs = new EpetraVector < double > ;
+    if (build_matrix(n, ar_mat, ar_rhs, mat, rhs, argc, argv))
+    {
+      AztecOOSolver<double> solver((EpetraMatrix<double>*)mat, (EpetraVector<double>*)rhs);
       solver.solve();
       sln = new double[mat->get_size()]; memcpy(sln, solver.get_sln_vector(), mat->get_size() * sizeof(double));
+    }
+#endif
+  }
+  else if (strcasecmp(argv_local[1], "aztecoo-block") == 0) {
+#ifdef WITH_TRILINOS
+    mat = new EpetraMatrix < double > ;
+    rhs = new EpetraVector < double > ;
+    if (build_matrix_block(n, ar_mat, ar_rhs, mat, rhs, argc, argv))
+    {
+      AztecOOSolver<double> solver((EpetraMatrix<double>*)mat, (EpetraVector<double>*)rhs);
+      solver.solve();
+      sln = new double[mat->get_size()]; memcpy(sln, solver.get_sln_vector(), mat->get_size() * sizeof(double));
+    }
+#endif
+  }
+  else if (strcasecmp(argv_local[1], "amesos") == 0) {
+#ifdef WITH_TRILINOS
+    mat = new EpetraMatrix < double > ;
+    rhs = new EpetraVector < double > ;
+    if (build_matrix(n, ar_mat, ar_rhs, mat, rhs, argc, argv))
+    {
+      if (AmesosSolver<double>::is_available("Klu")) {
+        AmesosSolver<double> solver("Klu", (EpetraMatrix<double>*)mat, (EpetraVector<double>*)rhs);
+        solver.solve();
+        sln = new double[mat->get_size()]; memcpy(sln, solver.get_sln_vector(), mat->get_size() * sizeof(double));
+      }
+    }
+#endif
+  }
+  else if (strcasecmp(argv_local[1], "amesos-block") == 0) {
+#ifdef WITH_TRILINOS
+    mat = new EpetraMatrix < double > ;
+    rhs = new EpetraVector < double > ;
+    if (build_matrix_block(n, ar_mat, ar_rhs, mat, rhs, argc, argv))
+    {
+      if (AmesosSolver<double>::is_available("Klu")) {
+        AmesosSolver<double> solver("Klu", (EpetraMatrix<double>*)mat, (EpetraVector<double>*)rhs);
+        solver.solve();
+        sln = new double[mat->get_size()]; memcpy(sln, solver.get_sln_vector(), mat->get_size() * sizeof(double));
+      }
     }
 #endif
   }
@@ -418,29 +445,29 @@ int main(int argc, char *argv[])
 #ifdef WITH_MUMPS
     mat = new MumpsMatrix<double>;
     rhs = new SimpleVector<double>;
-    build_matrix(n, ar_mat, ar_rhs, mat, rhs, argc, argv);
-
-    MumpsSolver<double> solver((MumpsMatrix<double>*)mat, (SimpleVector<double>*)rhs);
-    solver.solve();
-    sln = new double[mat->get_size()]; memcpy(sln, solver.get_sln_vector(), mat->get_size() * sizeof(double));
-#endif
+    if(build_matrix(n, ar_mat, ar_rhs, mat, rhs, argc, argv))
+    {
+      MumpsSolver<double> solver((MumpsMatrix<double>*)mat, (SimpleVector<double>*)rhs);
+      solver.solve();
+      sln = new double[mat->get_size()]; memcpy(sln, solver.get_sln_vector(), mat->get_size() * sizeof(double));
   }
+#endif
+}
   else if (strcasecmp(argv_local[1], "mumps-block") == 0) {
 #ifdef WITH_MUMPS
     mat =new  MumpsMatrix<double>;
     rhs = new SimpleVector<double>;
-    build_matrix_block(n, ar_mat, ar_rhs, mat, rhs, argc, argv);
-
-    MumpsSolver<double> solver((MumpsMatrix<double>*)mat, (SimpleVector<double>*)rhs);
-    solver.solve();
-    sln = new double[mat->get_size()]; memcpy(sln, solver.get_sln_vector(), mat->get_size() * sizeof(double));
+    if(build_matrix_block(n, ar_mat, ar_rhs, mat, rhs, argc, argv))
+    {
+      MumpsSolver<double> solver((MumpsMatrix<double>*)mat, (SimpleVector<double>*)rhs);
+      solver.solve();
+      sln = new double[mat->get_size()]; memcpy(sln, solver.get_sln_vector(), mat->get_size() * sizeof(double));
+    }
 #endif
   }
 
   bool success = true;
-  if(mat && rhs)
-    success = export_and_test(mat, argc, argv_local) && export_and_test(rhs, argc, argv_local);
- 
+
   if (sln)
   {
     switch (atoi(argv_local[2]))
