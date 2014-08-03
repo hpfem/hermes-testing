@@ -62,7 +62,7 @@ add_test(test-mumps-solver-block-1 ${BIN} mumps-block 1)
 add_test(test-mumps-solver-block-2 ${BIN} mumps-block 2)
 add_test(test-mumps-solver-block-3 ${BIN} mumps-block 3)
 
-IF(NOT MSVC AND NOT(NO_VALGRIND_TESTS))
+IF(NOT MSVC AND WITH_VALGRIND_TESTS)
   add_test(memory-leaks-solver-mumps-1 "sudo" "valgrind" "--leak-check=full" "--track-origins=yes" "--log-file=/var/www/valgrind-logfiles/${PROJECT_NAME}-mumps-1-logfile" ${BIN} mumps 1)
   add_test(memory-leaks-solver-mumps-2 "sudo" "valgrind" "--leak-check=full" "--track-origins=yes" "--log-file=/var/www/valgrind-logfiles/${PROJECT_NAME}-mumps-2-logfile" ${BIN} mumps 2)
   add_test(memory-leaks-solver-mumps-3 "sudo" "valgrind" "--leak-check=full" "--track-origins=yes" "--log-file=/var/www/valgrind-logfiles/${PROJECT_NAME}-mumps-3-logfile" ${BIN} mumps 3)

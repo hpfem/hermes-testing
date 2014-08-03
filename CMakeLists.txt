@@ -1,10 +1,33 @@
 project(hermes_testing)
   cmake_minimum_required(VERSION 2.8)
+  
+  ###########################################################################
+  #############//////---------------------------------\\\\\\#################
+  #############!!!!!! NEVER CHANGE THIS FILE DIRECTLY !!!!!!#################
+  ################!!!!!! USE the "CMake.vars" file !!!!!!####################
+  #############\\\\\\---------------------------------//////#################
+  ###########################################################################
+  #   __      __      __      __      __      __      __      __      __    #
+  # /    \  /    \  /    \  /    \  /    \  /    \  /    \  /    \  /    \  #
+  #| STOP || STOP || STOP || STOP || STOP || STOP || STOP || STOP || STOP | #
+  # \ __ /  \ __ /  \ __ /  \ __ /  \ __ /  \ __ /  \ __ /  \ __ /  \ __ /  #
+  #   ||      ||      ||      ||      ||      ||      ||      ||      ||    #
+  #   ||      ||      ||      ||      ||      ||      ||      ||      ||    #
+  #   ||      ||      ||      ||      ||      ||      ||      ||      ||    #
+  #   ||      ||      ||      ||      ||      ||      ||      ||      ||    #
+  #  /  \    /  \    /  \    /  \    /  \    /  \    /  \    /  \    /  \   #
+  # ~~~~~~~ ~~~~~~~ ~~~~~~~ ~~~~~~~ ~~~~~~~ ~~~~~~~ ~~~~~~~ ~~~~~~~ ~~~~~~~ #
+  ###########################################################################
+  #############//////---------------------------------\\\\\\#################
+  #############!!!!!! NEVER CHANGE THIS FILE DIRECTLY !!!!!!#################
+  ################!!!!!! USE the "CMake.vars" file !!!!!!####################
+  #############\\\\\\---------------------------------//////#################
+  ###########################################################################
 
   set(CMAKE_MODULE_PATH ${CMAKE_HOME_DIRECTORY}/cmake)
   include(CommonTargetProperties)
 
-  #SET(NO_VALGRIND_TESTS YES)
+  SET(WITH_VALGRIND_TESTS YES)
   
   # For Win64
   if(${CMAKE_CL_64})
@@ -13,37 +36,15 @@ project(hermes_testing)
     set(WIN64 NO)
   endif(${CMAKE_CL_64})
 
-  # This has to be the same as in the library's CMake.
-  set(H2D_WITH_GLUT YES)
-  # TC_MALLOC
-  set(WITH_TC_MALLOC NO)
-  # BSON 
-  set(WITH_BSON NO)
-  # MATIO
-  set(WITH_MATIO NO)
-  set(MATIO_WITH_HDF5 NO)
-  # UMFPACK
-  set(WITH_UMFPACK YES)
-  # PARALUTION
-  set(WITH_PARALUTION NO)
-  # MUMPS
-  set(WITH_MUMPS              NO)
-  # Trilinos
-  set(WITH_TRILINOS           NO)
-  set(WITH_SUPERLU NO)
-  ### Mesh format ###
-  set(WITH_EXODUSII           NO)
-  set(WITH_HDF5               NO)
-  set(WITH_OPENMP YES)
-  set(WITH_PJLIB               NO)
-
   # Where to look for the static libraries.
   set(HERMES_DIRECTORY /usr/local/lib)
   set(HERMES_INCLUDE_PATH /usr/local/include)
-  set(DEP_INCLUDE_PATHS /usr/local/include)
-
+  set(HERMES_SOURCE_DIRECTORY ~/hermes)
+  
   # Allow to override the default values in CMake.vars:
   include(CMake.vars OPTIONAL)
+  include(".CMake.vars.default.Linux" OPTIONAL)
+  include(${HERMES_CMAKE_VARS_FILE_LOCATION} OPTIONAL)
 
   if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # Disable all warnings and turn on only important ones:
